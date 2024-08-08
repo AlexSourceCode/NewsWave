@@ -51,6 +51,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+
+
+
+
     implementation("com.squareup.retrofit2:retrofit:2.10.0")
     implementation("com.squareup.retrofit2:converter-gson:2.10.0")
 
@@ -65,6 +71,8 @@ dependencies {
     implementation("com.google.dagger:dagger-android:2.51")
     implementation("com.google.dagger:dagger:2.51")
     kapt("com.google.dagger:dagger-compiler:2.51")
+
+    implementation("androidx.work:work-runtime:2.9.0")
 
 
 
