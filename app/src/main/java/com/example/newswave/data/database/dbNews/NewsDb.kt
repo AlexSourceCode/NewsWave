@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [NewsDbModel :: class], version = 2, exportSchema = false)
+@Database(entities = [NewsDbModel :: class], version = 3, exportSchema = false)
 abstract class NewsDb : RoomDatabase() {
 
     abstract fun newsDao(): NewsDao
@@ -23,7 +23,7 @@ abstract class NewsDb : RoomDatabase() {
                     context,
                     NewsDb :: class.java,
                     DB_NAME
-                ).build()
+                ).fallbackToDestructiveMigration().build()
 
                 db = instance
                 return instance

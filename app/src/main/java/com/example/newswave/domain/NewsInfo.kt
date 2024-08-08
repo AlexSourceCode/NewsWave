@@ -11,6 +11,6 @@ data class NewsInfo(
     val publishDate: String,
     val author: String,
     val language: String,
-    val category: String? = null,
+//    val category: String? = null,
     val sourceCountry: String
 )

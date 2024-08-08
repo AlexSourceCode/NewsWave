@@ -42,9 +42,9 @@ data class NewsItemDto(
     @SerializedName("language")
     val language: String,
 
-    @Expose
-    @SerializedName("category")
-    val category: String? = null,
+//    @Expose
+//    @SerializedName("category")
+//    val category: String? = null,
 
     @Expose
     @SerializedName("source_country")

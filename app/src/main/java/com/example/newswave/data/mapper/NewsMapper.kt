@@ -14,9 +14,9 @@ class NewsMapper {
 //        if (dto.category == null) {
 //            Log.d("CheckJson","Category is null for DTO with id: ${dto.title}")
 //        }
-        val category = dto.category ?: "Uncategorized"
+//        val category = dto.category ?: "Uncategorized"
         val author = dto.author ?: "unknownAuthor"
-        Log.d("CheckCategory", dto.category.toString())
+//        Log.d("CheckCategory", dto.category.toString())
 
         return NewsDbModel(
             id = dto.id,
@@ -28,7 +28,7 @@ class NewsMapper {
             publishDate = dto.publishDate,
             author = author,
             language = dto.language,
-            category = category,
+//            category = category,
             sourceCountry = dto.sourceCountry
         )
     }
@@ -55,7 +55,7 @@ class NewsMapper {
         publishDate = dbModel.publishDate,
         author = dbModel.author,
         language = dbModel.language,
-        category = dbModel.category,
+//        category = dbModel.category,
         sourceCountry = dbModel.sourceCountry
     )
 

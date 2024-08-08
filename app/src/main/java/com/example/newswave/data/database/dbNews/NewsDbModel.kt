@@ -15,6 +15,6 @@ data class NewsDbModel(
     val publishDate: String,
     val author: String,
     val language: String,
-    val category: String? = null,
+//    val category: String? = null,
     val sourceCountry: String
 )
