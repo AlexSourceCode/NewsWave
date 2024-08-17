@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">News Wave</string>
+    <string name="subscriptions">Подписки</string>
+    <string name="profile">Профиль</string>
+    <string name="home">Главная</string>
+    <string name="search">Поиск</string>
+    <string name="read">Читать</string>
+</resources>

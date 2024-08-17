@@ -1,5 +1,6 @@
 package com.example.newswave.data.repository
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import com.example.newswave.data.database.dbNews.NewsDb
@@ -21,6 +22,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class NewsRepositoryImpl(
     application: Application,
@@ -49,7 +52,7 @@ class NewsRepositoryImpl(
     override suspend fun loadData() {
 
             try {
-                val jsonContainer: Flow<NewsResponseDto> = apiService.getListTopNews()
+                val jsonContainer: Flow<NewsResponseDto> = apiService.getListTopNews(date = formatDate()) // Временно другая дата, так как сегодня еще нет новостей
 
                 val newsList: Flow<List<NewsDbModel>> = jsonContainer //преобразование из Flow<NewsResponseDto> в Flow<List<NewsItemDto>>
                     .map { mapper.mapJsonContainerToListNews(jsonContainer) }
@@ -59,11 +62,6 @@ class NewsRepositoryImpl(
                         }
                     }
 
-
-
-
-
-
                 val flatNewsList: List<NewsDbModel> = newsList.flattenToList() //преобразование в List<NewsDbModel>
                 newsInfoDao.newsDao().insertNews(flatNewsList)
             } catch (e: Exception) {
@@ -71,6 +69,13 @@ class NewsRepositoryImpl(
             }
             delay(10000)
 
+    }
+
+    @SuppressLint("NewApi")
+    fun formatDate(): String{
+        val currentDateTime = LocalDateTime.now()//текущая дата время
+        val dateFormatted = DateTimeFormatter.ofPattern("yyyy-MM-dd") // шаблон отображения времени
+        return currentDateTime.format(dateFormatted) //преобразование LocalDateTime в String по шаблону отображения
     }
 
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_fragments"
+    app:startDestination="@id/topNewsFragment">
+
+    <fragment
+        android:id="@+id/topNewsFragment"
+        android:name="com.example.newswave.presentation.fragments.TopNewsFragment"
+        android:label="fragment_top_news"
+        tools:layout="@layout/fragment_top_news" >
+        <action
+            android:id="@+id/action_topNewsFragment_to_newsDetailsFragment"
+            app:destination="@id/newsDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/subscribedAuthorsFragment"
+        android:name="com.example.newswave.presentation.fragments.SubscribedAuthorsFragment"
+        android:label="fragment_subscribed_authors"
+        tools:layout="@layout/fragment_subscribed_authors" >
+        <action
+            android:id="@+id/action_subscribedAuthorsFragment_to_authorsListFragment"
+            app:destination="@id/authorsListFragment" />
+        <action
+            android:id="@+id/action_subscribedAuthorsFragment_to_newsDetailsFragment"
+            app:destination="@id/newsDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newsDetailsFragment"
+        android:name="com.example.newswave.presentation.fragments.NewsDetailsFragment"
+        android:label="fragment_news_details"
+        tools:layout="@layout/fragment_news_details" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.newswave.presentation.fragments.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/authorsListFragment"
+        android:name="com.example.newswave.presentation.fragments.AuthorsListFragment"
+        android:label="fragment_authors_list"
+        tools:layout="@layout/fragment_authors_list" />
+</navigation>

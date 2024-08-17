@@ -53,6 +53,13 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    implementation("com.google.android.material:material:1.6.0")
+
+    implementation("com.squareup.picasso:picasso:2.8")
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
+
+
 
 
 
@@ -66,6 +73,11 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3")
 
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+
+    //implementation("androidx.navigation.ui.setupWithNavController")
+
+    implementation("com.jakewharton.threetenabp:threetenabp:1.3.1")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0")
     implementation("com.google.dagger:dagger-android:2.51")

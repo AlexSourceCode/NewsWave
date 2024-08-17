@@ -15,7 +15,7 @@ class NewsMapper {
 //            Log.d("CheckJson","Category is null for DTO with id: ${dto.title}")
 //        }
 //        val category = dto.category ?: "Uncategorized"
-        val author = dto.author ?: "unknownAuthor"
+        val author = dto.author ?: EMPTY_CATEGORY
 //        Log.d("CheckCategory", dto.category.toString())
 
         return NewsDbModel(
@@ -59,5 +59,8 @@ class NewsMapper {
         sourceCountry = dbModel.sourceCountry
     )
 
+    companion object{
+        private const val EMPTY_CATEGORY = "unknownAuthor"
+    }
 
 }

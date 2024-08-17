@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">News Wave</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="subscriptions">Subscriptions</string>
+    <string name="profile">Profile</string>
+    <string name="home">Home</string>
+    <string name="search">Search</string>
+    <string name="read">Read</string>
 </resources>
