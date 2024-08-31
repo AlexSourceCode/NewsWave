@@ -12,5 +12,17 @@
 
 
 
+
+    <style name="CustomTabLayout" parent="Widget.Design.TabLayout">
+        <item name="tabTextAppearance">@style/CustomTabTextAppearance</item>
+    </style>
+
+    <style name="CustomTabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">10sp</item> <!-- Установите нужный размер текста -->
+    </style>
+
+
+
+
     <style name="Theme.NewsWave" parent="Base.Theme.NewsWave" />
 </resources>

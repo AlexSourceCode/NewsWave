@@ -12,7 +12,8 @@
         tools:layout="@layout/fragment_top_news" >
         <action
             android:id="@+id/action_topNewsFragment_to_newsDetailsFragment"
-            app:destination="@id/newsDetailsFragment" />
+            app:destination="@id/newsDetailsFragment"
+            app:popUpTo="@id/topNewsFragment" />
     </fragment>
     <fragment
         android:id="@+id/subscribedAuthorsFragment"
@@ -30,7 +31,11 @@
         android:id="@+id/newsDetailsFragment"
         android:name="com.example.newswave.presentation.fragments.NewsDetailsFragment"
         android:label="fragment_news_details"
-        tools:layout="@layout/fragment_news_details" />
+        tools:layout="@layout/fragment_news_details" >
+        <argument
+            android:name="news"
+            app:argType="com.example.newswave.domain.NewsItemEntity" />
+    </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.newswave.presentation.fragments.SettingsFragment"
