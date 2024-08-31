@@ -7,32 +7,66 @@
     android:background="@color/black"
     tools:context=".presentation.fragments.TopNewsFragment">
 
+    <TextView
+        android:id="@+id/searchParamsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/SearchParameters"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/searchParamsTitle"
+        app:tabTextColor="@color/white"
+        app:tabSelectedTextColor="@color/white"
+        app:tabIndicatorColor="@color/white"
+        style="@style/CustomTabLayout">
+    </com.google.android.material.tabs.TabLayout>
+
+
+
     <EditText
-        android:id="@+id/btSearch"
+        android:id="@+id/edSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:background="@drawable/circle_edit_text"
         android:drawableRight="@drawable/search"
         android:paddingStart="14dp"
-        android:paddingTop="12dp"
+        android:paddingTop="10dp"
         android:paddingEnd="16dp"
-        android:paddingBottom="12dp"
+        android:paddingBottom="10dp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
-        android:textSize="17sp"
-        app:layout_constraintTop_toTopOf="parent"
-        android:hint="Search" />
-
+        android:textSize="12sp"
+        app:layout_constraintTop_toBottomOf="@+id/tabLayout"
+        android:hint="@string/search"
+        android:imeOptions="actionSearch"
+        android:inputType="text" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcNews"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginTop="8dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@id/btSearch"
-        tools:listitem="@layout/news_item" />
+        app:layout_constraintTop_toBottomOf="@id/edSearch"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:listitem="@layout/news_item"
+        android:layout_marginBottom="56dp"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

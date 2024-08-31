@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
     id("androidx.navigation.safeargs")
-
+    id("kotlin-parcelize")
 }
 
 android {
@@ -76,6 +76,11 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
 
     //implementation("androidx.navigation.ui.setupWithNavController")
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
+
+    implementation("androidx.media3:media3-exoplayer:1.0.0")
+    implementation("androidx.media3:media3-ui:1.0.0")
+
 
     implementation("com.jakewharton.threetenabp:threetenabp:1.3.1")
 

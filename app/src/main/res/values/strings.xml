@@ -7,4 +7,14 @@
     <string name="home">Home</string>
     <string name="search">Search</string>
     <string name="read">Read</string>
+    <string name="SearchParameters">Search Parameters</string>
+    <string name="FilterByText">By text</string>
+    <string name="FilterByAuthor">By author</string>
+    <string name="FilterByDate">By date</string>
+
+    <string name="minutes_ago">%d minutes ago</string>
+    <string name="hours_ago">%d hours ago</string>
+    <string name="yesterday_at">Yesterday at %s</string>
+    <string name="date_format">d MMMM \'at\' HH:mm</string>
+
 </resources>

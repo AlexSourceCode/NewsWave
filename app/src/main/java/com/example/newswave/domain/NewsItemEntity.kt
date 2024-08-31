@@ -1,7 +1,10 @@
 package com.example.newswave.domain
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-data class NewsInfo(
+@Parcelize
+data class NewsItemEntity(
     val id: Int,
     val title: String,
     val text: String,
@@ -13,4 +16,4 @@ data class NewsInfo(
     val language: String,
 //    val category: String? = null,
     val sourceCountry: String
-)
+): Parcelable
