@@ -14,11 +14,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.newswave.R
 import com.example.newswave.databinding.FragmentTopNewsBinding
 import com.example.newswave.domain.NewsItemEntity
 import com.example.newswave.presentation.Filter
+import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.adapters.NewsListAdapter
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -68,6 +71,13 @@ class TopNewsFragment : Fragment() {
                 }
             })
     }
+
+
+
+    fun scrollToTop() {
+        binding.rcNews.scrollToPosition(0)
+    }
+
 
     fun isShowingSearchResults(): Boolean {
         val sharedPreferences = requireActivity().application.getSharedPreferences(
@@ -142,6 +152,10 @@ class TopNewsFragment : Fragment() {
         binding.rcNews.adapter = adapter
         adapter.onNewsClickListener = {
             launchNewsDetailsFragment(it)
+        }
+
+        adapter.onLoadMoreListener = {
+            viewModel.loadNewsForPreviousDay()
         }
     }
 

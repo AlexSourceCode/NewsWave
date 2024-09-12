@@ -3,16 +3,18 @@ package com.example.newswave.data.repository
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.util.Log
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkManager
 import com.example.newswave.data.database.dbNews.NewsDb
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.mapper.flattenToList
 import com.example.newswave.data.network.api.ApiFactory
-import com.example.newswave.data.network.model.NewsResponseDto
 import com.example.newswave.data.network.model.TopNewsResponseDto
+import com.example.newswave.data.workers.RefreshDataWorker
 import com.example.newswave.domain.NewsItemEntity
 import com.example.newswave.domain.repository.NewsRepository
 import com.example.newswave.presentation.Filter
+import com.example.newswave.utils.DateUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +23,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import java.time.LocalDateTime
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class NewsRepositoryImpl(
@@ -32,6 +34,9 @@ class NewsRepositoryImpl(
     private val newsInfoDao = NewsDb.getInstance(application)
     private val mapper = NewsMapper()
     private val apiService = ApiFactory.apiService
+    @SuppressLint("NewApi")
+    private var currentEndDate: LocalDate = LocalDate.now()
+
 
     override fun getNewsDetailsById(id: Int): Flow<NewsItemEntity> {
         return newsInfoDao.newsDao().getNewsDetailsById(id)
@@ -49,29 +54,34 @@ class NewsRepositoryImpl(
     }
 
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun loadData() {
+    override fun loadData() {
+        val workManager = WorkManager.getInstance(application.applicationContext)
+        workManager.enqueueUniqueWork(
+            RefreshDataWorker.WORK_NAME,
+            ExistingWorkPolicy.REPLACE,
+            RefreshDataWorker.makeRequest()
+        )
+    }
 
-        try {
-            val jsonContainer: Flow<TopNewsResponseDto> =
-                apiService.getListTopNews(date = formatDate()) // Временно другая дата, так как сегодня еще нет новостей
-            val newsListDbModel =
-                jsonContainer //преобразование из Flow<NewsResponseDto> в Flow<List<NewsItemDto>>
-                    .map { mapper.mapJsonContainerTopNewsToListNews(jsonContainer) }//преобразование в List<NewsItemDto>
-                    .flatMapConcat { newList ->
-                        flow {
-                            emit(newList.map { mapper.mapDtoToDbModel(it) }) //преобразование в List<NewsDbModel>
-                        }
+    @SuppressLint("NewApi")
+    override suspend fun loadNewsForPreviousDay(){
+        currentEndDate = currentEndDate.minusDays(1)
+        val previousDate = currentEndDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val jsonContainer: Flow<TopNewsResponseDto> =
+            apiService.getListTopNews(date = previousDate)
+        val newsListDbModel =
+            jsonContainer //преобразование из Flow<NewsResponseDto> в Flow<List<NewsItemDto>>
+                .map { mapper.mapJsonContainerTopNewsToListNews(jsonContainer) }//преобразование в List<NewsItemDto>
+                .flatMapConcat { newList ->
+                    flow {
+                        emit(newList.map { mapper.mapDtoToDbModel(it) }) //преобразование в List<NewsDbModel>
                     }
-                    .flattenToList()// преобразование из flow в list
-                    .distinctBy { it.title }
-            //преобразование в List<NewsDbModel>
-            newsInfoDao.newsDao().insertNews(newsListDbModel)
-        } catch (e: Exception) {
-            Log.e("CheckNews", "Error fetching top news", e)
-        }
+                }
+                .flattenToList()// преобразование из flow в list
+                .distinctBy { it.title }
+        //преобразование в List<NewsDbModel>
+        newsInfoDao.newsDao().insertNews(newsListDbModel)
         delay(10000)
-
     }
 
     override suspend fun searchNewsByFilter(filterParameter: String, valueParameter: String) {
@@ -117,13 +127,5 @@ class NewsRepositoryImpl(
             emptyList()
         }
     }
-
-    @SuppressLint("NewApi")
-    fun formatDate(): String {
-        val currentDateTime = LocalDateTime.now()//текущая дата время
-        val dateFormatted = DateTimeFormatter.ofPattern("yyyy-MM-dd") // шаблон отображения времени
-        return currentDateTime.format(dateFormatted) //преобразование LocalDateTime в String по шаблону отображения
-    }
-
 
 }
