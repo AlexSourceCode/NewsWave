@@ -9,7 +9,8 @@ interface NewsRepository{
 
     fun getTopNewsList(): Flow<List<NewsItemEntity>>
 
-    suspend fun loadData()
+    fun loadData()
+    suspend fun loadNewsForPreviousDay()
 
     suspend fun searchNewsByFilter(filterParameter: String, valueParameter: String)
     suspend fun getSavedNewsBySearch(): List<NewsItemEntity>

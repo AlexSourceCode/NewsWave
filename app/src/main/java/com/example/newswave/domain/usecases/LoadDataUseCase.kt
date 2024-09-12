@@ -4,5 +4,5 @@ import com.example.newswave.domain.repository.NewsRepository
 
 class LoadDataUseCase(private val repository: NewsRepository) {
 
-    suspend operator fun invoke() = repository.loadData()
+    operator fun invoke() = repository.loadData()
 }
