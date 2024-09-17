@@ -34,7 +34,7 @@
         tools:layout="@layout/fragment_news_details" >
         <argument
             android:name="news"
-            app:argType="com.example.newswave.domain.NewsItemEntity" />
+            app:argType="com.example.newswave.domain.entity.NewsItemEntity" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
