@@ -42,7 +42,7 @@ class TopNewsViewModel @Inject constructor(
 
     fun showNews() {
         val sharedPreferences =
-            application.getSharedPreferences( // непонятки с контекстом
+            application.getSharedPreferences(
                 "news_by_search",
                 Context.MODE_PRIVATE
             )
@@ -56,8 +56,7 @@ class TopNewsViewModel @Inject constructor(
 
     fun loadTopNewsFromRoom(){
         viewModelScope.launch {
-            getTopNewsListUseCase().collect{
-                news ->
+            getTopNewsListUseCase().collect{ news ->
                 _newsList.postValue(news)
             }
         }
