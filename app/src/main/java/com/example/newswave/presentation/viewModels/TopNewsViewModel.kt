@@ -12,6 +12,7 @@ import com.example.newswave.domain.usecases.GetTopNewsList
 import com.example.newswave.domain.usecases.LoadDataUseCase
 import com.example.newswave.domain.usecases.LoadNewsForPreviousDayUseCase
 import com.example.newswave.domain.usecases.SearchNewsByFilterUseCase
+import com.example.newswave.domain.usecases.SearchNewsByFilterUseCaseFactory
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
@@ -19,11 +20,11 @@ import javax.inject.Inject
 
 
 class TopNewsViewModel @Inject constructor(
-    private val application: Application, // мб тут надо сабкомпонент, так как не понятно что делать с фильтром
+    private val application: Application,
     private val loadDataUseCase: LoadDataUseCase,
     private val loadNewsForPreviousDayUseCase: LoadNewsForPreviousDayUseCase,
     private val getTopNewsListUseCase: GetTopNewsList,
-    private val repository: NewsRepositoryImpl
+    private val searchNewsByFilterUseCaseFactory: SearchNewsByFilterUseCaseFactory
 ): ViewModel() {
 
     private lateinit var searchNewsByFilterUseCase: SearchNewsByFilterUseCase
@@ -32,8 +33,7 @@ class TopNewsViewModel @Inject constructor(
     val newsList: LiveData<List<NewsItemEntity>> get() = _newsList
 
     fun setSearchParameters(filterParameter: String, valueParameter: String) {
-        searchNewsByFilterUseCase =
-            SearchNewsByFilterUseCase(filterParameter, valueParameter, repository)
+        searchNewsByFilterUseCase = searchNewsByFilterUseCaseFactory.create(filterParameter, valueParameter)
     }
 
     suspend fun searchNewsByFilter() {

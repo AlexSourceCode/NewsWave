@@ -27,7 +27,6 @@ class RefreshDataWorker(
 ) : CoroutineWorker(context, workerParameters) {
 
 
-    // !!!!!!!!  заменить на DI
     private val apiService = ApiFactory.apiService
     private val newsInfoDao = NewsDb.getInstance(context)
     private val mapper = NewsMapper()
@@ -45,10 +44,12 @@ class RefreshDataWorker(
 
     private suspend fun loadData(){
         val jsonContainer: Flow<TopNewsResponseDto> =
-            apiService.getListTopNews(date = DateUtils.formatCurrentDate()) // Временно другая дата, так как сегодня еще нет новостей
+            apiService.getListTopNews(date = "2024-09-15") // Временно другая дата, так как сегодня еще нет новостей
         val newsListDbModel =
             jsonContainer //преобразование из Flow<NewsResponseDto> в Flow<List<NewsItemDto>>
-                .map { mapper.mapJsonContainerTopNewsToListNews(jsonContainer) }//преобразование в List<NewsItemDto>
+                .map {
+                    mapper.mapJsonContainerTopNewsToListNews(jsonContainer)
+                }//преобразование в List<NewsItemDto>
                 .flatMapConcat { newList ->
                     flow {
                         emit(newList.map { mapper.mapDtoToDbModel(it) }) //преобразование в List<NewsDbModel>

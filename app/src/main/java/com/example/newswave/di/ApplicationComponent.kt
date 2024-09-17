@@ -18,8 +18,6 @@ interface ApplicationComponent {
 
     fun inject(fragment: TopNewsFragment)
 
-    //fun searchNewsByFilterSubcomponentFactory(): SearchNewsByFilterSubcomponent.Factory
-
     @Component.Factory
     interface ApplicationComponentFactory{
 

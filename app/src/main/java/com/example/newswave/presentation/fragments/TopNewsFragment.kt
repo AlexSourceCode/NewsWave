@@ -80,21 +80,6 @@ class TopNewsFragment : Fragment() {
     }
 
 
-
-    fun scrollToTop() {
-        binding.rcNews.scrollToPosition(0)
-    }
-
-
-    fun isShowingSearchResults(): Boolean {
-        val sharedPreferences = requireActivity().application.getSharedPreferences(
-            "news_by_search",
-            Context.MODE_PRIVATE
-        )
-        val newsSearchResult = sharedPreferences.getString("news_search_result", null)
-        return newsSearchResult != null
-    }
-
     private fun setupTabLayout() {
         val tabLayout: TabLayout = binding.tabLayout
 
@@ -127,13 +112,6 @@ class TopNewsFragment : Fragment() {
         })
     }
 
-    private fun observeViewModel() {
-        viewModel.newsList.observe(viewLifecycleOwner) {
-            Log.d("checkadapter", "${it.map { it.id }}")
-            adapter.submitList(it)
-        }
-    }
-
     private fun searchByFilterListener() {
         binding.edSearch.setOnKeyListener { view, keycode, event ->
             if (event.action == KeyEvent.ACTION_DOWN && keycode == KeyEvent.KEYCODE_ENTER) { // проверка, что нажатая клавиша является Enter
@@ -154,6 +132,13 @@ class TopNewsFragment : Fragment() {
         }
     }
 
+    private fun observeViewModel() {
+        viewModel.newsList.observe(viewLifecycleOwner) {
+            Log.d("checkadapter", "${it.map { it.id }}")
+            adapter.submitList(it)
+        }
+    }
+
     private fun setupAdapter() {
         adapter = NewsListAdapter(requireActivity().application)
         binding.rcNews.adapter = adapter
@@ -164,6 +149,20 @@ class TopNewsFragment : Fragment() {
         adapter.onLoadMoreListener = {
             viewModel.loadNewsForPreviousDay()
         }
+    }
+
+    fun scrollToTop() {
+        binding.rcNews.scrollToPosition(0)
+    }
+
+
+    fun isShowingSearchResults(): Boolean {
+        val sharedPreferences = requireActivity().application.getSharedPreferences(
+            "news_by_search",
+            Context.MODE_PRIVATE
+        )
+        val newsSearchResult = sharedPreferences.getString("news_search_result", null)
+        return newsSearchResult != null
     }
 
 

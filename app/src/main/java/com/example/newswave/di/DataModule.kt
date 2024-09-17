@@ -6,6 +6,7 @@ import com.example.newswave.data.database.dbNews.NewsDao
 import com.example.newswave.data.database.dbNews.NewsDb
 import com.example.newswave.data.repository.NewsRepositoryImpl
 import com.example.newswave.domain.repository.NewsRepository
+import com.example.newswave.domain.usecases.SearchNewsByFilterUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
