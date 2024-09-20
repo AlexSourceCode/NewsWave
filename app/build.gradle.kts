@@ -91,6 +91,13 @@ dependencies {
 
     implementation("androidx.work:work-runtime:2.9.0")
 
+    implementation("com.google.dagger:dagger-android:2.51")
+    implementation("com.google.dagger:dagger:2.51")
+    kapt("com.google.dagger:dagger-compiler:2.51")
+    implementation("com.squareup.inject:assisted-inject-annotations-dagger2:0.8.1")
+    kapt("com.squareup.inject:assisted-inject-processor-dagger2:0.8.1")
+
+
 
 
 

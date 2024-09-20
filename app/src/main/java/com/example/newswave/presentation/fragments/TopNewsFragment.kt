@@ -1,5 +1,6 @@
 package com.example.newswave.presentation.fragments
 
+import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -7,38 +8,43 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.example.newswave.R
 import com.example.newswave.databinding.FragmentTopNewsBinding
-import com.example.newswave.domain.NewsItemEntity
+import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.presentation.Filter
-import com.example.newswave.presentation.MainActivity
+import com.example.newswave.presentation.NewsApp
 import com.example.newswave.presentation.adapters.NewsListAdapter
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.google.android.material.tabs.TabLayout
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 class TopNewsFragment : Fragment() {
 
     private lateinit var binding: FragmentTopNewsBinding
     private lateinit var adapter: NewsListAdapter
-    private val viewModel: TopNewsViewModel by viewModels()
+
+    private lateinit var viewModel: TopNewsViewModel
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val component by lazy {
+        (requireActivity().application as NewsApp).component
+    }
+
 
     var selectedFilter: String? = null
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onAttach(context: Context) { /// почему именно в onAttach, почему перед методом super
+        component.inject(this)
+        super.onAttach(context)
     }
 
     override fun onCreateView(
@@ -51,6 +57,7 @@ class TopNewsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this, viewModelFactory)[TopNewsViewModel::class.java]
         setupAdapter()
         observeViewModel()
         setupTabLayout()
@@ -72,21 +79,6 @@ class TopNewsFragment : Fragment() {
             })
     }
 
-
-
-    fun scrollToTop() {
-        binding.rcNews.scrollToPosition(0)
-    }
-
-
-    fun isShowingSearchResults(): Boolean {
-        val sharedPreferences = requireActivity().application.getSharedPreferences(
-            "news_by_search",
-            Context.MODE_PRIVATE
-        )
-        val newsSearchResult = sharedPreferences.getString("news_search_result", null)
-        return newsSearchResult != null
-    }
 
     private fun setupTabLayout() {
         val tabLayout: TabLayout = binding.tabLayout
@@ -120,13 +112,6 @@ class TopNewsFragment : Fragment() {
         })
     }
 
-    private fun observeViewModel() {
-        viewModel.newsList.observe(viewLifecycleOwner) {
-            Log.d("checkadapter", "${it.map { it.id }}")
-            adapter.submitList(it)
-        }
-    }
-
     private fun searchByFilterListener() {
         binding.edSearch.setOnKeyListener { view, keycode, event ->
             if (event.action == KeyEvent.ACTION_DOWN && keycode == KeyEvent.KEYCODE_ENTER) { // проверка, что нажатая клавиша является Enter
@@ -147,6 +132,13 @@ class TopNewsFragment : Fragment() {
         }
     }
 
+    private fun observeViewModel() {
+        viewModel.newsList.observe(viewLifecycleOwner) {
+            Log.d("checkadapter", "${it.map { it.id }}")
+            adapter.submitList(it)
+        }
+    }
+
     private fun setupAdapter() {
         adapter = NewsListAdapter(requireActivity().application)
         binding.rcNews.adapter = adapter
@@ -157,6 +149,20 @@ class TopNewsFragment : Fragment() {
         adapter.onLoadMoreListener = {
             viewModel.loadNewsForPreviousDay()
         }
+    }
+
+    fun scrollToTop() {
+        binding.rcNews.scrollToPosition(0)
+    }
+
+
+    fun isShowingSearchResults(): Boolean {
+        val sharedPreferences = requireActivity().application.getSharedPreferences(
+            "news_by_search",
+            Context.MODE_PRIVATE
+        )
+        val newsSearchResult = sharedPreferences.getString("news_search_result", null)
+        return newsSearchResult != null
     }
 
 

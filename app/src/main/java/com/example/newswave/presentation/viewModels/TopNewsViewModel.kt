@@ -2,42 +2,38 @@ package com.example.newswave.presentation.viewModels
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.data.mapper.flattenToList
 import com.example.newswave.data.repository.NewsRepositoryImpl
-import com.example.newswave.domain.NewsItemEntity
-import com.example.newswave.domain.usecases.GetNewsDetailsById
-import com.example.newswave.domain.usecases.GetSavedNewsBySearchUseCase
+import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.usecases.GetTopNewsList
 import com.example.newswave.domain.usecases.LoadDataUseCase
 import com.example.newswave.domain.usecases.LoadNewsForPreviousDayUseCase
 import com.example.newswave.domain.usecases.SearchNewsByFilterUseCase
+import com.example.newswave.domain.usecases.SearchNewsByFilterUseCaseFactory
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
-class TopNewsViewModel(
-    application: Application
-) : AndroidViewModel(application) {
-    private val repository = NewsRepositoryImpl(application)
-    private val loadDataUseCase = LoadDataUseCase(repository)
-    private val loadNewsForPreviousDayUseCase = LoadNewsForPreviousDayUseCase(repository)
+class TopNewsViewModel @Inject constructor(
+    private val application: Application,
+    private val loadDataUseCase: LoadDataUseCase,
+    private val loadNewsForPreviousDayUseCase: LoadNewsForPreviousDayUseCase,
+    private val getTopNewsListUseCase: GetTopNewsList,
+    private val searchNewsByFilterUseCaseFactory: SearchNewsByFilterUseCaseFactory
+): ViewModel() {
 
-    private val getTopNewsListUseCase = GetTopNewsList(repository)
     private lateinit var searchNewsByFilterUseCase: SearchNewsByFilterUseCase
 
     private val _newsList = MutableLiveData<List<NewsItemEntity>>()
     val newsList: LiveData<List<NewsItemEntity>> get() = _newsList
 
     fun setSearchParameters(filterParameter: String, valueParameter: String) {
-        searchNewsByFilterUseCase =
-            SearchNewsByFilterUseCase(filterParameter, valueParameter, repository)
+        searchNewsByFilterUseCase = searchNewsByFilterUseCaseFactory.create(filterParameter, valueParameter)
     }
 
     suspend fun searchNewsByFilter() {
@@ -46,7 +42,7 @@ class TopNewsViewModel(
 
     fun showNews() {
         val sharedPreferences =
-            getApplication<Application>().applicationContext.getSharedPreferences(
+            application.getSharedPreferences(
                 "news_by_search",
                 Context.MODE_PRIVATE
             )
@@ -60,8 +56,7 @@ class TopNewsViewModel(
 
     fun loadTopNewsFromRoom(){
         viewModelScope.launch {
-            getTopNewsListUseCase().collect{
-                news ->
+            getTopNewsListUseCase().collect{ news ->
                 _newsList.postValue(news)
             }
         }

@@ -1,4 +1,4 @@
-package com.example.newswave.domain
+package com.example.newswave.domain.entity
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

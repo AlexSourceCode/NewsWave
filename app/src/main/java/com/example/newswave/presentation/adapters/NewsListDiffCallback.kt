@@ -1,7 +1,7 @@
 package com.example.newswave.presentation.adapters
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.newswave.domain.NewsItemEntity
+import com.example.newswave.domain.entity.NewsItemEntity
 
 object NewsListDiffCallback: DiffUtil.ItemCallback<NewsItemEntity>() {
     override fun areItemsTheSame(oldItem: NewsItemEntity, newItem: NewsItemEntity): Boolean {

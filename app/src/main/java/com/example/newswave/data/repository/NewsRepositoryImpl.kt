@@ -5,16 +5,17 @@ import android.app.Application
 import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
+import com.example.newswave.data.database.dbNews.NewsDao
 import com.example.newswave.data.database.dbNews.NewsDb
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.mapper.flattenToList
 import com.example.newswave.data.network.api.ApiFactory
+import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.network.model.TopNewsResponseDto
 import com.example.newswave.data.workers.RefreshDataWorker
-import com.example.newswave.domain.NewsItemEntity
+import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.NewsRepository
 import com.example.newswave.presentation.Filter
-import com.example.newswave.utils.DateUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,27 +26,28 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
 
-class NewsRepositoryImpl(
+class NewsRepositoryImpl @Inject constructor(
     private val application: Application,
+    private val newsInfoDao: NewsDao,
+    private val mapper: NewsMapper,
+    private val apiService: ApiService
 ) : NewsRepository {
 
 
-    private val newsInfoDao = NewsDb.getInstance(application)
-    private val mapper = NewsMapper()
-    private val apiService = ApiFactory.apiService
     @SuppressLint("NewApi")
     private var currentEndDate: LocalDate = LocalDate.now()
 
 
     override fun getNewsDetailsById(id: Int): Flow<NewsItemEntity> {
-        return newsInfoDao.newsDao().getNewsDetailsById(id)
+        return newsInfoDao.getNewsDetailsById(id)
             .map { mapper.dbModelToEntity(it) }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getTopNewsList(): Flow<List<NewsItemEntity>> {
-        return newsInfoDao.newsDao().getNewsList()
+        return newsInfoDao.getNewsList()
             .flatMapConcat { newsList ->
                 flow {
                     emit(newsList.map { mapper.dbModelToEntity(it) })
@@ -80,7 +82,7 @@ class NewsRepositoryImpl(
                 .flattenToList()// преобразование из flow в list
                 .distinctBy { it.title }
         //преобразование в List<NewsDbModel>
-        newsInfoDao.newsDao().insertNews(newsListDbModel)
+        newsInfoDao.insertNews(newsListDbModel)
         delay(10000)
     }
 

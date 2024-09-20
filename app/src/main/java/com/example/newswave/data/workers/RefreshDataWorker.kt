@@ -8,10 +8,12 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
+import com.example.newswave.data.database.dbNews.NewsDao
 import com.example.newswave.data.database.dbNews.NewsDb
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.mapper.flattenToList
 import com.example.newswave.data.network.api.ApiFactory
+import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.network.model.TopNewsResponseDto
 import com.example.newswave.utils.DateUtils
 import kotlinx.coroutines.delay
@@ -23,14 +25,11 @@ import kotlinx.coroutines.flow.map
 class RefreshDataWorker(
     context: Context,
     private var workerParameters: WorkerParameters,
-
+    private val apiService: ApiService,
+    private val newsInfoDao: NewsDao,
+    private val mapper: NewsMapper
 ) : CoroutineWorker(context, workerParameters) {
 
-
-    // !!!!!!!!  заменить на DI
-    private val apiService = ApiFactory.apiService
-    private val newsInfoDao = NewsDb.getInstance(context)
-    private val mapper = NewsMapper()
 
     override suspend fun doWork(): Result {
         return try {
@@ -48,7 +47,9 @@ class RefreshDataWorker(
             apiService.getListTopNews(date = DateUtils.formatCurrentDate()) // Временно другая дата, так как сегодня еще нет новостей
         val newsListDbModel =
             jsonContainer //преобразование из Flow<NewsResponseDto> в Flow<List<NewsItemDto>>
-                .map { mapper.mapJsonContainerTopNewsToListNews(jsonContainer) }//преобразование в List<NewsItemDto>
+                .map {
+                    mapper.mapJsonContainerTopNewsToListNews(jsonContainer)
+                }//преобразование в List<NewsItemDto>
                 .flatMapConcat { newList ->
                     flow {
                         emit(newList.map { mapper.mapDtoToDbModel(it) }) //преобразование в List<NewsDbModel>
@@ -57,7 +58,7 @@ class RefreshDataWorker(
                 .flattenToList()// преобразование из flow в list
                 .distinctBy { it.title }
         //преобразование в List<NewsDbModel>
-        newsInfoDao.newsDao().insertNews(newsListDbModel)
+        newsInfoDao.insertNews(newsListDbModel)
         delay(10000)
     }
 

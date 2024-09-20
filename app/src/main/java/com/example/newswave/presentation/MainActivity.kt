@@ -18,10 +18,14 @@ class MainActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
-
     private lateinit var bottomNavigationView: BottomNavigationView
 
+    private val component by lazy {
+        (application as NewsApp).component
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        component.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         AndroidThreeTen.init(this)

@@ -1,15 +1,11 @@
 package com.example.newswave.presentation.adapters
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import com.example.newswave.R
 import com.example.newswave.databinding.NewsItemBinding
-import com.example.newswave.domain.NewsItemEntity
+import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.utils.DateUtils
 import com.example.newswave.utils.TextUtils
 import com.squareup.picasso.Picasso
