@@ -10,6 +10,7 @@ import com.example.newswave.data.database.dbNews.NewsDb
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.mapper.flattenToList
 import com.example.newswave.data.network.api.ApiFactory
+import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.network.model.TopNewsResponseDto
 import com.example.newswave.data.workers.RefreshDataWorker
 import com.example.newswave.domain.entity.NewsItemEntity
@@ -30,12 +31,11 @@ import javax.inject.Inject
 class NewsRepositoryImpl @Inject constructor(
     private val application: Application,
     private val newsInfoDao: NewsDao,
-    private val mapper: NewsMapper
+    private val mapper: NewsMapper,
+    private val apiService: ApiService
 ) : NewsRepository {
 
 
-    //private val newsInfoDao = NewsDb.getInstance(application)
-    private val apiService = ApiFactory.apiService
     @SuppressLint("NewApi")
     private var currentEndDate: LocalDate = LocalDate.now()
 

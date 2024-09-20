@@ -31,10 +31,6 @@ class RefreshDataWorker(
 ) : CoroutineWorker(context, workerParameters) {
 
 
-//    private val apiService = ApiFactory.apiService
-//    private val newsInfoDao = NewsDb.getInstance(context).newsDao()
-//    private val mapper = NewsMapper()
-
     override suspend fun doWork(): Result {
         return try {
             loadData()
