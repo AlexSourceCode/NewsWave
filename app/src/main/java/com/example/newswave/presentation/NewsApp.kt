@@ -1,6 +1,7 @@
 package com.example.newswave.presentation
 
 import android.app.Application
+import android.content.Context
 import androidx.work.Configuration
 import com.example.newswave.data.database.dbNews.NewsDb
 import com.example.newswave.data.mapper.NewsMapper
@@ -16,7 +17,10 @@ class NewsApp: Application(), Configuration.Provider {
 
     val component by lazy {
         DaggerApplicationComponent.factory()
-            .create(applicationContext)
+            .create(
+                applicationContext,
+                getSharedPreferences("news_by_search", Context.MODE_PRIVATE)
+                )
     }
 
     override fun onCreate() {

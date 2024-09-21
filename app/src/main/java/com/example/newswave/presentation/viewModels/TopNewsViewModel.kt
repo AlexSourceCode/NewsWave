@@ -2,6 +2,7 @@ package com.example.newswave.presentation.viewModels
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,11 +21,11 @@ import javax.inject.Inject
 
 
 class TopNewsViewModel @Inject constructor(
-    private val application: Application,
     private val loadDataUseCase: LoadDataUseCase,
     private val loadNewsForPreviousDayUseCase: LoadNewsForPreviousDayUseCase,
     private val getTopNewsListUseCase: GetTopNewsList,
-    private val searchNewsByFilterUseCaseFactory: SearchNewsByFilterUseCaseFactory
+    private val searchNewsByFilterUseCaseFactory: SearchNewsByFilterUseCaseFactory,
+    private val sharedPreferences: SharedPreferences
 ): ViewModel() {
 
     private lateinit var searchNewsByFilterUseCase: SearchNewsByFilterUseCase
@@ -41,11 +42,6 @@ class TopNewsViewModel @Inject constructor(
     }
 
     fun showNews() {
-        val sharedPreferences =
-            application.getSharedPreferences(
-                "news_by_search",
-                Context.MODE_PRIVATE
-            )
         val newsSearchResult = sharedPreferences.getString("news_search_result", null)
         if (newsSearchResult != null) {
             val type = object : TypeToken<List<NewsItemEntity>>() {}.type

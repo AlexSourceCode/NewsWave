@@ -1,6 +1,7 @@
 package com.example.newswave.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.NewsApp
 import com.example.newswave.presentation.fragments.TopNewsFragment
@@ -25,7 +26,10 @@ interface ApplicationComponent {
     @Component.Factory
     interface ApplicationComponentFactory{
 
-        fun create(@BindsInstance context: Context): ApplicationComponent
+        fun create(
+            @BindsInstance context: Context,
+            @BindsInstance sharedPreferences: SharedPreferences
+            ): ApplicationComponent
     }
 
 }
