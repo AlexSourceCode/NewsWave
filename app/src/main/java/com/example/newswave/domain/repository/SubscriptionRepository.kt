@@ -1,9 +1,11 @@
 package com.example.newswave.domain.repository
 
+import com.example.newswave.data.database.dbAuthors.AuthorDbModel
+
 interface SubscriptionRepository {
 
-    fun subscribeOnSource()
+    suspend fun subscribeOnAuthor(author: AuthorDbModel)
 
-    fun unsubscribeOnSource()
+    suspend fun unsubscribeOnAuthor(author: String)
 
 }

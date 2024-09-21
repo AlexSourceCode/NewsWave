@@ -21,9 +21,6 @@
         android:label="fragment_subscribed_authors"
         tools:layout="@layout/fragment_subscribed_authors" >
         <action
-            android:id="@+id/action_subscribedAuthorsFragment_to_authorsListFragment"
-            app:destination="@id/authorsListFragment" />
-        <action
             android:id="@+id/action_subscribedAuthorsFragment_to_newsDetailsFragment"
             app:destination="@id/newsDetailsFragment" />
     </fragment>
@@ -41,9 +38,4 @@
         android:name="com.example.newswave.presentation.fragments.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
-    <fragment
-        android:id="@+id/authorsListFragment"
-        android:name="com.example.newswave.presentation.fragments.AuthorsListFragment"
-        android:label="fragment_authors_list"
-        tools:layout="@layout/fragment_authors_list" />
 </navigation>

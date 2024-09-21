@@ -6,10 +6,8 @@ import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
 import com.example.newswave.data.database.dbNews.NewsDao
-import com.example.newswave.data.database.dbNews.NewsDb
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.mapper.flattenToList
-import com.example.newswave.data.network.api.ApiFactory
 import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.network.model.TopNewsResponseDto
 import com.example.newswave.data.workers.RefreshDataWorker
@@ -30,7 +28,7 @@ import javax.inject.Inject
 
 class NewsRepositoryImpl @Inject constructor(
     private val application: Application,
-    private val newsInfoDao: NewsDao,
+    private val newsDao: NewsDao,
     private val mapper: NewsMapper,
     private val apiService: ApiService
 ) : NewsRepository {
@@ -41,13 +39,13 @@ class NewsRepositoryImpl @Inject constructor(
 
 
     override fun getNewsDetailsById(id: Int): Flow<NewsItemEntity> {
-        return newsInfoDao.getNewsDetailsById(id)
+        return newsDao.getNewsDetailsById(id)
             .map { mapper.dbModelToEntity(it) }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getTopNewsList(): Flow<List<NewsItemEntity>> {
-        return newsInfoDao.getNewsList()
+        return newsDao.getNewsList()
             .flatMapConcat { newsList ->
                 flow {
                     emit(newsList.map { mapper.dbModelToEntity(it) })
@@ -82,7 +80,7 @@ class NewsRepositoryImpl @Inject constructor(
                 .flattenToList()// преобразование из flow в list
                 .distinctBy { it.title }
         //преобразование в List<NewsDbModel>
-        newsInfoDao.insertNews(newsListDbModel)
+        newsDao.insertNews(newsListDbModel)
         delay(10000)
     }
 

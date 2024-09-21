@@ -134,7 +134,6 @@ class TopNewsFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.newsList.observe(viewLifecycleOwner) {
-            Log.d("checkadapter", "${it.map { it.id }}")
             adapter.submitList(it)
         }
     }
