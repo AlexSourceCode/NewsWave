@@ -33,6 +33,8 @@
             android:background="@drawable/button_subscribe"
             android:textAllCaps="false"
             android:textColor="@color/black"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

@@ -2,6 +2,7 @@ package com.example.newswave.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -36,10 +37,6 @@ class SubscribedAuthorsFragment : Fragment() {
         super.onAttach(context)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,6 +55,9 @@ class SubscribedAuthorsFragment : Fragment() {
     private fun setupAdapter(){
         adapter = AuthorListAdapter()
         binding.rcAuthors.adapter = adapter
+        adapter.onAuthorClickSubscription = { author ->
+            viewModel.unsubscribeFromAuthor(author)
+        }
     }
 
     private fun observeViewModel(){

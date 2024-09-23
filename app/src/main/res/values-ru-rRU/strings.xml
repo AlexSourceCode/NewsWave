@@ -17,5 +17,5 @@
     <string name="date_format" >d MMMM \'в\' HH:mm</string>
     <string name="subcribe">Подписаться</string>
     <string name="subscribe">Подписаться</string>
-    <string name="subscribed">Отписаться</string>
+    <string name="subscribed">Вы подписаны</string>
 </resources>

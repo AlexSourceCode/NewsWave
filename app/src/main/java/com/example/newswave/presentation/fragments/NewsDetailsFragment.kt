@@ -87,16 +87,8 @@ class NewsDetailsFragment : Fragment() {
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                     val selectedItem = p0?.getItemAtPosition(p2).toString()
                     viewModel.checkAuthorInRepository(selectedItem)
-                    viewModel.isFavorite.observe(viewLifecycleOwner){
-                        if (it){
-                            binding.btSubscription.text = requireActivity().getString(R.string.subscribed)
-                            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
-                            binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                        } else{
-                            binding.btSubscription.text = requireActivity().getString(R.string.subscribe)
-                            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
-                            binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-                        }
+                    viewModel.isFavorite.observe(viewLifecycleOwner){ isFavorite ->
+                        updateSubscriptionButton(isFavorite)
                     }
                 }
 
@@ -121,6 +113,20 @@ class NewsDetailsFragment : Fragment() {
             }
         }
     }
+
+    private fun updateSubscriptionButton(isFavorite: Boolean) {
+        if (isFavorite) {
+            binding.btSubscription.text = getString(R.string.subscribed)
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
+            binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        } else {
+            binding.btSubscription.text = getString(R.string.subscribe)
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
+            binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        }
+    }
+
+
 
     private fun setOnClickListener(){
         binding.btSubscription.setOnClickListener {
