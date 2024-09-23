@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.data.repository.NewsRepositoryImpl
 import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.domain.usecases.GetTopNewsList
+import com.example.newswave.domain.usecases.GetTopNewsListUseCase
 import com.example.newswave.domain.usecases.LoadDataUseCase
 import com.example.newswave.domain.usecases.LoadNewsForPreviousDayUseCase
 import com.example.newswave.domain.usecases.SearchNewsByFilterUseCase
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class TopNewsViewModel @Inject constructor(
     private val loadDataUseCase: LoadDataUseCase,
     private val loadNewsForPreviousDayUseCase: LoadNewsForPreviousDayUseCase,
-    private val getTopNewsListUseCase: GetTopNewsList,
+    private val getTopNewsListUseCase: GetTopNewsListUseCase,
     private val searchNewsByFilterUseCaseFactory: SearchNewsByFilterUseCaseFactory,
     private val sharedPreferences: SharedPreferences
 ): ViewModel() {

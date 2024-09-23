@@ -44,7 +44,7 @@ class RefreshDataWorker(
 
     private suspend fun loadData(){
         val jsonContainer: Flow<TopNewsResponseDto> =
-            apiService.getListTopNews(date = DateUtils.formatCurrentDate()) // Временно другая дата, так как сегодня еще нет новостей
+            apiService.getListTopNews(date = "2024-09-20") // Временно другая дата, так как сегодня еще нет новостей
         val newsListDbModel =
             jsonContainer //преобразование из Flow<NewsResponseDto> в Flow<List<NewsItemDto>>
                 .map {

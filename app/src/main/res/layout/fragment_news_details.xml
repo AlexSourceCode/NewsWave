@@ -49,17 +49,10 @@
                     android:id="@+id/btSubscription"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/button_subscribe"
-                    android:text="Subscribe"
                     android:layout_gravity="end"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white" />
-
-
-
+                    android:layout_marginEnd="16dp"
+                    android:textAllCaps="false"/>
             </LinearLayout>
-
 
 
             <TextView
@@ -93,10 +86,10 @@
             <androidx.media3.ui.PlayerView
                 android:id="@+id/playerView"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:visibility="gone"
-                app:resize_mode="zoom"
-                android:layout_height="wrap_content" />
+                app:resize_mode="zoom" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </ScrollView>

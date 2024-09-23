@@ -40,7 +40,7 @@ class NewsRepositoryImpl @Inject constructor(
 
     override fun getNewsDetailsById(id: Int): Flow<NewsItemEntity> {
         return newsDao.getNewsDetailsById(id)
-            .map { mapper.dbModelToEntity(it) }
+            .map { mapper.mapDbModelToEntity(it) }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -48,7 +48,7 @@ class NewsRepositoryImpl @Inject constructor(
         return newsDao.getNewsList()
             .flatMapConcat { newsList ->
                 flow {
-                    emit(newsList.map { mapper.dbModelToEntity(it) })
+                    emit(newsList.map { mapper.mapDbModelToEntity(it) })
                 }
             }
     }
