@@ -12,7 +12,6 @@ interface NewsRepository{
     fun loadData()
     suspend fun loadNewsForPreviousDay()
 
-    suspend fun searchNewsByFilter(filterParameter: String, valueParameter: String)
-    suspend fun getSavedNewsBySearch(): List<NewsItemEntity>
+    suspend fun searchNewsByFilter(filterParameter: String, valueParameter: String): List<NewsItemEntity>
 
 }

@@ -19,6 +19,9 @@ class ViewModelFactory @Inject constructor(
         if (modelClass.isAssignableFrom(NewsDetailsViewModel::class.java)){
             return viewModelProviders[modelClass]?.get() as T
         }
+        if (modelClass.isAssignableFrom(AuthorNewsViewModel::class.java)){
+            return viewModelProviders[modelClass]?.get() as T
+        }
         throw RuntimeException("Unknown view model class $modelClass")
     }
 }

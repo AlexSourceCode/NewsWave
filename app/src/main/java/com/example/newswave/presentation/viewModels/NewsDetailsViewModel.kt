@@ -31,12 +31,14 @@ class NewsDetailsViewModel @Inject constructor(
     fun subscribeOnAuthor(author: AuthorDbModel){
         viewModelScope.launch {
             subscribeOnAuthorUseCase(author)
+            checkAuthorInRepository(author.author)
         }
     }
 
     fun unsubscribeFromAuthor(author: String){
         viewModelScope.launch {
             unsubscribeFromAuthorUseCase(author)
+            checkAuthorInRepository(author)
         }
     }
 }

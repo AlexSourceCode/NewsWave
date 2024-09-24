@@ -123,7 +123,7 @@ class TopNewsFragment : Fragment() {
                 }
                 lifecycleScope.launch {
                     viewModel.searchNewsByFilter()
-                    viewModel.showNews()
+//                    viewModel.showNews()
                 }
                 true
             } else {

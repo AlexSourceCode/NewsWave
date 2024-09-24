@@ -8,7 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.newswave.databinding.FragmentSubscribedAuthorsBinding
+import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.presentation.NewsApp
 import com.example.newswave.presentation.adapters.AuthorListAdapter
 import com.example.newswave.presentation.viewModels.SubscribedAuthorsViewModel
@@ -58,12 +60,21 @@ class SubscribedAuthorsFragment : Fragment() {
         adapter.onAuthorClickSubscription = { author ->
             viewModel.unsubscribeFromAuthor(author)
         }
+        adapter.onAuthorClickNews = { author ->
+            launchAuthorNewsFragment(author)
+        }
     }
 
     private fun observeViewModel(){
         viewModel.authorList.observe(viewLifecycleOwner){
             adapter.submitList(it)
         }
+    }
+
+    private fun launchAuthorNewsFragment(author: String){
+        findNavController().navigate(
+            SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToAuthorNewsFragment(author)
+        )
     }
 
 }

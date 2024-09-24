@@ -130,16 +130,14 @@ class NewsDetailsFragment : Fragment() {
 
     private fun setOnClickListener(){
         binding.btSubscription.setOnClickListener {
-            val checkSubscribed = binding.btSubscription.text
+            val checkSubscribed = binding.btSubscription.text.toString()
             val author = binding.srAuthors.selectedItem.toString()
             val btSub = requireActivity().getString(R.string.subscribe)
             if (checkSubscribed == btSub){
                 viewModel.subscribeOnAuthor(AuthorDbModel(author))
-                viewModel.checkAuthorInRepository(author)
             }
             else{
                 viewModel.unsubscribeFromAuthor(author)
-                viewModel.checkAuthorInRepository(author)
             }
         }
     }

@@ -14,7 +14,6 @@ import javax.inject.Inject
 
 class SubscribedAuthorsViewModel @Inject constructor(
     private val getAuthorListUseCase: GetAuthorListUseCase,
-    private val subscribeOnAuthorUseCase: SubscribeOnAuthorUseCase,
     private val unsubscribeFromAuthorUseCase: UnsubscribeFromAuthorUseCase
 ) : ViewModel() {
 
@@ -25,12 +24,6 @@ class SubscribedAuthorsViewModel @Inject constructor(
     fun unsubscribeFromAuthor(author: String){
         viewModelScope.launch {
             unsubscribeFromAuthorUseCase(author)
-        }
-    }
-
-    fun subscribeOnAuthor(author: AuthorDbModel){
-        viewModelScope.launch {
-            subscribeOnAuthorUseCase(author)
         }
     }
 

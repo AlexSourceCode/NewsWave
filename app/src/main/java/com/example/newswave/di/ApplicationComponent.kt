@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.NewsApp
+import com.example.newswave.presentation.fragments.AuthorNewsFragment
 import com.example.newswave.presentation.fragments.NewsDetailsFragment
 import com.example.newswave.presentation.fragments.SubscribedAuthorsFragment
 import com.example.newswave.presentation.fragments.TopNewsFragment
@@ -26,6 +27,8 @@ interface ApplicationComponent {
     fun inject(fragment: SubscribedAuthorsFragment)
 
     fun inject(fragment: NewsDetailsFragment)
+
+    fun inject(fragment: AuthorNewsFragment)
 
     fun inject(application: NewsApp)
 

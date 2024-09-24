@@ -7,10 +7,12 @@ import androidx.recyclerview.widget.ListAdapter
 import com.example.newswave.R
 import com.example.newswave.databinding.AuthorItemBinding
 import com.example.newswave.domain.entity.AuthorItemEntity
+import com.example.newswave.domain.entity.NewsItemEntity
 
 class AuthorListAdapter: ListAdapter<AuthorItemEntity, AuthorListViewHolder>(AuthorListDiffCallback) {
 
     var onAuthorClickSubscription: ((String) -> Unit)? = null
+    var onAuthorClickNews: ((String) -> Unit)? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AuthorListViewHolder {
@@ -30,6 +32,10 @@ class AuthorListAdapter: ListAdapter<AuthorItemEntity, AuthorListViewHolder>(Aut
 
         holder.binding.btSubscription.setOnClickListener {
             onAuthorClickSubscription?.invoke(author.author)
+        }
+
+        holder.itemView.setOnClickListener {
+            onAuthorClickNews?.invoke(author.author)
         }
     }
 }

@@ -6,6 +6,15 @@
     app:startDestination="@id/topNewsFragment">
 
     <fragment
+        android:id="@+id/newsDetailsFragment3"
+        android:name="com.example.newswave.presentation.fragments.NewsDetailsFragment"
+        android:label="fragment_news_details"
+        tools:layout="@layout/fragment_news_details">
+        <argument
+            android:name="news"
+            app:argType="com.example.newswave.domain.entity.NewsItemEntity" />
+    </fragment>
+    <fragment
         android:id="@+id/topNewsFragment"
         android:name="com.example.newswave.presentation.fragments.TopNewsFragment"
         android:label="fragment_top_news"
@@ -21,8 +30,8 @@
         android:label="fragment_subscribed_authors"
         tools:layout="@layout/fragment_subscribed_authors" >
         <action
-            android:id="@+id/action_subscribedAuthorsFragment_to_newsDetailsFragment"
-            app:destination="@id/newsDetailsFragment" />
+            android:id="@+id/action_subscribedAuthorsFragment_to_authorNewsFragment"
+            app:destination="@id/authorNewsFragment" />
     </fragment>
     <fragment
         android:id="@+id/newsDetailsFragment"
@@ -38,4 +47,16 @@
         android:name="com.example.newswave.presentation.fragments.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/authorNewsFragment"
+        android:name="com.example.newswave.presentation.fragments.AuthorNewsFragment"
+        android:label="fragment_author_news"
+        tools:layout="@layout/fragment_author_news" >
+        <argument
+            android:name="author"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_authorNewsFragment_to_newsDetailsFragment3"
+            app:destination="@id/newsDetailsFragment3" />
+    </fragment>
 </navigation>

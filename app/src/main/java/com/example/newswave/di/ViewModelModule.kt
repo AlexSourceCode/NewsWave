@@ -1,8 +1,10 @@
 package com.example.newswave.di
 
+import android.view.View
 import androidx.lifecycle.ViewModel
 import com.example.newswave.domain.usecases.SearchNewsByFilterUseCase
 import com.example.newswave.domain.usecases.SearchNewsByFilterUseCaseFactory
+import com.example.newswave.presentation.viewModels.AuthorNewsViewModel
 import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.SubscribedAuthorsViewModel
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
@@ -29,5 +31,10 @@ interface ViewModelModule {
     @IntoMap
     @ViewModelKey(NewsDetailsViewModel::class)
     fun bindNewsDetailsViewModel(viewModel: NewsDetailsViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AuthorNewsViewModel::class)
+    fun bindAuthorNewsViewModel(viewModel: AuthorNewsViewModel): ViewModel
 
 }

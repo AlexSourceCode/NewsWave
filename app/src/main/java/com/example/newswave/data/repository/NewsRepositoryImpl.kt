@@ -84,7 +84,7 @@ class NewsRepositoryImpl @Inject constructor(
         delay(10000)
     }
 
-    override suspend fun searchNewsByFilter(filterParameter: String, valueParameter: String) {
+    override suspend fun searchNewsByFilter(filterParameter: String, valueParameter: String): List<NewsItemEntity> {
         val news: List<NewsItemEntity> = when (filterParameter) {
             application.getString(Filter.TEXT.descriptionResId) -> apiService.getNewsByText(
                 text = valueParameter
@@ -108,24 +108,11 @@ class NewsRepositoryImpl @Inject constructor(
             }
             .flattenToList()
             .distinctBy { it.title }
+        return news
 
 
-        val sharedPreferences =
-            application.getSharedPreferences("news_by_search", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString("news_search_result", Gson().toJson(news))
-        editor.apply()
     }
 
-    override suspend fun getSavedNewsBySearch(): List<NewsItemEntity> {
-        val sharedPreferences =
-            application.getSharedPreferences("news_by_search", Context.MODE_PRIVATE)
-        val json = sharedPreferences.getString("news_search_result", null)
-        return if (json != null) {
-            Gson().fromJson(json, object : TypeToken<List<NewsItemEntity>>() {}.type)
-        } else {
-            emptyList()
-        }
-    }
+
 
 }
