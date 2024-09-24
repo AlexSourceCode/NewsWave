@@ -57,6 +57,7 @@
             app:argType="string" />
         <action
             android:id="@+id/action_authorNewsFragment_to_newsDetailsFragment3"
-            app:destination="@id/newsDetailsFragment3" />
+            app:destination="@id/newsDetailsFragment3"
+            app:popUpTo="@id/authorNewsFragment" />
     </fragment>
 </navigation>

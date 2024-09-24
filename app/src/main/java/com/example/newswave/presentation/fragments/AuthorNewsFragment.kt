@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
 import com.example.newswave.databinding.FragmentAuthorNewsBinding
@@ -70,7 +71,9 @@ class AuthorNewsFragment : Fragment() {
     }
 
     private fun launchNewsDetailsFragment(news: NewsItemEntity){
-        AuthorNewsFragmentDirections.actionAuthorNewsFragmentToNewsDetailsFragment3(news)
+        findNavController().navigate(
+            AuthorNewsFragmentDirections.actionAuthorNewsFragmentToNewsDetailsFragment3(news)
+        )
     }
 
 

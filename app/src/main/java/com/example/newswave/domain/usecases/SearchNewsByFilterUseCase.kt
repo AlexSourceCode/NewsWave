@@ -7,7 +7,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import javax.inject.Inject
 
-class SearchNewsByFilterUseCase(
+class SearchNewsByFilterUseCase @Inject constructor(
     private val filterParameter: String,
     private val valueParameter: String,
     private val repository: NewsRepository

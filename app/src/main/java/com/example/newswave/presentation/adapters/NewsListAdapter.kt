@@ -39,9 +39,9 @@ class NewsListAdapter(
         holder.binding.btReadDetail.setOnClickListener {
             onNewsClickListener?.invoke(news)
         }
-        if ( position == itemCount - 10){
-            onLoadMoreListener?.invoke()
-        }
+//        if ( position == itemCount - 10){
+//            onLoadMoreListener?.invoke()
+//        }
     }
 
 

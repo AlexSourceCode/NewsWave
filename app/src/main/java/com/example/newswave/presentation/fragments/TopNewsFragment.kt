@@ -42,7 +42,7 @@ class TopNewsFragment : Fragment() {
 
     var selectedFilter: String? = null
 
-    override fun onAttach(context: Context) { /// почему именно в onAttach, почему перед методом super
+    override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
     }
@@ -68,7 +68,7 @@ class TopNewsFragment : Fragment() {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (isShowingSearchResults()) {
+                    if (binding.edSearch.text.toString() != "") {
                         viewModel.loadTopNewsFromRoom()
                         binding.edSearch.text.clear()
                     } else {
@@ -83,14 +83,9 @@ class TopNewsFragment : Fragment() {
     private fun setupTabLayout() {
         val tabLayout: TabLayout = binding.tabLayout
 
-
         tabLayout.addTab(tabLayout.newTab().setText(Filter.TEXT.descriptionResId))
         tabLayout.addTab(tabLayout.newTab().setText(Filter.AUTHOR.descriptionResId))
         tabLayout.addTab(tabLayout.newTab().setText(Filter.DATE.descriptionResId))
-
-
-
-
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -123,7 +118,6 @@ class TopNewsFragment : Fragment() {
                 }
                 lifecycleScope.launch {
                     viewModel.searchNewsByFilter()
-//                    viewModel.showNews()
                 }
                 true
             } else {
@@ -145,31 +139,18 @@ class TopNewsFragment : Fragment() {
             launchNewsDetailsFragment(it)
         }
 
-        adapter.onLoadMoreListener = {
-            viewModel.loadNewsForPreviousDay()
-        }
+//        adapter.onLoadMoreListener = {
+//            viewModel.loadNewsForPreviousDay()
+//        }
     }
 
     fun scrollToTop() {
         binding.rcNews.scrollToPosition(0)
     }
 
-
-    fun isShowingSearchResults(): Boolean {
-        val sharedPreferences = requireActivity().application.getSharedPreferences(
-            "news_by_search",
-            Context.MODE_PRIVATE
-        )
-        val newsSearchResult = sharedPreferences.getString("news_search_result", null)
-        return newsSearchResult != null
-    }
-
-
     private fun launchNewsDetailsFragment(news: NewsItemEntity) {
         findNavController().navigate(
-            TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(
-                news
-            )
+            TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(news)
         )
     }
 

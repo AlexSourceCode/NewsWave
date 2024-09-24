@@ -22,6 +22,8 @@ interface ApiService {
         @Query("language") language: String = QUERY_PARAM_LANGUAGE,
         @Query("api-key") apiKey: String = QUERY_PARAM_API_KEY,
         @Query("text") text: String,
+        @Query("sort-direction") sortDirection: String = QUERY_PARAM_SORT_DIRECTION,
+        @Query("sort") sort: String = QUERY_PARAM_SORT
     ): Flow<NewsResponseDto>
 
     @GET("search-news")
