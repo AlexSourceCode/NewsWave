@@ -13,6 +13,10 @@
         <argument
             android:name="news"
             app:argType="com.example.newswave.domain.entity.NewsItemEntity" />
+        <argument
+            android:name="author"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/topNewsFragment"
@@ -41,6 +45,10 @@
         <argument
             android:name="news"
             app:argType="com.example.newswave.domain.entity.NewsItemEntity" />
+        <argument
+            android:name="author"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"

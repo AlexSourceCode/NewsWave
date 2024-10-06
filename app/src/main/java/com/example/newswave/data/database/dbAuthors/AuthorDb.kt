@@ -16,7 +16,7 @@ abstract class AuthorDb : RoomDatabase() {
         private const val DB_NAME = "favorite.db"
 
         fun getInstance(context: Context): AuthorDb {
-
+            db?.let { return it }
             synchronized(LOCK) {
                 db?.let { return it }
                 val instance = Room.databaseBuilder(

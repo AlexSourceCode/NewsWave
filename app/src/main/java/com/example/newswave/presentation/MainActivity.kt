@@ -1,14 +1,13 @@
 package com.example.newswave.presentation
 
 import android.os.Bundle
-import android.util.Log
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.example.newswave.R
+import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.ActivityMainBinding
 import com.example.newswave.presentation.fragments.TopNewsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView

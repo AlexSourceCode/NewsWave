@@ -1,4 +1,4 @@
-package com.example.newswave.presentation
+package com.example.newswave.utils
 
 import com.example.newswave.R
 

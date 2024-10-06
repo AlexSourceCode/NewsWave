@@ -19,6 +19,5 @@ interface NewsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNews(listNews: List<NewsDbModel>)//: Flow<NewsDbModel>
 
-
 }
 

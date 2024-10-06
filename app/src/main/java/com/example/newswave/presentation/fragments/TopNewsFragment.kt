@@ -1,23 +1,21 @@
 package com.example.newswave.presentation.fragments
 
-import android.app.Application
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.newswave.databinding.FragmentTopNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.presentation.Filter
-import com.example.newswave.presentation.NewsApp
+import com.example.newswave.utils.Filter
+import com.example.newswave.app.NewsApp
 import com.example.newswave.presentation.adapters.NewsListAdapter
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
@@ -60,6 +58,7 @@ class TopNewsFragment : Fragment() {
         viewModel = ViewModelProvider(this, viewModelFactory)[TopNewsViewModel::class.java]
         setupAdapter()
         observeViewModel()
+
         setupTabLayout()
         selectedFilter = requireActivity().application.getString(Filter.TEXT.descriptionResId)
         searchByFilterListener()
@@ -77,6 +76,8 @@ class TopNewsFragment : Fragment() {
                     }
                 }
             })
+
+        
     }
 
 
@@ -116,9 +117,7 @@ class TopNewsFragment : Fragment() {
                         binding.edSearch.text.toString()
                     )
                 }
-                lifecycleScope.launch {
-                    viewModel.searchNewsByFilter()
-                }
+                viewModel.searchNewsByFilter()
                 true
             } else {
                 false
@@ -150,7 +149,7 @@ class TopNewsFragment : Fragment() {
 
     private fun launchNewsDetailsFragment(news: NewsItemEntity) {
         findNavController().navigate(
-            TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(news)
+            TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(news, null)
         )
     }
 

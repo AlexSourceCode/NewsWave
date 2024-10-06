@@ -5,5 +5,5 @@ import javax.inject.Inject
 
 class GetAuthorListUseCase @Inject constructor(private val repository: SubscriptionRepository) {
 
-    operator fun invoke() = repository.getAuthorList()
+    suspend operator fun invoke() = repository.getAuthorList()
 }

@@ -9,7 +9,9 @@ import com.example.newswave.data.database.dbAuthors.AuthorDbModel
 import com.example.newswave.domain.usecases.FavoriteAuthorCheckUseCase
 import com.example.newswave.domain.usecases.SubscribeOnAuthorUseCase
 import com.example.newswave.domain.usecases.UnsubscribeFromAuthorUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class NewsDetailsViewModel @Inject constructor(
@@ -24,14 +26,14 @@ class NewsDetailsViewModel @Inject constructor(
     fun checkAuthorInRepository(author: String){
         viewModelScope.launch {
             val result = favoriteAuthorCheckUseCase(author)
-            _isFavorite.postValue(result)
+            _isFavorite.value = result
         }
     }
 
-    fun subscribeOnAuthor(author: AuthorDbModel){
+    fun subscribeOnAuthor(author: String){
         viewModelScope.launch {
             subscribeOnAuthorUseCase(author)
-            checkAuthorInRepository(author.author)
+            checkAuthorInRepository(author)
         }
     }
 

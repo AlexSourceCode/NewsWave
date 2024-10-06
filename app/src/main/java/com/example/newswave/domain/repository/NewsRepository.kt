@@ -5,9 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface NewsRepository{
 
-    fun getNewsDetailsById(id: Int): Flow<NewsItemEntity>
 
-    fun getTopNewsList(): Flow<List<NewsItemEntity>>
+    suspend fun getTopNewsList(): Flow<List<NewsItemEntity>>
 
     fun loadData()
     suspend fun loadNewsForPreviousDay()

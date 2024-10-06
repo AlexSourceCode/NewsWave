@@ -9,10 +9,9 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.newswave.R
 import com.example.newswave.databinding.FragmentAuthorNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.presentation.NewsApp
+import com.example.newswave.app.NewsApp
 import com.example.newswave.presentation.adapters.NewsListAdapter
 import com.example.newswave.presentation.viewModels.AuthorNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
@@ -61,6 +60,7 @@ class AuthorNewsFragment : Fragment() {
         adapter.onNewsClickListener = { news ->
             launchNewsDetailsFragment(news)
         }
+        binding.currentAuthor.text = args.author
     }
 
     private fun observeViewModel(){
@@ -72,7 +72,7 @@ class AuthorNewsFragment : Fragment() {
 
     private fun launchNewsDetailsFragment(news: NewsItemEntity){
         findNavController().navigate(
-            AuthorNewsFragmentDirections.actionAuthorNewsFragmentToNewsDetailsFragment3(news)
+            AuthorNewsFragmentDirections.actionAuthorNewsFragmentToNewsDetailsFragment3(news, args.author)
         )
     }
 

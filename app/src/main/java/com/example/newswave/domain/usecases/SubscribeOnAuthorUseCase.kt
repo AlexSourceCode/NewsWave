@@ -6,5 +6,5 @@ import javax.inject.Inject
 
 class SubscribeOnAuthorUseCase @Inject constructor(private val repository: SubscriptionRepository) {
 
-    suspend operator fun invoke(dbModel: AuthorDbModel) = repository.subscribeOnAuthor(dbModel)
+    suspend operator fun invoke(author: String) = repository.subscribeOnAuthor(author)
 }

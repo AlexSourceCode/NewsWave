@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface SubscriptionRepository {
 
-    fun getAuthorList(): Flow<List<AuthorItemEntity>>
+    suspend fun getAuthorList(): Flow<List<AuthorItemEntity>>
 
-    suspend fun subscribeOnAuthor(author: AuthorDbModel)
+    suspend fun subscribeOnAuthor(author: String)
 
     suspend fun unsubscribeOnAuthor(author: String)
 

@@ -1,5 +1,6 @@
 package com.example.newswave.presentation.viewModels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,8 @@ import com.example.newswave.domain.entity.AuthorItemEntity
 import com.example.newswave.domain.usecases.GetAuthorListUseCase
 import com.example.newswave.domain.usecases.SubscribeOnAuthorUseCase
 import com.example.newswave.domain.usecases.UnsubscribeFromAuthorUseCase
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,13 +30,15 @@ class SubscribedAuthorsViewModel @Inject constructor(
         }
     }
 
+
     init {
         viewModelScope.launch {
             getAuthorListUseCase().collect { authors ->
-                _authorList.postValue(authors)
+                _authorList.value = authors
             }
         }
     }
 
 
 }
+

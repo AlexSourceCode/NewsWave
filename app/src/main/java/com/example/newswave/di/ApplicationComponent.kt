@@ -3,7 +3,7 @@ package com.example.newswave.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.newswave.presentation.MainActivity
-import com.example.newswave.presentation.NewsApp
+import com.example.newswave.app.NewsApp
 import com.example.newswave.presentation.fragments.AuthorNewsFragment
 import com.example.newswave.presentation.fragments.NewsDetailsFragment
 import com.example.newswave.presentation.fragments.SubscribedAuthorsFragment

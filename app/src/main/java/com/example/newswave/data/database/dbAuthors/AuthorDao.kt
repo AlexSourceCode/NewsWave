@@ -14,7 +14,6 @@ interface AuthorDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAuthor(author: AuthorDbModel)
 
-
     @Query("DELETE FROM favorite WHERE author = :author")
     suspend fun deleteAuthor(author: String)
 
