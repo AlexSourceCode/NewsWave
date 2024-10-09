@@ -8,3 +8,7 @@ sealed class State {
     object Loading: State()
     data class Success(val currentList: List<NewsItemEntity>): State()
 }
+
+//data class Error(
+//    val throwable: Throwable? = null
+//) : UiState

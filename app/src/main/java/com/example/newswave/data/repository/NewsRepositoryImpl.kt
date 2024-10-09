@@ -2,6 +2,7 @@ package com.example.newswave.data.repository
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.util.Log
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
 import com.example.newswave.data.database.dbNews.NewsDao
@@ -13,15 +14,24 @@ import com.example.newswave.data.workers.RefreshDataWorker
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.NewsRepository
 import com.example.newswave.utils.Filter
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.retry
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -38,18 +48,23 @@ class NewsRepositoryImpl @Inject constructor(
     @SuppressLint("NewApi")
     private var currentEndDate: LocalDate = LocalDate.now()
 
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun getTopNewsList(): Flow<List<NewsItemEntity>> =
-        withContext(Dispatchers.IO) {
-            newsDao.getNewsList()
-                .flatMapConcat { newsList ->
-                    flow {
-                        emit(newsList.map { mapper.mapDbModelToEntity(it) })
-                    }
-                }
-        }
+    val getTopNewsList = newsDao.getNewsList()
+        .flatMapConcat { newsList ->
+            flow {
+                emit(newsList.map { mapper.mapDbModelToEntity(it) })
+            }
+        }.stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList()
+        )
 
+
+
+    override suspend fun getTopNewsList(): StateFlow<List<NewsItemEntity>> = getTopNewsList
 
     override fun loadData() {
         val workManager = WorkManager.getInstance(application.applicationContext)
@@ -104,6 +119,10 @@ class NewsRepositoryImpl @Inject constructor(
                 else -> {
                     throw RuntimeException("error filter")
                 }
+            }.retry {
+                Log.d("RetryLoad", it.toString())
+                delay(1000)
+                true
             }
                 .map { it.news }
                 .flatMapConcat { newsList ->
@@ -113,6 +132,3 @@ class NewsRepositoryImpl @Inject constructor(
                 .distinctBy { it.title }
         }
 }
-
-
-

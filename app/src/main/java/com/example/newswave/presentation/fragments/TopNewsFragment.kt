@@ -2,6 +2,7 @@ package com.example.newswave.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -9,17 +10,22 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.newswave.databinding.FragmentTopNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.utils.Filter
 import com.example.newswave.app.NewsApp
+import com.example.newswave.domain.model.State
 import com.example.newswave.presentation.adapters.NewsListAdapter
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -68,8 +74,8 @@ class TopNewsFragment : Fragment() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     if (binding.edSearch.text.toString() != "") {
-                        viewModel.loadTopNewsFromRoom()
                         binding.edSearch.text.clear()
+                        viewModel.backToTopNews()
                     } else {
                         isEnabled = false
                         requireActivity().onBackPressed()
@@ -77,7 +83,6 @@ class TopNewsFragment : Fragment() {
                 }
             })
 
-        
     }
 
 
@@ -125,9 +130,24 @@ class TopNewsFragment : Fragment() {
         }
     }
 
-    private fun observeViewModel() {
-        viewModel.newsList.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+    private fun observeViewModel() { // What name to give a feature?
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED){// ПОЧЕМУ ДЖАЖДЫ А ПОТОМ УВЕЛИЧЕНИЕ НА +1 ПРИ created norm
+                viewModel.uiState.collect{ uiState ->
+                    Log.d("LastState", uiState.toString())
+                    when(uiState){
+                        is State.Error -> Log.d("CheckState", uiState.toString())
+                        is State.Loading -> {
+                            binding.pgNews.visibility = View.VISIBLE
+                        }
+                        is State.Success -> {
+                            binding.pgNews.visibility = View.GONE
+                            adapter.submitList(uiState.currentList)
+                        }
+                        else -> {Log.d("CheckState", "FAILED")}
+                    }
+                }
+            }
         }
     }
 

@@ -16,6 +16,7 @@ class NewsListAdapter(
 
     var onNewsClickListener: ((NewsItemEntity) -> Unit)? = null
     var onLoadMoreListener: (() -> Unit)? = null
+    var onLoadListener:(() -> Unit)? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsListViewHolder {
@@ -25,6 +26,7 @@ class NewsListAdapter(
 
     override fun onBindViewHolder(holder: NewsListViewHolder, position: Int) {
         val news = getItem(position)
+        onLoadListener?.invoke()
         with(holder.binding) {
             with(news) {
                 tvText.text = TextUtils.sentenceDivision(news.text)
@@ -36,6 +38,7 @@ class NewsListAdapter(
                     .into(ivImage)
             }
         }
+
         holder.binding.btReadDetail.setOnClickListener {
             onNewsClickListener?.invoke(news)
         }
@@ -43,6 +46,5 @@ class NewsListAdapter(
 //            onLoadMoreListener?.invoke()
 //        }
     }
-
 
 }
