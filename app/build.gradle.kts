@@ -97,6 +97,9 @@ dependencies {
     implementation("com.squareup.inject:assisted-inject-annotations-dagger2:0.8.1")
     kapt("com.squareup.inject:assisted-inject-processor-dagger2:0.8.1")
 
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+
 
 
 

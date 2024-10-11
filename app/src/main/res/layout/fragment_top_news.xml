@@ -57,16 +57,25 @@
         android:imeOptions="actionSearch"
         android:inputType="text" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rcNews"
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/edSearch"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:listitem="@layout/news_item"
-        android:layout_marginBottom="56dp"/>
+        android:layout_marginBottom="56dp">
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcNews"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/news_item"/>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <ProgressBar
         android:id="@+id/pgNews"
@@ -80,4 +89,7 @@
         />
 
 
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

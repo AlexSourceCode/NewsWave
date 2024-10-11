@@ -4,17 +4,19 @@ import com.example.newswave.data.database.dbAuthors.AuthorDbModel
 import com.example.newswave.domain.entity.AuthorItemEntity
 import com.example.newswave.domain.entity.NewsItemEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface SubscriptionRepository {
 
-    suspend fun getAuthorList(): Flow<List<AuthorItemEntity>>
+    suspend fun getAuthorList(): StateFlow<List<AuthorItemEntity>>
 
-    suspend fun subscribeOnAuthor(author: String)
+    suspend fun subscribeToAuthor(author: String)
 
-    suspend fun unsubscribeOnAuthor(author: String)
+    suspend fun unsubscribeFromAuthor(author: String)
 
     suspend fun favoriteAuthorCheck(author: String): Boolean
 
-    suspend fun loadAuthorNews(author: String): List<NewsItemEntity>
+    suspend fun loadAuthorNews(author: String): SharedFlow<List<NewsItemEntity>>
 
 }

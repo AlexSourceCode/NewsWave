@@ -1,28 +1,27 @@
 package com.example.newswave.presentation.viewModels
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.data.database.dbAuthors.AuthorDbModel
-import com.example.newswave.domain.entity.AuthorItemEntity
+import com.example.newswave.domain.model.AuthorState
 import com.example.newswave.domain.usecases.GetAuthorListUseCase
-import com.example.newswave.domain.usecases.SubscribeOnAuthorUseCase
 import com.example.newswave.domain.usecases.UnsubscribeFromAuthorUseCase
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.newswave.domain.model.NewsState
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
 
 class SubscribedAuthorsViewModel @Inject constructor(
     private val getAuthorListUseCase: GetAuthorListUseCase,
     private val unsubscribeFromAuthorUseCase: UnsubscribeFromAuthorUseCase
 ) : ViewModel() {
 
-    private val _authorList = MutableLiveData<List<AuthorItemEntity>>()
-    val authorList: LiveData<List<AuthorItemEntity>>
-        get() = _authorList
+    private val _uiState = MutableStateFlow<AuthorState>(AuthorState.Loading)
+    val uiState: StateFlow<AuthorState> get() = _uiState.asStateFlow()
+
+
 
     fun unsubscribeFromAuthor(author: String){
         viewModelScope.launch {
@@ -34,11 +33,10 @@ class SubscribedAuthorsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             getAuthorListUseCase().collect { authors ->
-                _authorList.value = authors
+                _uiState.value = (AuthorState.Success(authors))
             }
         }
     }
-
 
 }
 

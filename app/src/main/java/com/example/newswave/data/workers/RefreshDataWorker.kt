@@ -35,42 +35,38 @@ class RefreshDataWorker(
 ) : CoroutineWorker(context, workerParameters) {
 
 
-
     override suspend fun doWork(): Result {
         return try {
             loadData()
             Result.success()
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Log.e("CheckNews", "Error fetching top news", e)
             Result.failure()
         }
     }
 
 
-    private suspend fun loadData(){
-            val jsonContainer: Flow<TopNewsResponseDto> =
-                apiService.getListTopNews(date = "2024-09-23")// Временно другая дата, так как сегодня еще нет новостей
-                    .retry {
-                        Log.d("RetryLoad", "In load")
-                        delay(1000)
-                        true
+    private suspend fun loadData() {
+        val jsonContainer: Flow<TopNewsResponseDto> =
+            apiService.getListTopNews(date = DateUtils.formatCurrentDate())// Временно другая дата, так как сегодня еще нет новостей
+                .retry {
+                    delay(1000)
+                    true
+                }
+        val newsListDbModel =
+            jsonContainer //преобразование из Flow<NewsResponseDto> в Flow<List<NewsItemDto>>
+                .map {
+                    mapper.mapJsonContainerTopNewsToListNews(jsonContainer)
+                }//преобразование в List<NewsItemDto>
+                .flatMapConcat { newList ->
+                    flow {
+                        emit(newList.map { mapper.mapDtoToDbModel(it) }) //преобразование в List<NewsDbModel>
                     }
-            val newsListDbModel =
-                jsonContainer //преобразование из Flow<NewsResponseDto> в Flow<List<NewsItemDto>>
-                    .map {
-                        mapper.mapJsonContainerTopNewsToListNews(jsonContainer)
-                    }//преобразование в List<NewsItemDto>
-                    .flatMapConcat { newList ->
-                        flow {
-                            emit(newList.map { mapper.mapDtoToDbModel(it) }) //преобразование в List<NewsDbModel>
-                        }
-                    }
-                    .flattenToList()// преобразование из flow в list
-                    .distinctBy { it.title }
-            //преобразование в List<NewsDbModel>
-            newsInfoDao.insertNews(newsListDbModel)
-            delay(10000)
-        }
+                }
+                .flattenToList()// преобразование из flow в list
+                .distinctBy { it.title } //преобразование в List<NewsDbModel>
+        newsInfoDao.insertNews(newsListDbModel)
+    }
 
 
     companion object {

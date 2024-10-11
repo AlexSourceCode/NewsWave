@@ -7,7 +7,6 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -19,13 +18,11 @@ import com.example.newswave.databinding.FragmentTopNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.utils.Filter
 import com.example.newswave.app.NewsApp
-import com.example.newswave.domain.model.State
+import com.example.newswave.domain.model.NewsState
 import com.example.newswave.presentation.adapters.NewsListAdapter
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.google.android.material.tabs.TabLayout
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,6 +39,8 @@ class TopNewsFragment : Fragment() {
     private val component by lazy {
         (requireActivity().application as NewsApp).component
     }
+
+    private var isSearchNews: Boolean? = null
 
 
     var selectedFilter: String? = null
@@ -73,15 +72,25 @@ class TopNewsFragment : Fragment() {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (binding.edSearch.text.toString() != "") {
+                    if (isSearchNews == true) {
                         binding.edSearch.text.clear()
                         viewModel.backToTopNews()
+                        isSearchNews = false
                     } else {
                         isEnabled = false
                         requireActivity().onBackPressed()
                     }
                 }
             })
+
+        binding.swipeRefreshLayout.setOnRefreshListener{
+            if (isSearchNews == true){
+                viewModel.searchNewsByFilter()
+            } else{
+                viewModel.refreshData()
+            }
+            binding.swipeRefreshLayout.isRefreshing = false
+        }
 
     }
 
@@ -117,11 +126,12 @@ class TopNewsFragment : Fragment() {
         binding.edSearch.setOnKeyListener { view, keycode, event ->
             if (event.action == KeyEvent.ACTION_DOWN && keycode == KeyEvent.KEYCODE_ENTER) { // проверка, что нажатая клавиша является Enter
                 selectedFilter?.let {
-                    viewModel.setSearchParameters(
+                    viewModel.updateSearchParameters(
                         it,
                         binding.edSearch.text.toString()
                     )
                 }
+                isSearchNews = true
                 viewModel.searchNewsByFilter()
                 true
             } else {
@@ -132,24 +142,24 @@ class TopNewsFragment : Fragment() {
 
     private fun observeViewModel() { // What name to give a feature?
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){// ПОЧЕМУ ДЖАЖДЫ А ПОТОМ УВЕЛИЧЕНИЕ НА +1 ПРИ created norm
+            repeatOnLifecycle(Lifecycle.State.CREATED){
                 viewModel.uiState.collect{ uiState ->
                     Log.d("LastState", uiState.toString())
                     when(uiState){
-                        is State.Error -> Log.d("CheckState", uiState.toString())
-                        is State.Loading -> {
+                        is NewsState.Error -> Log.d("CheckState", uiState.toString())
+                        is NewsState.Loading -> {
                             binding.pgNews.visibility = View.VISIBLE
                         }
-                        is State.Success -> {
+                        is NewsState.Success -> {
                             binding.pgNews.visibility = View.GONE
                             adapter.submitList(uiState.currentList)
                         }
-                        else -> {Log.d("CheckState", "FAILED")}
                     }
                 }
             }
         }
     }
+
 
     private fun setupAdapter() {
         adapter = NewsListAdapter(requireActivity().application)

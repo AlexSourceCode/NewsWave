@@ -13,7 +13,10 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.fragment.navArgs
@@ -26,6 +29,7 @@ import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.DateUtils
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -155,8 +159,12 @@ class NewsDetailsFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.isFavorite.observe(viewLifecycleOwner) { isFavorite ->
-            updateSubscriptionButton(isFavorite)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED){
+                viewModel.stateAuthor.collect { isFavorite ->
+                    updateSubscriptionButton(isFavorite)
+                }
+            }
         }
     }
 

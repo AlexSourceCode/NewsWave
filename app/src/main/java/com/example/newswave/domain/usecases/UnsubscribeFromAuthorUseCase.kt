@@ -5,5 +5,5 @@ import javax.inject.Inject
 
 class UnsubscribeFromAuthorUseCase @Inject constructor(private val repository: SubscriptionRepository) {
 
-    suspend operator fun invoke(author: String) = repository.unsubscribeOnAuthor(author)
+    suspend operator fun invoke(author: String) = repository.unsubscribeFromAuthor(author)
 }

@@ -20,11 +20,19 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -32,7 +40,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.Thread.State
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -48,23 +58,28 @@ class NewsRepositoryImpl @Inject constructor(
     @SuppressLint("NewApi")
     private var currentEndDate: LocalDate = LocalDate.now()
 
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val ioScope = CoroutineScope(Dispatchers.IO)
+
+    private val _filterFlow = MutableSharedFlow<String>()
+    private var _valueFilter: String? = null
+
+    private val _filteredNewsFlow = MutableSharedFlow<List<NewsItemEntity>>()
+    private val filteredNewsFlow: SharedFlow<List<NewsItemEntity>> get() = _filteredNewsFlow.asSharedFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val getTopNewsList = newsDao.getNewsList()
+    val topNewsFlow = newsDao.getNewsList()
         .flatMapConcat { newsList ->
             flow {
                 emit(newsList.map { mapper.mapDbModelToEntity(it) })
             }
         }.stateIn(
-            scope = coroutineScope,
+            scope = ioScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = emptyList()
         )
 
 
-
-    override suspend fun getTopNewsList(): StateFlow<List<NewsItemEntity>> = getTopNewsList
+    override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> = topNewsFlow
 
     override fun loadData() {
         val workManager = WorkManager.getInstance(application.applicationContext)
@@ -98,37 +113,54 @@ class NewsRepositoryImpl @Inject constructor(
         delay(10000)
     }
 
+    private suspend fun updateFilterParameters(filterParameter: String, valueParameter: String) {
+        _valueFilter = valueParameter
+        _filterFlow.emit(filterParameter)
+    }
+
     override suspend fun searchNewsByFilter(
         filterParameter: String,
         valueParameter: String
-    ): List<NewsItemEntity> =
-        withContext(Dispatchers.IO) {
-            when (filterParameter) {
-                application.getString(Filter.TEXT.descriptionResId) -> apiService.getNewsByText(
-                    text = valueParameter
-                )
+    ): SharedFlow<List<NewsItemEntity>> {
+        updateFilterParameters(filterParameter, valueParameter)
+        return filteredNewsFlow
+    }
 
-                application.getString(Filter.AUTHOR.descriptionResId) -> apiService.getNewsByAuthor(
-                    author = valueParameter
-                )
+    init {
+        ioScope.launch {
+            _filterFlow
+                .filterNot { it == "initial" }
+                .flatMapLatest { filter ->
+                    when (filter) {
+                        application.getString(Filter.TEXT.descriptionResId) -> apiService.getNewsByText(
+                            text = _valueFilter.toString() // temp solution
+                        )
 
-                application.getString(Filter.DATE.descriptionResId) -> apiService.getNewsByDate(
-                    date = valueParameter
-                )
+                        application.getString(Filter.AUTHOR.descriptionResId) -> apiService.getNewsByAuthor(
+                            author = _valueFilter.toString()
+                        )
 
-                else -> {
-                    throw RuntimeException("error filter")
+                        application.getString(Filter.DATE.descriptionResId) -> apiService.getNewsByDate(
+                            date = _valueFilter.toString()
+                        )
+
+                        else -> {
+                            throw RuntimeException("error filter")
+                        }
+                    }
+                        .retry {
+                            delay(1000)
+                            true
+                        }
+                        .map { it.news }
+                        .flatMapConcat { newsList ->
+                            flow { emit(newsList.map { mapper.mapDtoToEntity(it) }) }
+                        }
+                        .map { it.distinctBy { news -> news.id } }
                 }
-            }.retry {
-                Log.d("RetryLoad", it.toString())
-                delay(1000)
-                true
-            }
-                .map { it.news }
-                .flatMapConcat { newsList ->
-                    flow { emit(newsList.map { mapper.mapDtoToEntity(it) }) }
+                .collect { news ->
+                    _filteredNewsFlow.emit(news)
                 }
-                .flattenToList()
-                .distinctBy { it.title }
         }
+    }
 }

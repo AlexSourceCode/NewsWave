@@ -13,7 +13,7 @@ class SearchNewsByFilterUseCase @Inject constructor(
     private val repository: NewsRepository
 ) {
 
-    suspend operator fun invoke(): List<NewsItemEntity> = repository.searchNewsByFilter(filterParameter, valueParameter)
+    suspend operator fun invoke()  = repository.searchNewsByFilter(filterParameter, valueParameter)
 
 
 }
