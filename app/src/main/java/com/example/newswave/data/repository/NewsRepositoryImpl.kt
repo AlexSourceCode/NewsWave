@@ -129,7 +129,6 @@ class NewsRepositoryImpl @Inject constructor(
     init {
         ioScope.launch {
             _filterFlow
-                .filterNot { it == "initial" }
                 .flatMapLatest { filter ->
                     when (filter) {
                         application.getString(Filter.TEXT.descriptionResId) -> apiService.getNewsByText(

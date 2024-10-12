@@ -1,5 +1,6 @@
 package com.example.newswave.presentation.viewModels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.domain.model.NewsState
@@ -11,6 +12,14 @@ import com.example.newswave.domain.usecases.SearchNewsByFilterUseCaseFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,6 +36,7 @@ class TopNewsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<NewsState>(NewsState.Loading)
     val uiState: StateFlow<NewsState> = _uiState.asStateFlow()
 
+    private val _searchTrigger = MutableStateFlow<Boolean>(false)
 
     fun updateSearchParameters(filter: String, value: String) {
         searchNewsByFilterUseCase =
@@ -34,6 +44,7 @@ class TopNewsViewModel @Inject constructor(
     }
 
     fun searchNewsByFilter() {
+        _searchTrigger.value = true
         viewModelScope.launch {
             searchNewsByFilterUseCase()
         }
@@ -58,7 +69,6 @@ class TopNewsViewModel @Inject constructor(
 
     init {
         loadDataUseCase()
-        updateSearchParameters("initial", "initial") // crutch!
 
         viewModelScope.launch {
             try {
@@ -71,11 +81,16 @@ class TopNewsViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch {  // почему в разных скоупах
+        viewModelScope.launch {
             try {
-                searchNewsByFilterUseCase()
-                    .collect { news ->
-                        _uiState.value = NewsState.Success(news)
+                _searchTrigger
+                    .filter { it }
+                    .take(1)
+                    .collect{
+                        searchNewsByFilterUseCase()
+                            .collect { news ->
+                            _uiState.value = NewsState.Success(news)
+                        }
                     }
             } catch (e: Exception) {
                 _uiState.value = NewsState.Error(e.toString())
