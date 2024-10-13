@@ -63,25 +63,10 @@ class TopNewsFragment : Fragment() {
         viewModel = ViewModelProvider(this, viewModelFactory)[TopNewsViewModel::class.java]
         setupAdapter()
         observeViewModel()
-
         setupTabLayout()
         selectedFilter = requireActivity().application.getString(Filter.TEXT.descriptionResId)
         searchByFilterListener()
-
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    if (isSearchNews == true) {
-                        binding.edSearch.text.clear()
-                        viewModel.backToTopNews()
-                        isSearchNews = false
-                    } else {
-                        isEnabled = false
-                        requireActivity().onBackPressed()
-                    }
-                }
-            })
+        handleBackNavigation()
 
         binding.swipeRefreshLayout.setOnRefreshListener{
             if (isSearchNews == true){
@@ -93,6 +78,26 @@ class TopNewsFragment : Fragment() {
         }
 
     }
+
+    private fun handleBackNavigation() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (isSearchNews == true) {
+                        binding.edSearch.text.clear() //handleBackFromSearch
+                        viewModel.backToTopNews()
+                        isSearchNews = false
+                    } else { // disableBackPressAndNavigate
+                        isEnabled = false
+                        requireActivity().onBackPressed()
+                    }
+                }
+            })
+    }
+
+
+
 
 
     private fun setupTabLayout() {
@@ -126,13 +131,9 @@ class TopNewsFragment : Fragment() {
         binding.edSearch.setOnKeyListener { view, keycode, event ->
             if (event.action == KeyEvent.ACTION_DOWN && keycode == KeyEvent.KEYCODE_ENTER) { // проверка, что нажатая клавиша является Enter
                 selectedFilter?.let {
-                    viewModel.updateSearchParameters(
-                        it,
-                        binding.edSearch.text.toString()
-                    )
+                    viewModel.updateSearchParameters(it, binding.edSearch.text.toString())
+                    isSearchNews = true
                 }
-                isSearchNews = true
-                viewModel.searchNewsByFilter()
                 true
             } else {
                 false
@@ -144,7 +145,6 @@ class TopNewsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED){
                 viewModel.uiState.collect{ uiState ->
-                    Log.d("LastState", uiState.toString())
                     when(uiState){
                         is NewsState.Error -> Log.d("CheckState", uiState.toString())
                         is NewsState.Loading -> {
@@ -172,6 +172,8 @@ class TopNewsFragment : Fragment() {
 //            viewModel.loadNewsForPreviousDay()
 //        }
     }
+
+
 
     fun scrollToTop() {
         binding.rcNews.scrollToPosition(0)

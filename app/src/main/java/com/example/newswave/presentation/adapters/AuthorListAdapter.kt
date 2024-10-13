@@ -8,6 +8,7 @@ import com.example.newswave.R
 import com.example.newswave.databinding.AuthorItemBinding
 import com.example.newswave.domain.entity.AuthorItemEntity
 import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.utils.StringUtils
 
 class AuthorListAdapter: ListAdapter<AuthorItemEntity, AuthorListViewHolder>(AuthorListDiffCallback) {
 
@@ -21,21 +22,21 @@ class AuthorListAdapter: ListAdapter<AuthorItemEntity, AuthorListViewHolder>(Aut
     }
 
     override fun onBindViewHolder(holder: AuthorListViewHolder, position: Int) {
-        val author = getItem(position)
+        val author = getItem(position).author
         val context = holder.itemView.context
 
-        holder.binding.tvAuthor.text = author.author
+        holder.binding.tvAuthor.text = StringUtils.truncateText(author, 30)
         holder.binding.btSubscription.text = context.getString(R.string.subscribed)
         holder.binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
         holder.binding.btSubscription.setTextColor(ContextCompat.getColor(context, R.color.white))
 
 
         holder.binding.btSubscription.setOnClickListener {
-            onAuthorClickSubscription?.invoke(author.author)
+            onAuthorClickSubscription?.invoke(author)
         }
 
         holder.itemView.setOnClickListener {
-            onAuthorClickNews?.invoke(author.author)
+            onAuthorClickNews?.invoke(author)
         }
     }
 }

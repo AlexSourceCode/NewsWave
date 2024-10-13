@@ -7,11 +7,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.example.newswave.R
 import com.example.newswave.databinding.FragmentSubscribedAuthorsBinding
 import com.example.newswave.app.NewsApp
 import com.example.newswave.domain.model.AuthorState
@@ -58,22 +60,10 @@ class SubscribedAuthorsFragment : Fragment() {
         observeViewModel()
     }
 
-    private fun setupAdapter(){
-        adapter = AuthorListAdapter()
-        binding.rcAuthors.adapter = adapter
-        adapter.onAuthorClickSubscription = { author ->
-            viewModel.unsubscribeFromAuthor(author)
-        }
-        adapter.onAuthorClickNews = { author ->
-            launchAuthorNewsFragment(author)
-        }
-    }
-
     private fun observeViewModel(){
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED){
                 viewModel.uiState.collect{ uiState ->
-                    Log.d("CheckState", uiState.toString())
                     when(uiState){
                         is AuthorState.Error -> Log.d("CheckState", uiState.toString())
                         is AuthorState.Loading -> {
@@ -87,7 +77,34 @@ class SubscribedAuthorsFragment : Fragment() {
                 }
             }
         }
+    }
 
+    private fun setupAdapter(){
+        adapter = AuthorListAdapter()
+        binding.rcAuthors.adapter = adapter
+        adapter.onAuthorClickSubscription = { author ->
+            showUnsubscribeDialog(author)
+        }
+        adapter.onAuthorClickNews = { author ->
+            launchAuthorNewsFragment(author)
+        }
+    }
+
+    private fun showUnsubscribeDialog(author: String) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(getString(R.string.confirmation))
+        builder.setMessage(getString(R.string.alert_dialog_question, author))
+
+        builder.setPositiveButton(getString(R.string.positive_answer)) { dialog, _ ->
+            viewModel.unsubscribeFromAuthor(author)
+            dialog.dismiss()
+        }
+        builder.setNegativeButton(getString(R.string.negative_answer)){ dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun launchAuthorNewsFragment(author: String){

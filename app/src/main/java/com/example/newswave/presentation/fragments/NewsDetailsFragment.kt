@@ -5,13 +5,16 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
+import android.text.TextPaint
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -27,7 +30,9 @@ import com.example.newswave.presentation.MainActivity
 import com.example.newswave.app.NewsApp
 import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
+import com.example.newswave.utils.CustomArrayAdapter
 import com.example.newswave.utils.DateUtils
+import com.example.newswave.utils.TextUtils
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -93,17 +98,20 @@ class NewsDetailsFragment : Fragment() {
     private fun setupSpinner(){
         val list = args.news.author.split(",")
         val spinner = binding.srAuthors
-        val spinnerAdapter =
-            ArrayAdapter(requireActivity().application, R.layout.spinner_item, list)
-        spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
-        spinner.adapter = spinnerAdapter
+
+        val customAdapter = CustomArrayAdapter(requireActivity().application, R.layout.spinner_item, list)
+        customAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
+        spinner.adapter = customAdapter
+
+        spinner.adapter = customAdapter
         if (!args.author.isNullOrBlank()) {
-            for (pos in 0 until spinnerAdapter.count) {
-                if (spinnerAdapter.getItem(pos).toString() == args.author) {
+            for (pos in 0 until customAdapter.count) {
+                if (customAdapter.getItem(pos).toString() == args.author) {
                     spinner.setSelection(pos)
                 }
             }
         }
+
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @SuppressLint("ResourceAsColor")
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
@@ -177,12 +185,29 @@ class NewsDetailsFragment : Fragment() {
             if (checkSubscribed == btSub) {
                 viewModel.subscribeOnAuthor(author)
             } else {
-                viewModel.unsubscribeFromAuthor(author)
+                showUnsubscribeDialog(author)
             }
         }
     }
 
-    override fun onDestroyView() {
+    private fun showUnsubscribeDialog(author: String) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(getString(R.string.confirmation))
+        builder.setMessage(getString(R.string.alert_dialog_question, author))
+
+        builder.setPositiveButton(getString(R.string.positive_answer)) {dialog, _ ->
+            viewModel.unsubscribeFromAuthor(author)
+            dialog.dismiss()
+        }
+        builder.setNegativeButton(getString(R.string.negative_answer)){ dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+        override fun onDestroyView() {
         super.onDestroyView()
         player.release()
         binding.playerView.player = null

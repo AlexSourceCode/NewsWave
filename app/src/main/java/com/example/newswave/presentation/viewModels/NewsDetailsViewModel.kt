@@ -17,7 +17,7 @@ class NewsDetailsViewModel @Inject constructor(
     private val unsubscribeFromAuthorUseCase: UnsubscribeFromAuthorUseCase
 ): ViewModel() {
 
-    private val _stateAuthor = MutableStateFlow(true)//под вопросом использование Flow
+    private val _stateAuthor = MutableStateFlow(false)//под вопросом использование Flow
     val stateAuthor: StateFlow<Boolean> get() = _stateAuthor.asStateFlow()
 
 

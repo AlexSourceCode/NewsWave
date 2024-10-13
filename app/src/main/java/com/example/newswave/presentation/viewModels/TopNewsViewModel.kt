@@ -36,15 +36,23 @@ class TopNewsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<NewsState>(NewsState.Loading)
     val uiState: StateFlow<NewsState> = _uiState.asStateFlow()
 
-    private val _searchTrigger = MutableStateFlow<Boolean>(false)
+    private val _searchTrigger = MutableStateFlow(false)
+
+    private val _searchArgs = MutableStateFlow<Pair<String, String>?>(null)
+
 
     fun updateSearchParameters(filter: String, value: String) {
-        searchNewsByFilterUseCase =
-            searchNewsByFilterUseCaseFactory.create(filter, value)
+        viewModelScope.launch {
+            _searchArgs.value = Pair(filter,value)
+            searchNewsByFilter()
+        }
     }
 
     fun searchNewsByFilter() {
-        _searchTrigger.value = true
+        if (!_searchTrigger.value){
+            _searchTrigger.value = true
+            return
+        }
         viewModelScope.launch {
             searchNewsByFilterUseCase()
         }
@@ -89,12 +97,21 @@ class TopNewsViewModel @Inject constructor(
                     .collect{
                         searchNewsByFilterUseCase()
                             .collect { news ->
-                            _uiState.value = NewsState.Success(news)
+                                _uiState.value = NewsState.Success(news)
                         }
                     }
             } catch (e: Exception) {
                 _uiState.value = NewsState.Error(e.toString())
             }
+        }
+
+        viewModelScope.launch {
+            _searchArgs
+                .filterNotNull()
+                .collect{ args ->
+                    searchNewsByFilterUseCase =
+                        searchNewsByFilterUseCaseFactory.create(args.first, args.second)
+                }
         }
     }
 }
