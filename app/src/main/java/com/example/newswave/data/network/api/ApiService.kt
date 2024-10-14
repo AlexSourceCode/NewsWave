@@ -35,16 +35,17 @@ interface ApiService {
         @Query("sort") sort: String = QUERY_PARAM_SORT
     ): Flow<NewsResponseDto>
 
-    @GET("search-news")
+    @GET("top-news")
     suspend fun getNewsByDate(
         @Query("language") language: String = QUERY_PARAM_LANGUAGE,
         @Query("api-key") apiKey: String = QUERY_PARAM_API_KEY,
-        @Query("authors") date: String
-    ): Flow<NewsResponseDto>
+        @Query("source-country") sourceCountry: String = QUERY_PARAM_SOURCE_COUNTRY,
+        @Query("date") date: String,
+        ): Flow<TopNewsResponseDto>
 
 
     companion object {
-        private const val QUERY_PARAM_API_KEY = "b6ef41d59ba74add937bb849af4656b4"
+        private const val QUERY_PARAM_API_KEY = "8c4ee1f143ac4af197fbfb7237dc6235"
         private const val QUERY_PARAM_LANGUAGE = "en"
         private const val QUERY_PARAM_SOURCE_COUNTRY = "us"
         private const val QUERY_PARAM_SORT_DIRECTION = "DESC"

@@ -133,15 +133,15 @@ class NewsRepositoryImpl @Inject constructor(
                     when (filter) {
                         application.getString(Filter.TEXT.descriptionResId) -> apiService.getNewsByText(
                             text = _valueFilter.toString() // temp solution
-                        )
+                        ).map { it.news }
 
                         application.getString(Filter.AUTHOR.descriptionResId) -> apiService.getNewsByAuthor(
                             author = _valueFilter.toString()
-                        )
+                        ).map { it.news }
 
                         application.getString(Filter.DATE.descriptionResId) -> apiService.getNewsByDate(
-                            date = _valueFilter.toString()
-                        )
+                            date = _valueFilter.toString(),
+                        ).map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
 
                         else -> {
                             throw RuntimeException("error filter")
@@ -151,11 +151,17 @@ class NewsRepositoryImpl @Inject constructor(
                             delay(1000)
                             true
                         }
-                        .map { it.news }
                         .flatMapConcat { newsList ->
                             flow { emit(newsList.map { mapper.mapDtoToEntity(it) }) }
                         }
-                        .map { it.distinctBy { news -> news.id } }
+                        .map {
+                            it.distinctBy { news -> news.title }
+                        }
+                        .map {
+                            if (filter == application.getString(Filter.DATE.descriptionResId)) {
+                                it.sortedBy { it.publishDate }
+                            } else it
+                        }
                 }
                 .collect { news ->
                     _filteredNewsFlow.emit(news)

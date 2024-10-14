@@ -15,15 +15,20 @@ import com.example.newswave.data.mapper.flattenToList
 import com.example.newswave.data.network.api.ApiFactory
 import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.network.model.TopNewsResponseDto
+import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.utils.DateUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.retry
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.launch
 
 class RefreshDataWorker(
@@ -33,6 +38,7 @@ class RefreshDataWorker(
     private val newsInfoDao: NewsDao,
     private val mapper: NewsMapper
 ) : CoroutineWorker(context, workerParameters) {
+
 
 
     override suspend fun doWork(): Result {
@@ -46,27 +52,28 @@ class RefreshDataWorker(
     }
 
 
+
     private suspend fun loadData() {
-        val jsonContainer: Flow<TopNewsResponseDto> =
-            apiService.getListTopNews(date = DateUtils.formatCurrentDate())// Временно другая дата, так как сегодня еще нет новостей
-                .retry {
-                    delay(1000)
-                    true
+        var date = DateUtils.formatCurrentDate()
+        val jsonContainer = flow {
+            while (true){
+                val response = apiService.getNewsByDate(date = date).first()
+                if (response.news.isNotEmpty()) {
+                    emit(response)
+                    break
                 }
-        val newsListDbModel =
-            jsonContainer //преобразование из Flow<NewsResponseDto> в Flow<List<NewsItemDto>>
-                .map {
-                    mapper.mapJsonContainerTopNewsToListNews(jsonContainer)
-                }//преобразование в List<NewsItemDto>
-                .flatMapConcat { newList ->
-                    flow {
-                        emit(newList.map { mapper.mapDtoToDbModel(it) }) //преобразование в List<NewsDbModel>
-                    }
-                }
-                .flattenToList()// преобразование из flow в list
-                .distinctBy { it.title } //преобразование в List<NewsDbModel>
-        newsInfoDao.insertNews(newsListDbModel)
+                date = DateUtils.formatDateToYesterday()
+            }
+        }
+
+        jsonContainer
+            .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
+            .flatMapConcat { newsList -> flow { emit(newsList.map { mapper.mapDtoToDbModel(it) }) } }
+            .map { it.distinctBy { it.title } }
+            .collect { news -> newsInfoDao.insertNews(news) }
     }
+
+
 
 
     companion object {
