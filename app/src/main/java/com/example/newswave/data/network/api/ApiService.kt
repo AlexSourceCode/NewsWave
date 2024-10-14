@@ -23,7 +23,8 @@ interface ApiService {
         @Query("api-key") apiKey: String = QUERY_PARAM_API_KEY,
         @Query("text") text: String,
         @Query("sort-direction") sortDirection: String = QUERY_PARAM_SORT_DIRECTION,
-        @Query("sort") sort: String = QUERY_PARAM_SORT
+        @Query("sort") sort: String = QUERY_PARAM_SORT,
+        @Query("number") number: Int = QUERY_PARAM_LIMIT
     ): Flow<NewsResponseDto>
 
     @GET("search-news")
@@ -32,7 +33,8 @@ interface ApiService {
         @Query("api-key") apiKey: String = QUERY_PARAM_API_KEY,
         @Query("authors") author: String,
         @Query("sort-direction") sortDirection: String = QUERY_PARAM_SORT_DIRECTION,
-        @Query("sort") sort: String = QUERY_PARAM_SORT
+        @Query("sort") sort: String = QUERY_PARAM_SORT,
+        @Query("number") limit: Int = QUERY_PARAM_LIMIT
     ): Flow<NewsResponseDto>
 
     @GET("top-news")
@@ -45,10 +47,11 @@ interface ApiService {
 
 
     companion object {
-        private const val QUERY_PARAM_API_KEY = "8c4ee1f143ac4af197fbfb7237dc6235"
+        private const val QUERY_PARAM_API_KEY = "b6ef41d59ba74add937bb849af4656b4"
         private const val QUERY_PARAM_LANGUAGE = "en"
         private const val QUERY_PARAM_SOURCE_COUNTRY = "us"
         private const val QUERY_PARAM_SORT_DIRECTION = "DESC"
         private const val QUERY_PARAM_SORT = "publish-time"
+        private const val QUERY_PARAM_LIMIT = 50
     }
 }

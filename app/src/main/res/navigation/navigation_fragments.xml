@@ -26,7 +26,7 @@
         <action
             android:id="@+id/action_topNewsFragment_to_newsDetailsFragment"
             app:destination="@id/newsDetailsFragment"
-            app:popUpTo="@id/topNewsFragment" />
+            app:popUpTo="@id/topNewsFragment"/>
     </fragment>
     <fragment
         android:id="@+id/subscribedAuthorsFragment"

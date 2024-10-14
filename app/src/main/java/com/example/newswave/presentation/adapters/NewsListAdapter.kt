@@ -16,7 +16,7 @@ class NewsListAdapter(
 
     var onNewsClickListener: ((NewsItemEntity) -> Unit)? = null
     var onLoadMoreListener: (() -> Unit)? = null
-    var onLoadListener:(() -> Unit)? = null
+    var onLoadListener: (() -> Unit)? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsListViewHolder {
@@ -46,5 +46,6 @@ class NewsListAdapter(
 //            onLoadMoreListener?.invoke()
 //        }
     }
-
+    fun scrollToFirst() {
+    }
 }

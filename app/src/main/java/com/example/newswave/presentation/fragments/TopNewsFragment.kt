@@ -152,12 +152,19 @@ class TopNewsFragment : Fragment() {
                         }
                         is NewsState.Success -> {
                             binding.pgNews.visibility = View.GONE
-                            adapter.submitList(uiState.currentList)
+                            adapter.submitList(uiState.currentList){
+                                scrollToTop()
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+
+    fun scrollToTop() {
+        binding.rcNews.scrollToPosition(0)
     }
 
 
@@ -175,9 +182,6 @@ class TopNewsFragment : Fragment() {
 
 
 
-    fun scrollToTop() {
-        binding.rcNews.scrollToPosition(0)
-    }
 
     private fun launchNewsDetailsFragment(news: NewsItemEntity) {
         findNavController().navigate(
