@@ -72,7 +72,18 @@
             app:layout_constraintTop_toBottomOf="@id/ivImage"
             tools:text="Lawmakers grilled Secret Service Director Kimberly Cheatle Monday for more than four hours at a House Oversight and Accountability Committee hearing after her agency's staggering July 13 security failure at a Pennsylvania campaign rally. " />
 
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            app:layout_constraintTop_toBottomOf="@+id/tvText"
+            android:layout_margin="16dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.cardview.widget.CardView>
+

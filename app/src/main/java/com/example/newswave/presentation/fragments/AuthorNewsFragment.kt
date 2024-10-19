@@ -7,12 +7,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.example.newswave.R
 import com.example.newswave.databinding.FragmentAuthorNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.app.NewsApp
@@ -58,7 +60,13 @@ class AuthorNewsFragment : Fragment() {
         viewModel = ViewModelProvider(this, viewModelFactory)[AuthorNewsViewModel::class.java]
         setupAdapter()
         observeViewModel()
+        setOnClickListener()
+        setupSwipeRefresh()
 
+
+    }
+
+    private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.refreshData(args.author)
             binding.swipeRefreshLayout.isRefreshing = false
@@ -66,7 +74,7 @@ class AuthorNewsFragment : Fragment() {
     }
 
 
-    private fun setupAdapter(){
+    private fun setupAdapter() {
         adapter = NewsListAdapter(requireActivity().application)
         binding.rcNews.adapter = adapter
         adapter.onNewsClickListener = { news ->
@@ -75,17 +83,24 @@ class AuthorNewsFragment : Fragment() {
         binding.currentAuthor.text = args.author
     }
 
-    private fun observeViewModel(){
+    private fun observeViewModel() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.loadAuthorNews(args.author)
-                viewModel.uiState.collect{ uiState ->
-
-                    when(uiState){
-                        is NewsState.Error -> Log.d("CheckState", uiState.toString())
-                        is NewsState.Loading -> binding.pgNews.visibility = View.VISIBLE
+                viewModel.uiState.collect { uiState ->
+                    when (uiState) {
+                        is NewsState.Error -> {
+                            showToast()
+                            binding.pgNews.visibility = View.GONE
+                            binding.tvRetry.visibility = View.VISIBLE
+                        }
+                        is NewsState.Loading -> {
+                            binding.tvRetry.visibility = View.GONE
+                            binding.pgNews.visibility = View.VISIBLE
+                        }
                         is NewsState.Success -> {
                             binding.pgNews.visibility = View.GONE
+                            binding.tvRetry.visibility = View.GONE
                             adapter.submitList(uiState.currentList)
                         }
                     }
@@ -94,9 +109,23 @@ class AuthorNewsFragment : Fragment() {
         }
     }
 
-    private fun launchNewsDetailsFragment(news: NewsItemEntity){
+
+    private fun setOnClickListener() {
+        binding.tvRetry.setOnClickListener {
+            viewModel.loadAuthorNews((args.author))
+        }
+    }
+
+    private fun showToast(){    // Показ уведомления
+        Toast.makeText(requireContext(), requireActivity().getString(R.string.error_load_data), Toast.LENGTH_LONG).show()
+    }
+
+    private fun launchNewsDetailsFragment(news: NewsItemEntity) {
         findNavController().navigate(
-            AuthorNewsFragmentDirections.actionAuthorNewsFragmentToNewsDetailsFragment3(news, args.author)
+            AuthorNewsFragmentDirections.actionAuthorNewsFragmentToNewsDetailsFragment3(
+                news,
+                args.author
+            )
         )
     }
 

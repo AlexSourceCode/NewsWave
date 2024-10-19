@@ -8,6 +8,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.example.newswave.data.database.dbNews.NewsDao
 import com.example.newswave.data.database.dbNews.NewsDb
 import com.example.newswave.data.mapper.NewsMapper
@@ -46,8 +47,8 @@ class RefreshDataWorker(
             loadData()
             Result.success()
         } catch (e: Exception) {
-            Log.e("CheckNews", "Error fetching top news", e)
-            Result.failure()
+            val outPutData = workDataOf("error" to e.message)
+            Result.failure(outPutData)
         }
     }
 
@@ -55,7 +56,7 @@ class RefreshDataWorker(
 
     private suspend fun loadData() {
         var date = DateUtils.formatCurrentDate()
-        val jsonContainer = flow {
+        val jsonContainer: Flow<TopNewsResponseDto> = flow {
             while (true){
                 val response = apiService.getNewsByDate(date = date).first()
                 if (response.news.isNotEmpty()) {
@@ -65,7 +66,6 @@ class RefreshDataWorker(
                 date = DateUtils.formatDateToYesterday()
             }
         }
-
         jsonContainer
             .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
             .flatMapConcat { newsList -> flow { emit(newsList.map { mapper.mapDtoToDbModel(it) }) } }
@@ -79,7 +79,7 @@ class RefreshDataWorker(
     companion object {
         const val WORK_NAME = "refresh news"
 
-        fun makeRequest(): OneTimeWorkRequest { // в качестве параметра можно будет передавать вчерашнюю дату, если сегодняшние новости закончились
+        fun makeRequest(): OneTimeWorkRequest {
             return OneTimeWorkRequestBuilder<RefreshDataWorker>().apply {
                 setConstraints(makeConstraints())
             }.build()

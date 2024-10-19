@@ -65,7 +65,7 @@ class SubscribedAuthorsFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.CREATED){
                 viewModel.uiState.collect{ uiState ->
                     when(uiState){
-                        is AuthorState.Error -> Log.d("CheckState", uiState.toString())
+                        is AuthorState.Error -> Log.d("CheckState", uiState.toString()) // When will be repository then need to change handle error.
                         is AuthorState.Loading -> {
                             binding.pgNews.visibility = View.VISIBLE
                         }

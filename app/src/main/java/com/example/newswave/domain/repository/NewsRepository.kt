@@ -10,7 +10,9 @@ interface NewsRepository{
 
     suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>>
 
-    fun loadData()
+    suspend fun fetchErrorLoadData(): SharedFlow<String>
+
+    suspend fun loadData()
 
     suspend fun loadNewsForPreviousDay()
 

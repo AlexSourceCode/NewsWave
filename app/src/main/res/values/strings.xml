@@ -25,5 +25,10 @@
     <string name="negative_answer">No</string>
     <string name="alert_dialog_question">Do you really want to unsubscribe from the %s ?</string>
 
+    <string name="error_load_data">Download error. Check the network connection and download again.</string>
+    <string name="download_error">Download error</string>
+    <string name="repeat">Repeat</string>
+    <string name="retry">Retry</string>
+
 
 </resources>

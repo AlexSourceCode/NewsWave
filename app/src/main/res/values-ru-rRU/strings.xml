@@ -21,4 +21,8 @@
     <string name="positive_answer">Да</string>
     <string name="negative_answer">Нет</string>
     <string name="alert_dialog_question">Вы действительно хотите отписаться от автора %s?</string>
+    <string name="error_load_data">Ошибка загрузки. Проверьте подключение к сети и повторите загрузку.</string>
+    <string name="download_error">Ошибка загрузки</string>
+    <string name="repeat">Повторить</string>
+    <string name="retry">Повторить</string>
 </resources>

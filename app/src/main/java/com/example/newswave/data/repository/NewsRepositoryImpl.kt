@@ -4,45 +4,41 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import retrofit2.HttpException
 import com.example.newswave.data.database.dbNews.NewsDao
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.mapper.flattenToList
 import com.example.newswave.data.network.api.ApiService
+import com.example.newswave.data.network.model.NewsItemDto
 import com.example.newswave.data.network.model.TopNewsResponseDto
 import com.example.newswave.data.workers.RefreshDataWorker
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.NewsRepository
 import com.example.newswave.utils.Filter
+import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.retry
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.Thread.State
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -66,6 +62,9 @@ class NewsRepositoryImpl @Inject constructor(
     private val _filteredNewsFlow = MutableSharedFlow<List<NewsItemEntity>>()
     private val filteredNewsFlow: SharedFlow<List<NewsItemEntity>> get() = _filteredNewsFlow.asSharedFlow()
 
+    private val _errorLoadData = MutableSharedFlow<String>()
+    private val errorLoadData: SharedFlow<String> get() = _errorLoadData.asSharedFlow()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val topNewsFlow = newsDao.getNewsList()
         .flatMapConcat { newsList ->
@@ -81,14 +80,53 @@ class NewsRepositoryImpl @Inject constructor(
 
     override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> = topNewsFlow
 
-    override fun loadData() {
-        val workManager = WorkManager.getInstance(application.applicationContext)
-        workManager.enqueueUniqueWork(
-            RefreshDataWorker.WORK_NAME,
-            ExistingWorkPolicy.REPLACE,
-            RefreshDataWorker.makeRequest()
-        )
+    override suspend fun loadData() {
+        val workManager =
+            WorkManager.getInstance(application.applicationContext)     // Получаем экземпляр WorkManager для управления задачами
+        val workRequest =
+            RefreshDataWorker.makeRequest()     // Создаем запрос на выполнение работы
+
+        if (workRequest != null) {
+            workManager.enqueueUniqueWork(
+                RefreshDataWorker.WORK_NAME,
+                ExistingWorkPolicy.REPLACE,
+                workRequest
+            )
+
+            ioScope.launch {
+                workManager.getWorkInfosForUniqueWorkFlow(RefreshDataWorker.WORK_NAME)
+                    .collect { workInfos ->
+                        val workInfo = workInfos.firstOrNull()
+                        if (workInfo != null) {
+                            when (workInfo.state) {
+                                WorkInfo.State.ENQUEUED -> {
+                                    if (!isNetworkAvailable(application)) {
+                                        _errorLoadData.emit("No Internet connection")
+                                    }
+                                }
+
+                                WorkInfo.State.FAILED -> {
+                                    val error = workInfo.outputData.getString("error")
+                                    if (error != null) {
+                                        _errorLoadData.emit(error)
+                                    }
+                                }
+
+                                WorkInfo.State.SUCCEEDED -> {
+                                    cancel() // Прекращаем слежение при успешном завершении работы
+                                }
+
+                                else -> {}
+                            }
+                        }
+                    }
+            }
+        }
     }
+
+
+    override suspend fun fetchErrorLoadData(): SharedFlow<String> = errorLoadData
+
 
     @SuppressLint("NewApi")
     override suspend fun loadNewsForPreviousDay() {//add withContext
@@ -110,7 +148,6 @@ class NewsRepositoryImpl @Inject constructor(
             //преобразование в List<NewsDbModel>
             newsDao.insertNews(newsListDbModel)
         }
-        delay(10000)
     }
 
     private suspend fun updateFilterParameters(filterParameter: String, valueParameter: String) {
@@ -126,46 +163,75 @@ class NewsRepositoryImpl @Inject constructor(
         return filteredNewsFlow
     }
 
+    private suspend fun getNewsByText(text: String): Flow<List<NewsItemDto>> {
+        try {
+            return apiService.getNewsByText(text = text).map { it.news }
+        } catch (e: Exception){
+            _errorLoadData.emit("Error loading news by text: ${e.message}")
+             return flow { emptyList<NewsItemDto>()}
+        }
+    }
+
+    private suspend fun getNewsByAuthor(author: String): Flow<List<NewsItemDto>> {
+        try {
+            return apiService.getNewsByAuthor(author = author).map { it.news }
+        } catch (e: Exception){
+            _errorLoadData.emit("Error loading news by text: ${e.message}")
+            return flow { emptyList<NewsItemDto>()}
+        }
+    }
+
+    private suspend fun getNewsByDate(date: String): Flow<List<NewsItemDto>> {
+        try {
+            return apiService.getNewsByDate(date = date)
+                .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
+        } catch (e: Exception){
+            _errorLoadData.emit("Error loading news by text: ${e.message}")
+            return flow { emptyList<NewsItemDto>()}
+        }
+    }
+
     init {
         ioScope.launch {
             _filterFlow
+                .filter {
+                    val isConnected = isNetworkAvailable(application)
+                    if (!isConnected) {
+                        _errorLoadData.emit("No Internet connection")
+                    }
+                    isConnected
+                }
                 .flatMapLatest { filter ->
                     when (filter) {
-                        application.getString(Filter.TEXT.descriptionResId) -> apiService.getNewsByText(
-                            text = _valueFilter.toString() // temp solution
-                        ).map { it.news }
+                        application.getString(Filter.TEXT.descriptionResId) ->
+                            getNewsByText(_valueFilter.toString())
 
-                        application.getString(Filter.AUTHOR.descriptionResId) -> apiService.getNewsByAuthor(
-                            author = _valueFilter.toString()
-                        ).map { it.news }
+                        application.getString(Filter.AUTHOR.descriptionResId) ->
+                            getNewsByAuthor(_valueFilter.toString())
 
-                        application.getString(Filter.DATE.descriptionResId) -> apiService.getNewsByDate(
-                            date = _valueFilter.toString(),
-                        ).map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
-
+                        application.getString(Filter.DATE.descriptionResId) ->
+                            getNewsByDate(date = _valueFilter.toString())
                         else -> {
-                            throw RuntimeException("error filter")
+                            throw Exception("Invalid filter: $filter")
                         }
                     }
-                        .retry {
-                            delay(1000)
-                            true
-                        }
+//                        .retry { cause ->
+//                            if (cause is HttpException && cause.code() == 429) {
+//                                delay(2000)
+//                                true
+//                            } else false
+//                        }
                         .flatMapConcat { newsList ->
                             flow { emit(newsList.map { mapper.mapDtoToEntity(it) }) }
                         }
-                        .map {
-                            it.distinctBy { news -> news.title }
-                        }
+                        .map { it.distinctBy { news -> news.title } }
                         .map {
                             if (filter == application.getString(Filter.DATE.descriptionResId)) {
                                 it.sortedBy { it.publishDate }
                             } else it
                         }
                 }
-                .collect { news ->
-                    _filteredNewsFlow.emit(news)
-                }
+                .collect { news -> _filteredNewsFlow.emit(news) }
         }
     }
 }
