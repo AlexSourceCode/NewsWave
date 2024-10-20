@@ -91,45 +91,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-<!--    <androidx.cardview.widget.CardView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_margin="16dp"-->
-<!--        android:alpha="0.9"-->
-<!--        app:cardBackgroundColor="#363636"-->
-<!--        app:cardCornerRadius="16dp"-->
-<!--        app:cardUseCompatPadding="true"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/swipeRefreshLayout">-->
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/tvText"-->
-<!--            android:gravity="center">-->
-
-<!--            <TextView-->
-<!--                android:layout_width="0dp"-->
-<!--                android:padding="6dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1"-->
-<!--                android:textColor="@color/white"-->
-<!--                android:gravity="center"-->
-<!--                android:text="@string/download_error"/>-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/tvRetry"-->
-<!--                android:gravity="center"-->
-<!--                android:layout_weight="1"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:textColor="#E39C49"-->
-<!--                android:text="@string/repeat"/>-->
-
-<!--        </LinearLayout>-->
-
-<!--    </androidx.cardview.widget.CardView>-->
-
     <ProgressBar
         android:id="@+id/pgNews"
         android:layout_width="wrap_content"

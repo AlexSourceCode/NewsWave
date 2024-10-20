@@ -129,24 +129,30 @@ class NewsRepositoryImpl @Inject constructor(
 
 
     @SuppressLint("NewApi")
-    override suspend fun loadNewsForPreviousDay() {//add withContext
-        withContext(Dispatchers.IO) {
+    override suspend fun loadNewsForPreviousDay() {
+        ioScope.launch {
             currentEndDate = currentEndDate.minusDays(1)
             val previousDate = currentEndDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-            val jsonContainer: Flow<TopNewsResponseDto> =
+
+            if (!isNetworkAvailable(application)) {
+                _errorLoadData.emit("No Internet connection")
+                return@launch
+            }
+            try {
                 apiService.getListTopNews(date = previousDate)
-            val newsListDbModel =
-                jsonContainer //преобразование из Flow<NewsResponseDto> в Flow<List<NewsItemDto>>
-                    .map { mapper.mapJsonContainerTopNewsToListNews(jsonContainer) }//преобразование в List<NewsItemDto>
+                    .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }//преобразование в List<NewsItemDto>
                     .flatMapConcat { newList ->
                         flow {
                             emit(newList.map { mapper.mapDtoToDbModel(it) }) //преобразование в List<NewsDbModel>
                         }
                     }
-                    .flattenToList()// преобразование из flow в list
-                    .distinctBy { it.title }
-            //преобразование в List<NewsDbModel>
-            newsDao.insertNews(newsListDbModel)
+                    .map { it.distinctBy { news -> news.title } }
+                    .collect {
+                        newsDao.insertNews(it)
+                    }
+            } catch (e: Exception){
+                _errorLoadData.emit("Error loading news ${e.message}")
+            }
         }
     }
 
@@ -166,18 +172,18 @@ class NewsRepositoryImpl @Inject constructor(
     private suspend fun getNewsByText(text: String): Flow<List<NewsItemDto>> {
         try {
             return apiService.getNewsByText(text = text).map { it.news }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             _errorLoadData.emit("Error loading news by text: ${e.message}")
-             return flow { emptyList<NewsItemDto>()}
+            return flow { emptyList<NewsItemDto>() }
         }
     }
 
     private suspend fun getNewsByAuthor(author: String): Flow<List<NewsItemDto>> {
         try {
             return apiService.getNewsByAuthor(author = author).map { it.news }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             _errorLoadData.emit("Error loading news by text: ${e.message}")
-            return flow { emptyList<NewsItemDto>()}
+            return flow { emptyList<NewsItemDto>() }
         }
     }
 
@@ -185,9 +191,9 @@ class NewsRepositoryImpl @Inject constructor(
         try {
             return apiService.getNewsByDate(date = date)
                 .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             _errorLoadData.emit("Error loading news by text: ${e.message}")
-            return flow { emptyList<NewsItemDto>()}
+            return flow { emptyList<NewsItemDto>() }
         }
     }
 
@@ -210,7 +216,8 @@ class NewsRepositoryImpl @Inject constructor(
                             getNewsByAuthor(_valueFilter.toString())
 
                         application.getString(Filter.DATE.descriptionResId) ->
-                            getNewsByDate(date = _valueFilter.toString())
+                            getNewsByDate(_valueFilter.toString())
+
                         else -> {
                             throw Exception("Invalid filter: $filter")
                         }

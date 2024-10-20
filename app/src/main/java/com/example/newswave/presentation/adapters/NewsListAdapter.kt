@@ -1,7 +1,9 @@
 package com.example.newswave.presentation.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.example.newswave.databinding.NewsItemBinding
@@ -18,6 +20,7 @@ class NewsListAdapter(
     var onLoadMoreListener: (() -> Unit)? = null
     var onLoadListener: (() -> Unit)? = null
 
+    var shouldHideRetryButton: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsListViewHolder {
         val binding = NewsItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -42,8 +45,21 @@ class NewsListAdapter(
         holder.binding.btReadDetail.setOnClickListener {
             onNewsClickListener?.invoke(news)
         }
-        if ( position == itemCount){
+        if (position == itemCount - 10) {
             onLoadMoreListener?.invoke()
         }
+        if (position == itemCount - 1) {
+            holder.binding.cvRetryLoadingMore.visibility = View.VISIBLE
+            holder.binding.tvMoreRetry.setOnClickListener {
+                onLoadMoreListener?.invoke()
+            }
+        }  else{
+            holder.binding.cvRetryLoadingMore.visibility = View.GONE
+        }
+    }
+
+    fun submitListWithLoadMore(list: List<NewsItemEntity>?, commitCallback: Runnable?) {
+        shouldHideRetryButton = false
+        super.submitList(list, commitCallback)
     }
 }

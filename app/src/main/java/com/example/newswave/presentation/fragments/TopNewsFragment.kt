@@ -2,6 +2,7 @@ package com.example.newswave.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,8 @@ import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.Filter
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -154,6 +157,10 @@ class TopNewsFragment : Fragment() {
                             if (isSearchNews == true){
                                 binding.tvRetry.visibility = View.VISIBLE
                             }
+                            if (adapter.shouldHideRetryButton){
+                                adapter.notifyDataSetChanged()
+                                adapter.shouldHideRetryButton = false
+                            }
                         }
                         is NewsState.Loading -> {
                             binding.tvRetry.visibility = View.GONE
@@ -162,8 +169,14 @@ class TopNewsFragment : Fragment() {
                         is NewsState.Success -> {
                             binding.pgNews.visibility = View.GONE
                             binding.tvRetry.visibility = View.GONE
-                            adapter.submitList(uiState.currentList){
-                                scrollToTop()
+                            if (adapter.shouldHideRetryButton) {
+                                adapter.submitListWithLoadMore(uiState.currentList, null)
+                                adapter.notifyDataSetChanged()
+
+                            } else {
+                                adapter.submitList(uiState.currentList) {
+                                    scrollToTop()
+                                }
                             }
                         }
                     }
@@ -179,9 +192,9 @@ class TopNewsFragment : Fragment() {
             launchNewsDetailsFragment(it)
         }
 
-        adapter.onLoadMoreListener = {// сделать логику подгрузки за вчера
-//            viewModel.loadNewsForPreviousDay()
-//            binding.llErrorConnection.visibility = View.VISIBLE
+        adapter.onLoadMoreListener = {
+            adapter.shouldHideRetryButton = true
+            viewModel.loadNewsForPreviousDay()
         }
     }
 
