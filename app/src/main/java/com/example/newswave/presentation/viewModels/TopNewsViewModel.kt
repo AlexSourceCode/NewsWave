@@ -1,83 +1,131 @@
 package com.example.newswave.presentation.viewModels
 
-import android.app.Application
-import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.data.repository.NewsRepositoryImpl
-import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.domain.usecases.GetTopNewsList
+import com.example.newswave.domain.model.NewsState
+import com.example.newswave.domain.usecases.FetchErrorLoadDataUseCase
+import com.example.newswave.domain.usecases.FetchTopNewsListUseCase
 import com.example.newswave.domain.usecases.LoadDataUseCase
 import com.example.newswave.domain.usecases.LoadNewsForPreviousDayUseCase
 import com.example.newswave.domain.usecases.SearchNewsByFilterUseCase
 import com.example.newswave.domain.usecases.SearchNewsByFilterUseCaseFactory
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 class TopNewsViewModel @Inject constructor(
-    private val application: Application,
     private val loadDataUseCase: LoadDataUseCase,
     private val loadNewsForPreviousDayUseCase: LoadNewsForPreviousDayUseCase,
-    private val getTopNewsListUseCase: GetTopNewsList,
-    private val searchNewsByFilterUseCaseFactory: SearchNewsByFilterUseCaseFactory
-): ViewModel() {
+    private val fetchTopNewsListUseCase: FetchTopNewsListUseCase,
+    private val searchNewsByFilterUseCaseFactory: SearchNewsByFilterUseCaseFactory,
+    private val fetchErrorLoadDataUseCase: FetchErrorLoadDataUseCase
+) : ViewModel() {
 
     private lateinit var searchNewsByFilterUseCase: SearchNewsByFilterUseCase
 
-    private val _newsList = MutableLiveData<List<NewsItemEntity>>()
-    val newsList: LiveData<List<NewsItemEntity>> get() = _newsList
+    private val _uiState = MutableStateFlow<NewsState>(NewsState.Loading)
+    val uiState: StateFlow<NewsState> = _uiState.asStateFlow()
 
-    fun setSearchParameters(filterParameter: String, valueParameter: String) {
-        searchNewsByFilterUseCase = searchNewsByFilterUseCaseFactory.create(filterParameter, valueParameter)
-    }
+    private val _searchTrigger = MutableStateFlow(false)
 
-    suspend fun searchNewsByFilter() {
-        searchNewsByFilterUseCase()
-    }
+    private val _searchArgs = MutableStateFlow<Pair<String, String>?>(null)
 
-    fun showNews() {
-        val sharedPreferences =
-            application.getSharedPreferences(
-                "news_by_search",
-                Context.MODE_PRIVATE
-            )
-        val newsSearchResult = sharedPreferences.getString("news_search_result", null)
-        if (newsSearchResult != null) {
-            val type = object : TypeToken<List<NewsItemEntity>>() {}.type
-            val listFromDb: List<NewsItemEntity> = Gson().fromJson(newsSearchResult, type)
-            _newsList.value = listFromDb
-        }
-    }
 
-    fun loadTopNewsFromRoom(){
+    fun updateSearchParameters(filter: String, value: String) {
         viewModelScope.launch {
-            getTopNewsListUseCase().collect{ news ->
-                _newsList.postValue(news)
-            }
+            _uiState.value = NewsState.Loading
+            _searchArgs.value = Pair(filter,value)
+            searchNewsByFilter()
         }
     }
 
-    fun loadNewsForPreviousDay(){
+    fun searchNewsByFilter() {
+        if (!_searchTrigger.value){
+            _searchTrigger.value = true
+            return
+        }
+        viewModelScope.launch {
+            searchNewsByFilterUseCase()
+        }
+    }
+
+    fun backToTopNews() {
+        viewModelScope.launch {
+            _uiState.value = NewsState.Success(fetchTopNewsListUseCase().value)
+        }
+    }
+
+
+    fun loadNewsForPreviousDay() {
         viewModelScope.launch {
             loadNewsForPreviousDayUseCase()
         }
     }
 
-
-
-    init {
-        loadDataUseCase()
+    fun refreshData() {
         viewModelScope.launch {
-            getTopNewsListUseCase().collect { news ->
-                _newsList.postValue(news)
-            }
+            loadDataUseCase()
         }
     }
 
-}
+    init {
+        viewModelScope.launch {
+            loadDataUseCase()
+        }
 
+        viewModelScope.launch {
+            fetchErrorLoadDataUseCase()
+                .collect{
+                    _uiState.value = NewsState.Error(it)
+                }
+        }
+
+        viewModelScope.launch {
+            try {
+                fetchTopNewsListUseCase()
+                    .collect { news ->
+                        _uiState.value = NewsState.Success(news)
+                    }
+            } catch (e: Exception) {
+                _uiState.value = NewsState.Error(e.toString())
+            }
+        }
+
+        viewModelScope.launch {
+            try {
+                _searchTrigger
+                    .filter { it }
+                    .take(1)
+                    .collect{
+                        searchNewsByFilterUseCase()
+                            .collect { news ->
+                                _uiState.value = NewsState.Success(news)
+                        }
+                    }
+            } catch (e: Exception) {
+                _uiState.value = NewsState.Error(e.toString())
+            }
+        }
+
+        viewModelScope.launch {
+            _searchArgs
+                .filterNotNull()
+                .collect{ args ->
+                    searchNewsByFilterUseCase =
+                        searchNewsByFilterUseCaseFactory.create(args.first, args.second)
+                }
+        }
+    }
+}

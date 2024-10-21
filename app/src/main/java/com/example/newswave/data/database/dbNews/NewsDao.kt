@@ -13,12 +13,8 @@ interface NewsDao {
     @Query("SELECT * FROM news ORDER BY publishDate DESC")
     fun getNewsList(): Flow<List<NewsDbModel>>
 
-    @Query("SELECT * FROM news  WHERE id = :id")
-    fun getNewsDetailsById(id: Int): Flow<NewsDbModel>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNews(listNews: List<NewsDbModel>)//: Flow<NewsDbModel>
-
 
 }
 

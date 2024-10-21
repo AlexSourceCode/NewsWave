@@ -6,6 +6,19 @@
     app:startDestination="@id/topNewsFragment">
 
     <fragment
+        android:id="@+id/newsDetailsFragment3"
+        android:name="com.example.newswave.presentation.fragments.NewsDetailsFragment"
+        android:label="fragment_news_details"
+        tools:layout="@layout/fragment_news_details">
+        <argument
+            android:name="news"
+            app:argType="com.example.newswave.domain.entity.NewsItemEntity" />
+        <argument
+            android:name="author"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+    <fragment
         android:id="@+id/topNewsFragment"
         android:name="com.example.newswave.presentation.fragments.TopNewsFragment"
         android:label="fragment_top_news"
@@ -13,7 +26,7 @@
         <action
             android:id="@+id/action_topNewsFragment_to_newsDetailsFragment"
             app:destination="@id/newsDetailsFragment"
-            app:popUpTo="@id/topNewsFragment" />
+            app:popUpTo="@id/topNewsFragment"/>
     </fragment>
     <fragment
         android:id="@+id/subscribedAuthorsFragment"
@@ -21,11 +34,8 @@
         android:label="fragment_subscribed_authors"
         tools:layout="@layout/fragment_subscribed_authors" >
         <action
-            android:id="@+id/action_subscribedAuthorsFragment_to_authorsListFragment"
-            app:destination="@id/authorsListFragment" />
-        <action
-            android:id="@+id/action_subscribedAuthorsFragment_to_newsDetailsFragment"
-            app:destination="@id/newsDetailsFragment" />
+            android:id="@+id/action_subscribedAuthorsFragment_to_authorNewsFragment"
+            app:destination="@id/authorNewsFragment" />
     </fragment>
     <fragment
         android:id="@+id/newsDetailsFragment"
@@ -35,6 +45,10 @@
         <argument
             android:name="news"
             app:argType="com.example.newswave.domain.entity.NewsItemEntity" />
+        <argument
+            android:name="author"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -42,8 +56,16 @@
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
     <fragment
-        android:id="@+id/authorsListFragment"
-        android:name="com.example.newswave.presentation.fragments.AuthorsListFragment"
-        android:label="fragment_authors_list"
-        tools:layout="@layout/fragment_authors_list" />
+        android:id="@+id/authorNewsFragment"
+        android:name="com.example.newswave.presentation.fragments.AuthorNewsFragment"
+        android:label="fragment_author_news"
+        tools:layout="@layout/fragment_author_news" >
+        <argument
+            android:name="author"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_authorNewsFragment_to_newsDetailsFragment3"
+            app:destination="@id/newsDetailsFragment3"
+            app:popUpTo="@id/authorNewsFragment" />
+    </fragment>
 </navigation>

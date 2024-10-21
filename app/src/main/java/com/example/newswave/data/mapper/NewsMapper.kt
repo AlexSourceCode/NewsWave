@@ -1,8 +1,10 @@
 package com.example.newswave.data.mapper
 
+import com.example.newswave.data.database.dbAuthors.AuthorDbModel
 import com.example.newswave.data.database.dbNews.NewsDbModel
 import com.example.newswave.data.network.model.NewsItemDto
 import com.example.newswave.data.network.model.TopNewsResponseDto
+import com.example.newswave.domain.entity.AuthorItemEntity
 import com.example.newswave.domain.entity.NewsItemEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -39,7 +41,7 @@ class NewsMapper @Inject constructor() {
         )
     }
 
-    fun dbModelToEntity(dbModel: NewsDbModel) = NewsItemEntity(
+    fun mapDbModelToEntity(dbModel: NewsDbModel) = NewsItemEntity(
         id = dbModel.id,
         title = dbModel.title,
         text = dbModel.text,
@@ -52,6 +54,10 @@ class NewsMapper @Inject constructor() {
 //        category = dbModel.category,
         sourceCountry = dbModel.sourceCountry
     )
+
+
+
+
 
 //    suspend fun mapJsonContainerNewsToListNews(newsResponseDto: NewsResponseDto): List<NewsItemDto>{
 //        val result = mutableListOf<NewsItemDto>()

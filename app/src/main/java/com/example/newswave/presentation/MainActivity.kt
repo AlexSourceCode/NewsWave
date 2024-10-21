@@ -1,14 +1,14 @@
 package com.example.newswave.presentation
 
 import android.os.Bundle
-import android.util.Log
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.example.newswave.R
+import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.ActivityMainBinding
 import com.example.newswave.presentation.fragments.TopNewsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -30,6 +30,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         AndroidThreeTen.init(this)
 
+
+
         val navController = findNavController(R.id.nav_host_fragment)
         bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.setupWithNavController(navController)
@@ -44,8 +46,15 @@ class MainActivity : AppCompatActivity() {
                 }
                 true // Возвращаем true, чтобы предотвратить дальнейшую обработку
             } else {
+//                val navOptions = NavOptions.Builder()
+//                    .setEnterAnim(R.anim.fade_in)
+//                    .setExitAnim(R.anim.fade_out)
+//                    .setPopEnterAnim(R.anim.fade_in)
+//                    .setPopExitAnim(R.anim.fade_out)
+//                    .build()
                 // Возвращаем true для всех элементов, чтобы позволить navController обрабатывать навигацию
                 NavigationUI.onNavDestinationSelected(item, navController)
+//                navController.navigate(item.itemId, null, navOptions)
                 true
             }
         }

@@ -6,15 +6,18 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
-//@Dao
-//interface AuthorDao {
-//    @Query("SELECT * FROM favorite")
-//    suspend fun getAuthorsList(): Flow<List<String>>
-//
-//    @Insert(onConflict = OnConflictStrategy.REPLACE)
-//    suspend fun insertAuthor(author: String)
-//
-//    @Query("DELETE FROM favorite WHERE author = :author")
-//    suspend fun deleteAuthorByAuthor(author: String)
-//}
+@Dao
+interface AuthorDao {
+    @Query("SELECT * FROM favorite")
+    fun getAuthorsList(): Flow<List<AuthorDbModel>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAuthor(author: AuthorDbModel)
+
+    @Query("DELETE FROM favorite WHERE author = :author")
+    suspend fun deleteAuthor(author: String)
+
+    @Query("SELECT EXISTS(SELECT 1 FROM favorite WHERE author = :author)")
+    suspend fun isAuthorExists(author: String): Boolean
+}
 

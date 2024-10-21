@@ -1,6 +1,5 @@
 package com.example.newswave.presentation.fragments
 
-import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -8,20 +7,26 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.example.newswave.R
+import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentTopNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.presentation.Filter
-import com.example.newswave.presentation.NewsApp
+import com.example.newswave.domain.model.NewsState
 import com.example.newswave.presentation.adapters.NewsListAdapter
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
+import com.example.newswave.utils.Filter
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,11 +44,13 @@ class TopNewsFragment : Fragment() {
         (requireActivity().application as NewsApp).component
     }
 
-
+    // Переменные для управления состоянием поиска
+    private var isSearchNews: Boolean? = null
     var selectedFilter: String? = null
 
-    override fun onAttach(context: Context) { /// почему именно в onAttach, почему перед методом super
+    override fun onAttach(context: Context) {
         component.inject(this)
+        Log.d("sTATEApplication", "onAttach")
         super.onAttach(context)
     }
 
@@ -52,26 +59,43 @@ class TopNewsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentTopNewsBinding.inflate(layoutInflater)
+        Log.d("sTATEApplication", "onCreateView")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("sTATEApplication", "onViewCreated")
         viewModel = ViewModelProvider(this, viewModelFactory)[TopNewsViewModel::class.java]
-        setupAdapter()
-        observeViewModel()
-        setupTabLayout()
+        setupAdapter()              // Настройка адаптера для RecyclerView
+        observeViewModel()          // Подписка на обновления данных из ViewModel
+        setupTabLayout()            // Настройка вкладок (TabLayout)
         selectedFilter = requireActivity().application.getString(Filter.TEXT.descriptionResId)
-        searchByFilterListener()
+        searchByFilterListener()    // Добавление слушателя поиска
+        handleBackNavigation()      // Обработка нажатия кнопки "Назад"
+        setOnClickListener()        // Установка слушателей нажатий
+        setupSwipeRefresh()         // Обновление данных при свайпе вниз
 
+    }
+
+    private fun setOnClickListener() {
+        binding.tvRetry.setOnClickListener {
+            viewModel.searchNewsByFilter()
+        }
+    }
+
+    private fun handleBackNavigation() {
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (isShowingSearchResults()) {
-                        viewModel.loadTopNewsFromRoom()
-                        binding.edSearch.text.clear()
+                    if (isSearchNews == true) {
+                        // Очистка поля поиска и возврат к основным новостям
+                        binding.edSearch.text.clear() //handleBackFromSearch
+                        viewModel.backToTopNews()
+                        isSearchNews = false
                     } else {
+                        // Обычное поведение кнопки "Назад"
                         isEnabled = false
                         requireActivity().onBackPressed()
                     }
@@ -79,35 +103,33 @@ class TopNewsFragment : Fragment() {
             })
     }
 
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            if (isSearchNews == true) {
+                viewModel.searchNewsByFilter()
+            } else {
+                viewModel.refreshData()
+            }
+            binding.swipeRefreshLayout.isRefreshing = false
+        }
+    }
 
     private fun setupTabLayout() {
         val tabLayout: TabLayout = binding.tabLayout
-
-
         tabLayout.addTab(tabLayout.newTab().setText(Filter.TEXT.descriptionResId))
         tabLayout.addTab(tabLayout.newTab().setText(Filter.AUTHOR.descriptionResId))
         tabLayout.addTab(tabLayout.newTab().setText(Filter.DATE.descriptionResId))
 
-
-
-
-
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                //поменять как параметр поумолчания
-
                 val context = requireActivity().application
-
-
                 selectedFilter = Filter.entries.find { filter ->
                     context.getString(filter.descriptionResId) == tab.text.toString()
                 }?.let { filter ->
                     context.getString(filter.descriptionResId)
                 }
             }
-
             override fun onTabUnselected(tab: TabLayout.Tab) {}
-
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
     }
@@ -116,14 +138,9 @@ class TopNewsFragment : Fragment() {
         binding.edSearch.setOnKeyListener { view, keycode, event ->
             if (event.action == KeyEvent.ACTION_DOWN && keycode == KeyEvent.KEYCODE_ENTER) { // проверка, что нажатая клавиша является Enter
                 selectedFilter?.let {
-                    viewModel.setSearchParameters(
-                        it,
-                        binding.edSearch.text.toString()
-                    )
-                }
-                lifecycleScope.launch {
-                    viewModel.searchNewsByFilter()
-                    viewModel.showNews()
+                    viewModel.updateSearchParameters(it, binding.edSearch.text.toString())
+                    adapter.submitList(emptyList())
+                    isSearchNews = true
                 }
                 true
             } else {
@@ -133,9 +150,35 @@ class TopNewsFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.newsList.observe(viewLifecycleOwner) {
-            Log.d("checkadapter", "${it.map { it.id }}")
-            adapter.submitList(it)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED){
+                viewModel.uiState.collect{ uiState ->
+                    when(uiState){
+                        is NewsState.Error -> {
+                            showToast()
+                            binding.pgNews.visibility = View.GONE
+                            if (isSearchNews == true){
+                                binding.tvRetry.visibility = View.VISIBLE
+                                adapter.submitList(emptyList())
+                            }
+                        }
+                        is NewsState.Loading -> {
+                            binding.tvRetry.visibility = View.GONE
+                            binding.pgNews.visibility = View.VISIBLE
+                        }
+                        is NewsState.Success -> {
+                            binding.pgNews.visibility = View.GONE
+                            binding.tvRetry.visibility = View.GONE
+                            if (!adapter.shouldHideRetryButton) {
+                                adapter.submitListWithLoadMore(uiState.currentList, null)
+                                adapter.notifyDataSetChanged()
+                            } else {
+                                adapter.submitList(uiState.currentList)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -147,30 +190,23 @@ class TopNewsFragment : Fragment() {
         }
 
         adapter.onLoadMoreListener = {
+            adapter.shouldHideRetryButton = false
             viewModel.loadNewsForPreviousDay()
         }
     }
 
-    fun scrollToTop() {
+    private fun showToast(){    // Показ уведомления
+        Toast.makeText(requireContext(), requireActivity().getString(R.string.error_load_data), Toast.LENGTH_LONG).show()
+    }
+
+
+    fun scrollToTop() {         // Прокрутка к началу списка новостей
         binding.rcNews.scrollToPosition(0)
     }
 
-
-    fun isShowingSearchResults(): Boolean {
-        val sharedPreferences = requireActivity().application.getSharedPreferences(
-            "news_by_search",
-            Context.MODE_PRIVATE
-        )
-        val newsSearchResult = sharedPreferences.getString("news_search_result", null)
-        return newsSearchResult != null
-    }
-
-
-    private fun launchNewsDetailsFragment(news: NewsItemEntity) {
+    private fun launchNewsDetailsFragment(news: NewsItemEntity) {   // Переход к фрагменту с деталями новости
         findNavController().navigate(
-            TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(
-                news
-            )
+            TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(news, null)
         )
     }
 

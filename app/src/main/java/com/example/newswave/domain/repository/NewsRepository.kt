@@ -2,17 +2,20 @@ package com.example.newswave.domain.repository
 
 import com.example.newswave.domain.entity.NewsItemEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface NewsRepository{
 
-    fun getNewsDetailsById(id: Int): Flow<NewsItemEntity>
 
-    fun getTopNewsList(): Flow<List<NewsItemEntity>>
+    suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>>
 
-    fun loadData()
+    suspend fun fetchErrorLoadData(): SharedFlow<String>
+
+    suspend fun loadData()
+
     suspend fun loadNewsForPreviousDay()
 
-    suspend fun searchNewsByFilter(filterParameter: String, valueParameter: String)
-    suspend fun getSavedNewsBySearch(): List<NewsItemEntity>
+    suspend fun searchNewsByFilter(filterParameter: String, valueParameter: String): SharedFlow<List<NewsItemEntity>>
 
 }
