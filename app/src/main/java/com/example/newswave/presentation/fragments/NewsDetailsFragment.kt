@@ -32,6 +32,7 @@ import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.CustomArrayAdapter
 import com.example.newswave.utils.DateUtils
+import com.example.newswave.utils.NetworkUtils
 import com.example.newswave.utils.TextUtils
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
@@ -126,10 +127,14 @@ class NewsDetailsFragment : Fragment() {
     }
 
     private fun setupImage(){
-        Picasso.get()
-            .load(args.news.image)
-            .resize(800, 600)
-            .into(binding.ivImage)
+        if (NetworkUtils.isNetworkAvailable(requireActivity().application)){
+            Picasso.get()
+                .load(args.news.image)
+                .resize(800, 600)
+                .into(binding.ivImage)
+        } else{
+            binding.ivImage.setImageResource(R.drawable.error_placeholder)
+        }
     }
 
     private fun setupVideoPlayer(){

@@ -46,16 +46,15 @@ class MainActivity : AppCompatActivity() {
                 }
                 true // Возвращаем true, чтобы предотвратить дальнейшую обработку
             } else {
-                val navOptions = NavOptions.Builder()
-                    .setEnterAnim(R.anim.fade_in)
-                    .setExitAnim(R.anim.fade_out)
-                    .setPopEnterAnim(R.anim.fade_in)
-                    .setPopExitAnim(R.anim.fade_out)
-                    .build()
+//                val navOptions = NavOptions.Builder()
+//                    .setEnterAnim(R.anim.fade_in)
+//                    .setExitAnim(R.anim.fade_out)
+//                    .setPopEnterAnim(R.anim.fade_in)
+//                    .setPopExitAnim(R.anim.fade_out)
+//                    .build()
                 // Возвращаем true для всех элементов, чтобы позволить navController обрабатывать навигацию
-//                NavigationUI.onNavDestinationSelected(item, navController)
-                navController.navigate(item.itemId, null, navOptions)
-
+                NavigationUI.onNavDestinationSelected(item, navController)
+//                navController.navigate(item.itemId, null, navOptions)
                 true
             }
         }

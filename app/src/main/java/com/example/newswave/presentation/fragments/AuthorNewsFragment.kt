@@ -77,6 +77,7 @@ class AuthorNewsFragment : Fragment() {
     private fun setupAdapter() {
         adapter = NewsListAdapter(requireActivity().application)
         binding.rcNews.adapter = adapter
+        adapter.shouldHideRetryButton = true
         adapter.onNewsClickListener = { news ->
             launchNewsDetailsFragment(news)
         }

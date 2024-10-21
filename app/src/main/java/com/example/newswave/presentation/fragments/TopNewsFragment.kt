@@ -50,6 +50,7 @@ class TopNewsFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         component.inject(this)
+        Log.d("sTATEApplication", "onAttach")
         super.onAttach(context)
     }
 
@@ -58,11 +59,13 @@ class TopNewsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentTopNewsBinding.inflate(layoutInflater)
+        Log.d("sTATEApplication", "onCreateView")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("sTATEApplication", "onViewCreated")
         viewModel = ViewModelProvider(this, viewModelFactory)[TopNewsViewModel::class.java]
         setupAdapter()              // Настройка адаптера для RecyclerView
         observeViewModel()          // Подписка на обновления данных из ViewModel
@@ -136,7 +139,7 @@ class TopNewsFragment : Fragment() {
             if (event.action == KeyEvent.ACTION_DOWN && keycode == KeyEvent.KEYCODE_ENTER) { // проверка, что нажатая клавиша является Enter
                 selectedFilter?.let {
                     viewModel.updateSearchParameters(it, binding.edSearch.text.toString())
-                    adapter.submitList(listOf())
+                    adapter.submitList(emptyList())
                     isSearchNews = true
                 }
                 true
@@ -156,10 +159,7 @@ class TopNewsFragment : Fragment() {
                             binding.pgNews.visibility = View.GONE
                             if (isSearchNews == true){
                                 binding.tvRetry.visibility = View.VISIBLE
-                            }
-                            if (adapter.shouldHideRetryButton){
-                                adapter.notifyDataSetChanged()
-                                adapter.shouldHideRetryButton = false
+                                adapter.submitList(emptyList())
                             }
                         }
                         is NewsState.Loading -> {
@@ -169,14 +169,11 @@ class TopNewsFragment : Fragment() {
                         is NewsState.Success -> {
                             binding.pgNews.visibility = View.GONE
                             binding.tvRetry.visibility = View.GONE
-                            if (adapter.shouldHideRetryButton) {
+                            if (!adapter.shouldHideRetryButton) {
                                 adapter.submitListWithLoadMore(uiState.currentList, null)
                                 adapter.notifyDataSetChanged()
-
                             } else {
-                                adapter.submitList(uiState.currentList) {
-                                    scrollToTop()
-                                }
+                                adapter.submitList(uiState.currentList)
                             }
                         }
                     }
@@ -193,7 +190,7 @@ class TopNewsFragment : Fragment() {
         }
 
         adapter.onLoadMoreListener = {
-            adapter.shouldHideRetryButton = true
+            adapter.shouldHideRetryButton = false
             viewModel.loadNewsForPreviousDay()
         }
     }
