@@ -1,16 +1,13 @@
 package com.example.newswave.di
 
-import android.view.View
 import androidx.lifecycle.ViewModel
-import com.example.newswave.domain.usecases.SearchNewsByFilterUseCase
-import com.example.newswave.domain.usecases.SearchNewsByFilterUseCaseFactory
 import com.example.newswave.presentation.viewModels.AuthorNewsViewModel
+import com.example.newswave.presentation.viewModels.SignInViewModel
 import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.SubscribedAuthorsViewModel
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.multibindings.IntoMap
 
 //Модуль со всеми вьюмоделями, для того чтобы все они инжектились в вьюмодель фектори
@@ -36,5 +33,10 @@ interface ViewModelModule {
     @IntoMap
     @ViewModelKey(AuthorNewsViewModel::class)
     fun bindAuthorNewsViewModel(viewModel: AuthorNewsViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(SignInViewModel::class)
+    fun bindSignInViewModel(viewmodel: SignInViewModel): ViewModel
 
 }

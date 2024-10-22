@@ -29,6 +29,16 @@
     <string name="download_error">Download error</string>
     <string name="repeat">Repeat</string>
     <string name="retry">Retry</string>
+    <string name="sign_in_subscriptions_text">Sign in, and your subscriptions will be here</string>
+    <string name="sign_up_no_account_text">If you don\'t have an account, sign up. Your subscriptions will be here afterward</string>
+    <string name="sign_in_text">Sign in</string>
+    <string name="authorization">Authorization</string>
+    <string name="sign_in_message">Please sign in to use the author subscription feature</string>
+    <string name="registration_text">Registration</string>
+    <string name="enter_email">Enter email</string>
+    <string name="enter_password">Enter password</string>
+    <string name="no_account_yet_text">Do not have an account yet?</string>
+    <string name="forgot_password">Forgot password?</string>
 
 
 </resources>

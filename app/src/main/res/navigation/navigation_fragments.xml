@@ -36,6 +36,9 @@
         <action
             android:id="@+id/action_subscribedAuthorsFragment_to_authorNewsFragment"
             app:destination="@id/authorNewsFragment" />
+        <action
+            android:id="@+id/action_subscribedAuthorsFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/newsDetailsFragment"
@@ -68,4 +71,9 @@
             app:destination="@id/newsDetailsFragment3"
             app:popUpTo="@id/authorNewsFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.newswave.presentation.fragments.SignInFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_sign_in" />
 </navigation>

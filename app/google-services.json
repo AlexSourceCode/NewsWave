@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1084133139610",
+    "project_id": "news-wave-15125",
+    "storage_bucket": "news-wave-15125.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084133139610:android:f70988a5752c6b091deb23",
+        "android_client_info": {
+          "package_name": "com.example.newswave"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBrijWI9Ca8Z2z35jn6-AmA_Q4zVr6rpQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

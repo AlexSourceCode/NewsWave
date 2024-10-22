@@ -20,6 +20,9 @@ import com.example.newswave.domain.model.AuthorState
 import com.example.newswave.presentation.adapters.AuthorListAdapter
 import com.example.newswave.presentation.viewModels.SubscribedAuthorsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,13 +30,12 @@ import javax.inject.Inject
 class SubscribedAuthorsFragment : Fragment() {
 
     private lateinit var binding: FragmentSubscribedAuthorsBinding
+    private lateinit var adapter: AuthorListAdapter
+    private lateinit var auth: FirebaseAuth
 
     private val component by lazy {
         (requireActivity().application as NewsApp).component
     }
-
-    private lateinit var adapter: AuthorListAdapter
-
     private lateinit var viewModel: SubscribedAuthorsViewModel
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -43,6 +45,11 @@ class SubscribedAuthorsFragment : Fragment() {
     override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        auth = Firebase.auth
+        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
@@ -57,7 +64,22 @@ class SubscribedAuthorsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory)[SubscribedAuthorsViewModel::class.java]
         setupAdapter()
+        checkAuthState()
         observeViewModel()
+
+        binding.btLogin.setOnClickListener {
+            launchLoginFragment()
+        }
+    }
+
+    private fun checkAuthState(){
+        val currentUser = auth.currentUser
+        if (currentUser == null){
+            binding.textContainer.visibility = View.VISIBLE
+        } else{
+            binding.rcAuthors.visibility = View.VISIBLE
+            observeViewModel()
+        }
     }
 
     private fun observeViewModel(){
@@ -110,6 +132,12 @@ class SubscribedAuthorsFragment : Fragment() {
     private fun launchAuthorNewsFragment(author: String){
         findNavController().navigate(
             SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToAuthorNewsFragment(author)
+        )
+    }
+
+    private fun launchLoginFragment(){
+        findNavController().navigate(
+            SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToLoginFragment()
         )
     }
 

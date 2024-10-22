@@ -50,7 +50,6 @@ class TopNewsFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         component.inject(this)
-        Log.d("sTATEApplication", "onAttach")
         super.onAttach(context)
     }
 
@@ -59,13 +58,11 @@ class TopNewsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentTopNewsBinding.inflate(layoutInflater)
-        Log.d("sTATEApplication", "onCreateView")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d("sTATEApplication", "onViewCreated")
         viewModel = ViewModelProvider(this, viewModelFactory)[TopNewsViewModel::class.java]
         setupAdapter()              // Настройка адаптера для RecyclerView
         observeViewModel()          // Подписка на обновления данных из ViewModel
