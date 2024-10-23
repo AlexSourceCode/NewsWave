@@ -25,6 +25,15 @@ class ViewModelFactory @Inject constructor(
         if (modelClass.isAssignableFrom(SignInViewModel::class.java)){
             return viewModelProviders[modelClass]?.get() as T
         }
+        if (modelClass.isAssignableFrom(RegistrationViewModel::class.java)){
+            return viewModelProviders[modelClass]?.get() as T
+        }
+        if (modelClass.isAssignableFrom(ForgotPasswordViewModel::class.java)){
+            return viewModelProviders[modelClass]?.get() as T
+        }
+        if (modelClass.isAssignableFrom(SettingsViewModel::class.java)){
+            return viewModelProviders[modelClass]?.get() as T
+        }
         throw RuntimeException("Unknown view model class $modelClass")
     }
 }

@@ -35,10 +35,18 @@
     <string name="authorization">Authorization</string>
     <string name="sign_in_message">Please sign in to use the author subscription feature</string>
     <string name="registration_text">Registration</string>
-    <string name="enter_email">Enter email</string>
-    <string name="enter_password">Enter password</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
     <string name="no_account_yet_text">Do not have an account yet?</string>
     <string name="forgot_password">Forgot password?</string>
+    <string name="registration_message">Enter the information in the appropriate fields below:</string>
+    <string name="username">Username</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="register">Register</string>
+    <string name="already_registered_text">Already have an account,</string>
+    <string name="reset_password_hint">Enter the email address to which the password reset email will be sent</string>
+    <string name="reset_password">Reset password</string>
 
 
 </resources>

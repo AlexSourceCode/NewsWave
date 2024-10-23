@@ -1,9 +1,13 @@
 package com.example.newswave.di
 
 import androidx.lifecycle.ViewModel
+import com.example.newswave.presentation.fragments.RegistrationFragment
 import com.example.newswave.presentation.viewModels.AuthorNewsViewModel
+import com.example.newswave.presentation.viewModels.ForgotPasswordViewModel
 import com.example.newswave.presentation.viewModels.SignInViewModel
 import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
+import com.example.newswave.presentation.viewModels.RegistrationViewModel
+import com.example.newswave.presentation.viewModels.SettingsViewModel
 import com.example.newswave.presentation.viewModels.SubscribedAuthorsViewModel
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import dagger.Binds
@@ -38,5 +42,20 @@ interface ViewModelModule {
     @IntoMap
     @ViewModelKey(SignInViewModel::class)
     fun bindSignInViewModel(viewmodel: SignInViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(RegistrationViewModel::class)
+    fun bindRegistrationViewModel(viewModel: RegistrationViewModel):ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ForgotPasswordViewModel::class)
+    fun bindForgotPasswordViewModel(viewModel: ForgotPasswordViewModel):ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(SettingsViewModel::class)
+    fun bindSettingsViewModel(viewModel: SettingsViewModel):ViewModel
 
 }

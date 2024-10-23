@@ -1,22 +1,24 @@
 package com.example.newswave.presentation.fragments
 
 import android.content.Context
+import androidx.fragment.app.viewModels
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.newswave.app.NewsApp
-import com.example.newswave.databinding.FragmentSignInBinding
-import com.example.newswave.presentation.viewModels.SignInViewModel
+import com.example.newswave.databinding.FragmentRegistrationBinding
+import com.example.newswave.presentation.viewModels.RegistrationViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import javax.inject.Inject
 
-class SignInFragment : Fragment() {
+class RegistrationFragment : Fragment() {
 
-    private lateinit var binding: FragmentSignInBinding
-    private lateinit var viewModel: SignInViewModel
+    private lateinit var binding: FragmentRegistrationBinding
+
+    private lateinit var viewModel: RegistrationViewModel
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -25,6 +27,8 @@ class SignInFragment : Fragment() {
         (requireActivity().application as NewsApp).component
     }
 
+
+
     override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
@@ -32,38 +36,27 @@ class SignInFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentSignInBinding.inflate(layoutInflater)
+        binding = FragmentRegistrationBinding.inflate(layoutInflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.tvRegistration.setOnClickListener {
+        binding.tvSignIn.setOnClickListener {
             launchRegistrationFragment()
-        }
-        binding.tvForgotPassword.setOnClickListener {
-            launchForgotPasswordFragment()
         }
     }
 
     private fun launchRegistrationFragment(){
         findNavController().navigate(
-            SignInFragmentDirections.actionLoginFragmentToRegistrationFragment()
+            RegistrationFragmentDirections.actionRegistrationFragmentToLoginFragment()
         )
     }
-
-    private fun launchForgotPasswordFragment(){
-        findNavController().navigate(
-            SignInFragmentDirections.actionLoginFragmentToForgotPasswordFragment()
-        )
-    }
-
 }
