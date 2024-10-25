@@ -35,10 +35,11 @@
         tools:layout="@layout/fragment_subscribed_authors" >
         <action
             android:id="@+id/action_subscribedAuthorsFragment_to_authorNewsFragment"
-            app:destination="@id/authorNewsFragment" />
+            app:destination="@id/authorNewsFragment"/>
         <action
             android:id="@+id/action_subscribedAuthorsFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/subscribedAuthorsFragment" />
     </fragment>
     <fragment
         android:id="@+id/newsDetailsFragment"
@@ -60,7 +61,8 @@
         tools:layout="@layout/fragment_settings" >
         <action
             android:id="@+id/action_settingsFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/authorNewsFragment"
@@ -82,7 +84,8 @@
         tools:layout="@layout/fragment_sign_in" >
         <action
             android:id="@+id/action_loginFragment_to_registrationFragment"
-            app:destination="@id/registrationFragment" />
+            app:destination="@id/registrationFragment"
+            app:popUpTo="@id/loginFragment" />
         <action
             android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
             app:destination="@id/forgotPasswordFragment" />
@@ -91,21 +94,14 @@
         android:id="@+id/registrationFragment"
         android:name="com.example.newswave.presentation.fragments.RegistrationFragment"
         android:label="fragment_registration"
-        tools:layout="@layout/fragment_registration" >
-        <action
-            android:id="@+id/action_registrationFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_registration" />
     <fragment
         android:id="@+id/forgotPasswordFragment"
         android:name="com.example.newswave.presentation.fragments.ForgotPasswordFragment"
         android:label="fragment_forgot_password"
         tools:layout="@layout/fragment_forgot_password" >
-        <action
-            android:id="@+id/action_forgotPasswordFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-        <action
-            android:id="@+id/action_forgotPasswordFragment_to_registrationFragment"
-            app:destination="@id/registrationFragment" />
+        <argument
+            android:name="email"
+            app:argType="string" />
     </fragment>
 </navigation>

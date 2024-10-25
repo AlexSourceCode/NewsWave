@@ -7,11 +7,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentRegistrationBinding
 import com.example.newswave.presentation.viewModels.RegistrationViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class RegistrationFragment : Fragment() {
@@ -26,7 +34,6 @@ class RegistrationFragment : Fragment() {
     private val component by lazy {
         (requireActivity().application as NewsApp).component
     }
-
 
 
     override fun onAttach(context: Context) {
@@ -48,15 +55,45 @@ class RegistrationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this, viewModelFactory)[RegistrationViewModel::class.java]
+        setupOnClickListener()
+        observeViewModel()
 
-        binding.tvSignIn.setOnClickListener {
-            launchRegistrationFragment()
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.user.collect { fireBaseUser ->
+                    if (fireBaseUser != null){
+                        findNavController().popBackStack()
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.error.collect{ errorMessage ->
+                    Toast.makeText(requireActivity().application, errorMessage, Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 
-    private fun launchRegistrationFragment(){
-        findNavController().navigate(
-            RegistrationFragmentDirections.actionRegistrationFragmentToLoginFragment()
-        )
+    private fun setupOnClickListener() {
+        binding.tvSignIn.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        binding.btRegister.setOnClickListener {
+            val username = binding.etUsername.text.toString().trim()
+            val email = binding.etEmail.text.toString().trim()
+            val password = binding.etPassword.text.toString().trim()
+            val firstName = binding.etFirstName.text.toString().trim()
+            val lastName = binding.etLastName.text.toString().trim()
+            viewModel.signUp(username,email,password, firstName, lastName)
+        }
     }
+
+
 }

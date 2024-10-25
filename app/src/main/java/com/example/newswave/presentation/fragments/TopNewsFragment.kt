@@ -53,6 +53,16 @@ class TopNewsFragment : Fragment() {
         super.onAttach(context)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("stateTopNewsFragment", "create")
+        super.onCreate(savedInstanceState)
+    }
+
+    override fun onStart() {
+        Log.d("stateTopNewsFragment", "start")
+        super.onStart()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

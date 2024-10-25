@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
 
         val navController = findNavController(R.id.nav_host_fragment)
-        bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNavigationView = findViewById(R.id.bottomNavigationView)
         bottomNavigationView.setupWithNavController(navController)
 
         bottomNavigationView.setOnItemSelectedListener { item ->

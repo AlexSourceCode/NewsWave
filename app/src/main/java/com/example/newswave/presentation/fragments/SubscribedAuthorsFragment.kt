@@ -23,7 +23,10 @@ import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -31,25 +34,19 @@ class SubscribedAuthorsFragment : Fragment() {
 
     private lateinit var binding: FragmentSubscribedAuthorsBinding
     private lateinit var adapter: AuthorListAdapter
-    private lateinit var auth: FirebaseAuth
 
     private val component by lazy {
         (requireActivity().application as NewsApp).component
     }
     private lateinit var viewModel: SubscribedAuthorsViewModel
+
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-
 
 
     override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        auth = Firebase.auth
-        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
@@ -62,9 +59,9 @@ class SubscribedAuthorsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory)[SubscribedAuthorsViewModel::class.java]
+        viewModel =
+            ViewModelProvider(this, viewModelFactory)[SubscribedAuthorsViewModel::class.java]
         setupAdapter()
-        checkAuthState()
         observeViewModel()
 
         binding.btLogin.setOnClickListener {
@@ -72,25 +69,19 @@ class SubscribedAuthorsFragment : Fragment() {
         }
     }
 
-    private fun checkAuthState(){
-        val currentUser = auth.currentUser
-        if (currentUser == null){
-            binding.textContainer.visibility = View.VISIBLE
-        } else{
-            binding.rcAuthors.visibility = View.VISIBLE
-            observeViewModel()
-        }
-    }
-
-    private fun observeViewModel(){
+    private fun observeViewModel() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){
-                viewModel.uiState.collect{ uiState ->
-                    when(uiState){
-                        is AuthorState.Error -> Log.d("CheckState", uiState.toString()) // When will be repository then need to change handle error.
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.uiState.collect { uiState ->
+                    when (uiState) {
+                        is AuthorState.Error -> Log.d(
+                            "CheckState",
+                            uiState.toString()
+                        ) // When will be repository then need to change handle error.
                         is AuthorState.Loading -> {
                             binding.pgNews.visibility = View.VISIBLE
                         }
+
                         is AuthorState.Success -> {
                             binding.pgNews.visibility = View.GONE
                             adapter.submitList(uiState.currentList)
@@ -99,9 +90,25 @@ class SubscribedAuthorsFragment : Fragment() {
                 }
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.user.collect { firebaseUser ->
+                        if (firebaseUser == null) {
+                            binding.textContainer.visibility = View.VISIBLE
+                            binding.rcAuthors.visibility = View.GONE
+                        } else {
+                            binding.rcAuthors.visibility = View.VISIBLE
+                            binding.textContainer.visibility = View.GONE
+                        }
+                }
+            }
+        }
     }
 
-    private fun setupAdapter(){
+
+
+    private fun setupAdapter() {
         adapter = AuthorListAdapter()
         binding.rcAuthors.adapter = adapter
         adapter.onAuthorClickSubscription = { author ->
@@ -121,7 +128,7 @@ class SubscribedAuthorsFragment : Fragment() {
             viewModel.unsubscribeFromAuthor(author)
             dialog.dismiss()
         }
-        builder.setNegativeButton(getString(R.string.negative_answer)){ dialog, _ ->
+        builder.setNegativeButton(getString(R.string.negative_answer)) { dialog, _ ->
             dialog.dismiss()
         }
 
@@ -129,13 +136,15 @@ class SubscribedAuthorsFragment : Fragment() {
         dialog.show()
     }
 
-    private fun launchAuthorNewsFragment(author: String){
+    private fun launchAuthorNewsFragment(author: String) {
         findNavController().navigate(
-            SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToAuthorNewsFragment(author)
+            SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToAuthorNewsFragment(
+                author
+            )
         )
     }
 
-    private fun launchLoginFragment(){
+    private fun launchLoginFragment() {
         findNavController().navigate(
             SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToLoginFragment()
         )

@@ -43,7 +43,7 @@
     <string name="username">Username</string>
     <string name="first_name">First name</string>
     <string name="last_name">Last name</string>
-    <string name="register">Register</string>
+    <string name="sign_up">Sign up</string>
     <string name="already_registered_text">Already have an account,</string>
     <string name="reset_password_hint">Enter the email address to which the password reset email will be sent</string>
     <string name="reset_password">Reset password</string>

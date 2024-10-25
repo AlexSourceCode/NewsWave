@@ -7,18 +7,26 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentForgotPasswordBinding
 import com.example.newswave.presentation.viewModels.ForgotPasswordViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ForgotPasswordFragment : Fragment() {
 
     private lateinit var binding: FragmentForgotPasswordBinding
-
     private lateinit var viewModel: ForgotPasswordViewModel
+    private val args by navArgs<ForgotPasswordFragmentArgs>()
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -47,23 +55,34 @@ class ForgotPasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.tvRegistration.setOnClickListener {
-            launchRegistrationFragment()
-        }
-        binding.tvSignIn.setOnClickListener {
-            launchSignInFragment()
+        viewModel = ViewModelProvider(this, viewModelFactory)[ForgotPasswordViewModel::class.java]
+        observeViewModel()
+        binding.etEmail.setText(args.email)
+
+        binding.btReset.setOnClickListener {
+            viewModel.resetPassword(binding.etEmail.text.toString())
         }
     }
 
-    private fun launchSignInFragment(){
-        findNavController().navigate(
-            ForgotPasswordFragmentDirections.actionForgotPasswordFragmentToLoginFragment()
-        )
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED){
+                viewModel.isSuccess.collect{ success ->
+                    if (success) {
+                        Toast.makeText(requireActivity().application, "The reset link has been successfully sent", Toast.LENGTH_LONG).show()
+                        findNavController().popBackStack()
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED){
+                viewModel.error.collect{ errorMessage ->
+                    Toast.makeText(requireActivity().application, errorMessage, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
     }
 
-    private fun launchRegistrationFragment(){
-        findNavController().navigate(
-            ForgotPasswordFragmentDirections.actionForgotPasswordFragmentToRegistrationFragment()
-        )
-    }
 }

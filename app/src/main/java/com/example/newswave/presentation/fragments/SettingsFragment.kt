@@ -2,10 +2,15 @@ package com.example.newswave.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentSettingsBinding
@@ -14,6 +19,8 @@ import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -21,10 +28,9 @@ class SettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsBinding
     private lateinit var viewModel: SettingsViewModel
-    private lateinit var auth: FirebaseAuth
 
     @Inject
-    lateinit var viewmodel: ViewModelFactory
+    lateinit var viewModelFactory: ViewModelFactory
 
     private val component by lazy {
         (requireActivity().application as NewsApp).component
@@ -36,8 +42,13 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        auth = Firebase.auth
+        Log.d("stateSettingsFragment", "create")
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onStart() {
+        Log.d("stateSettingsFragment", "start")
+        super.onStart()
     }
 
     override fun onCreateView(
@@ -50,24 +61,41 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        checkAuthState()
+        viewModel = ViewModelProvider(this, viewModelFactory)[SettingsViewModel::class.java]
+        observeViewModel()
 
         binding.btSignIn.setOnClickListener {
             launchSignInFragment()
         }
-    }
 
-    private fun checkAuthState(){
-        val currentUser = auth.currentUser
-        if (currentUser == null){
-            binding.btSignIn.visibility = View.VISIBLE
-        } else{
-            binding.tvName.visibility = View.VISIBLE // сделать нормальное присваивание
-            binding.tvUsername.visibility = View.VISIBLE
+        binding.tvLogout.setOnClickListener {
+            viewModel.logout()
         }
     }
 
-    private fun launchSignInFragment(){
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.user.collect { firebaseUser ->
+                        if (firebaseUser == null) {
+                            binding.btSignIn.visibility = View.VISIBLE
+                            binding.cvLogout.visibility = View.GONE
+                            binding.tvName.visibility = View.GONE
+                            binding.tvUsername.visibility = View.GONE
+                        } else {
+                            binding.tvName.visibility = View.VISIBLE
+                            binding.btSignIn.visibility = View.GONE
+                            binding.tvUsername.visibility = View.VISIBLE
+                            binding.cvLogout.visibility = View.VISIBLE
+
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun launchSignInFragment() {
         findNavController().navigate(
             SettingsFragmentDirections.actionSettingsFragmentToLoginFragment()
         )
