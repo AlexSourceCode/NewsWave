@@ -17,6 +17,9 @@ import com.example.newswave.domain.repository.UserRepository
 import com.example.newswave.domain.usecases.SearchNewsByFilterUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import dagger.Binds
 import dagger.Module
@@ -64,6 +67,11 @@ interface DataModule {
         @Provides
         fun provideFirebaseAuth(): FirebaseAuth{
             return Firebase.auth
+        }
+
+        @Provides
+        fun provideFirebaseDatabase(): FirebaseDatabase {
+            return Firebase.database
         }
     }
 }
