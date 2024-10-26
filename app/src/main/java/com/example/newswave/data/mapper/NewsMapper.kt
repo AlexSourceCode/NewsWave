@@ -1,6 +1,5 @@
 package com.example.newswave.data.mapper
 
-import com.example.newswave.data.database.dbAuthors.AuthorDbModel
 import com.example.newswave.data.database.dbNews.NewsDbModel
 import com.example.newswave.data.network.model.NewsItemDto
 import com.example.newswave.data.network.model.TopNewsResponseDto

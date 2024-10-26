@@ -75,7 +75,6 @@ class UserRepositoryImpl @Inject constructor(
         firstName: String,
         lastName: String
     ) {
-
         auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
                 val firebase = authResult.user
@@ -105,6 +104,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun observeAuthState(): StateFlow<FirebaseUser?> {
         auth.addAuthStateListener {
+            Log.d("UserRepositoryImpl", "observeAuthState")
             _user.value = auth.currentUser
         }
         return user

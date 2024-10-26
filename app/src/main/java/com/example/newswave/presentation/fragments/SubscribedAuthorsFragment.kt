@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.newswave.R
 import com.example.newswave.databinding.FragmentSubscribedAuthorsBinding
 import com.example.newswave.app.NewsApp
+import com.example.newswave.domain.model.AuthState
 import com.example.newswave.domain.model.AuthorState
 import com.example.newswave.presentation.adapters.AuthorListAdapter
 import com.example.newswave.presentation.viewModels.SubscribedAuthorsViewModel
@@ -73,18 +74,20 @@ class SubscribedAuthorsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.uiState.collect { uiState ->
+                    Log.d("SubscribedAuthorsFragment", "uiState ${uiState.toString()}")
                     when (uiState) {
                         is AuthorState.Error -> Log.d(
                             "CheckState",
                             uiState.toString()
-                        ) // When will be repository then need to change handle error.
+                        )
+
                         is AuthorState.Loading -> {
-                            binding.pgNews.visibility = View.VISIBLE
+                            showProgressBar()
                         }
 
                         is AuthorState.Success -> {
-                            binding.pgNews.visibility = View.GONE
                             adapter.submitList(uiState.currentList)
+                            hideProgressBar()
                         }
                     }
                 }
@@ -94,18 +97,37 @@ class SubscribedAuthorsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.user.collect { firebaseUser ->
-                        if (firebaseUser == null) {
-                            binding.textContainer.visibility = View.VISIBLE
-                            binding.rcAuthors.visibility = View.GONE
-                        } else {
-                            binding.rcAuthors.visibility = View.VISIBLE
-                            binding.textContainer.visibility = View.GONE
+                    Log.d("SubscribedAuthorsFragment", "user ${firebaseUser.toString()}")
+                    when (firebaseUser) {
+                        is AuthState.LoggedIn -> {
+                            showProgressBar()
+                            showLoggedInState()
                         }
+                        is AuthState.LoggedOut -> showLoggedOutState()
+                    }
                 }
             }
         }
     }
 
+    private fun showLoggedOutState() {
+        binding.textContainer.visibility = View.VISIBLE
+        binding.rcAuthors.visibility = View.GONE
+    }
+
+    private fun showLoggedInState() {
+        binding.rcAuthors.visibility = View.VISIBLE
+        binding.textContainer.visibility = View.GONE
+    }
+
+
+    private fun showProgressBar() {
+        binding.pgNews.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        binding.pgNews.visibility = View.GONE
+    }
 
 
     private fun setupAdapter() {

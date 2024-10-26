@@ -3,6 +3,7 @@ package com.example.newswave.presentation.viewModels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.newswave.domain.model.AuthState
 import com.example.newswave.domain.model.AuthorState
 import com.example.newswave.domain.usecases.GetAuthorListUseCase
 import com.example.newswave.domain.usecases.UnsubscribeFromAuthorUseCase
@@ -29,8 +30,8 @@ class SubscribedAuthorsViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    private var _user = MutableStateFlow<FirebaseUser?>(null)
-    val user: StateFlow<FirebaseUser?> get() = _user.asStateFlow()
+    private var _user = MutableStateFlow<AuthState>(AuthState.LoggedOut)
+    val user: StateFlow<AuthState> get() = _user.asStateFlow()
 
     private val _uiState = MutableStateFlow<AuthorState>(AuthorState.Loading)
     val uiState: StateFlow<AuthorState> get() = _uiState.asStateFlow()
@@ -56,8 +57,13 @@ class SubscribedAuthorsViewModel @Inject constructor(
 
     private fun observeAuthState() {
         viewModelScope.launch {
-            observeAuthStateUseCase().collect {
-                _user.value = it
+            observeAuthStateUseCase().collect { userFirebase ->
+
+                if (userFirebase != null){
+                    _user.value = AuthState.LoggedIn(userFirebase)
+                } else{
+                    _user.value = AuthState.LoggedOut
+                }
             }
         }
     }

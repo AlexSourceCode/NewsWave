@@ -4,17 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.os.Looper
-import android.text.TextPaint
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -24,16 +20,14 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
-import com.example.newswave.data.database.dbAuthors.AuthorDbModel
+import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentNewsDetailsBinding
 import com.example.newswave.presentation.MainActivity
-import com.example.newswave.app.NewsApp
 import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.CustomArrayAdapter
 import com.example.newswave.utils.DateUtils
 import com.example.newswave.utils.NetworkUtils
-import com.example.newswave.utils.TextUtils
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -175,7 +169,10 @@ class NewsDetailsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED){
                 viewModel.stateAuthor.collect { isFavorite ->
-                    updateSubscriptionButton(isFavorite)
+                    Log.d("repeatOnLifecycle", isFavorite.toString())
+                    if (isFavorite != null){
+                        updateSubscriptionButton(isFavorite)
+                    }
                 }
             }
         }
@@ -202,6 +199,7 @@ class NewsDetailsFragment : Fragment() {
         builder.setMessage(getString(R.string.alert_dialog_question, author))
 
         builder.setPositiveButton(getString(R.string.unsubscribe)) { dialog, _ ->
+            Log.d("setPositiveButton", "work")
             viewModel.unsubscribeFromAuthor(author)
             dialog.dismiss()
         }
