@@ -1,5 +1,6 @@
 package com.example.newswave.domain.repository
 
+import com.example.newswave.domain.entity.UserEntity
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
@@ -24,5 +25,7 @@ interface UserRepository {
     fun observeAuthState(): StateFlow<FirebaseUser?>
 
     fun fetchErrorAuth(): SharedFlow<String>
+
+    fun fetchUserData(): StateFlow<UserEntity?>
 
 }

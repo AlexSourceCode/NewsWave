@@ -60,16 +60,6 @@ class NewsDetailsFragment : Fragment() {
         super.onAttach(context)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("stateNewsDetailsFragment", "create")
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onStart() {
-        Log.d("stateNewsDetailsFragment", "start")
-        super.onStart()
-    }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -198,6 +188,7 @@ class NewsDetailsFragment : Fragment() {
             val author = binding.srAuthors.selectedItem.toString()
             val btSub = requireActivity().getString(R.string.subscribe)
             if (checkSubscribed == btSub) {
+                // В зависимости от авторизации диалоговое окно или подписываться
                 viewModel.subscribeOnAuthor(author)
             } else {
                 showUnsubscribeDialog(author)
@@ -210,11 +201,29 @@ class NewsDetailsFragment : Fragment() {
         builder.setTitle(getString(R.string.confirmation))
         builder.setMessage(getString(R.string.alert_dialog_question, author))
 
-        builder.setPositiveButton(getString(R.string.positive_answer)) {dialog, _ ->
+        builder.setPositiveButton(getString(R.string.unsubscribe)) { dialog, _ ->
             viewModel.unsubscribeFromAuthor(author)
             dialog.dismiss()
         }
-        builder.setNegativeButton(getString(R.string.negative_answer)){ dialog, _ ->
+        builder.setNegativeButton(getString(R.string.cancel)){ dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    private fun requestLoginForSubscription(){
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(getString(R.string.subscription_prompt_message))
+        builder.setMessage(getString(R.string.sign_in_required_message))
+
+        builder.setPositiveButton(getString(R.string.sign_in_text)){ dialog, _ ->
+            //code
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton(getString(R.string.cancel)){ dialog, _ ->
             dialog.dismiss()
         }
 

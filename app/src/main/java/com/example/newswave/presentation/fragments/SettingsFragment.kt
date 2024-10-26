@@ -17,6 +17,7 @@ import com.example.newswave.databinding.FragmentSettingsBinding
 import com.example.newswave.presentation.viewModels.SettingsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.collect
@@ -39,16 +40,6 @@ class SettingsFragment : Fragment() {
     override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("stateSettingsFragment", "create")
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onStart() {
-        Log.d("stateSettingsFragment", "start")
-        super.onStart()
     }
 
     override fun onCreateView(
@@ -77,23 +68,40 @@ class SettingsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.user.collect { firebaseUser ->
-                        if (firebaseUser == null) {
-                            binding.btSignIn.visibility = View.VISIBLE
-                            binding.cvLogout.visibility = View.GONE
-                            binding.tvName.visibility = View.GONE
-                            binding.tvUsername.visibility = View.GONE
-                        } else {
-                            binding.tvName.visibility = View.VISIBLE
-                            binding.btSignIn.visibility = View.GONE
-                            binding.tvUsername.visibility = View.VISIBLE
-                            binding.cvLogout.visibility = View.VISIBLE
+                    updateUI(firebaseUser != null)
+                }
+            }
+        }
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED){
+                viewModel.userData.collect{ user ->
+                    if (user != null){
+                        binding.tvName.text = "${user.firstName} ${user.lastName}"
+                        binding.tvEmail.text = user.email
+                        binding.tvUsername.text = user.username
                     }
                 }
             }
         }
     }
 
+    private fun updateUI(isUserLoggedIn: Boolean) {
+        if (isUserLoggedIn) {
+            binding.tvName.visibility = View.VISIBLE
+            binding.btSignIn.visibility = View.GONE
+            binding.tvEmail.visibility = View.VISIBLE
+            binding.cvLogout.visibility = View.VISIBLE
+            binding.tvUsername.visibility = View.VISIBLE
+            binding.cvUserData.visibility = View.VISIBLE
+        } else {
+            binding.btSignIn.visibility = View.VISIBLE
+            binding.cvLogout.visibility = View.GONE
+            binding.tvName.visibility = View.GONE
+            binding.cvUserData.visibility = View.GONE
+            binding.tvEmail.visibility = View.GONE
+        }
+    }
 
     private fun launchSignInFragment() {
         findNavController().navigate(
