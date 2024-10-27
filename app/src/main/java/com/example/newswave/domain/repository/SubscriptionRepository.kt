@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface SubscriptionRepository {
 
-    suspend fun getAuthorList(): StateFlow<List<AuthorItemEntity>?>
+    suspend fun getAuthorList(): SharedFlow<List<AuthorItemEntity>?>
 
     suspend fun subscribeToAuthor(author: String)
 

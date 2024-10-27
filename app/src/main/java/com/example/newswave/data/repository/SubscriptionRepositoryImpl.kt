@@ -48,8 +48,8 @@ class SubscriptionRepositoryImpl @Inject constructor(
     private val _authorNews = MutableSharedFlow<NewsState>()//mb stateflow
     private val authorNews: SharedFlow<NewsState> get() = _authorNews.asSharedFlow()
 
-    private val _authorList = MutableStateFlow<List<AuthorItemEntity>?>(null)
-    private val authorList: StateFlow<List<AuthorItemEntity>?> get() = _authorList.asStateFlow()
+    private val _authorList = MutableSharedFlow<List<AuthorItemEntity>?>()
+    private val authorList: SharedFlow<List<AuthorItemEntity>?> get() = _authorList.asSharedFlow()
 
     private val _isFavoriteAuthorFlow = MutableStateFlow<Boolean?>(null)
     private val isFavoriteAuthorFlow: StateFlow<Boolean?> get() = _isFavoriteAuthorFlow.asStateFlow()
@@ -57,7 +57,7 @@ class SubscriptionRepositoryImpl @Inject constructor(
     private val authorsReference = database.getReference("Authors")
 
 
-    override suspend fun getAuthorList(): StateFlow<List<AuthorItemEntity>?> = authorList
+    override suspend fun getAuthorList(): SharedFlow<List<AuthorItemEntity>?> = authorList
 
 
     override suspend fun loadAuthorNews(author: String): SharedFlow<NewsState> {
@@ -138,13 +138,14 @@ class SubscriptionRepositoryImpl @Inject constructor(
             authorsReference.child(auth.currentUser?.uid.toString())
                 .addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        Log.w("UserRepositoryImpl", "flagdblsitener")
                         val authors = mutableListOf<AuthorItemEntity>()
                         for (authorSnapshot in snapshot.children) {
                             val author = authorSnapshot.getValue(AuthorItemEntity::class.java)
                             author?.let { authors.add(author) }
                         }
-                        _authorList.value = authors
+                        ioScope.launch {
+                            _authorList.emit(authors)
+                        }
                     }
 
                     override fun onCancelled(error: DatabaseError) {

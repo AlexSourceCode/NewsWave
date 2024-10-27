@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 //                    .setPopEnterAnim(R.anim.fade_in)
 //                    .setPopExitAnim(R.anim.fade_out)
 //                    .build()
-                // Возвращаем true для всех элементов, чтобы позволить navController обрабатывать навигацию
+//                 Возвращаем true для всех элементов, чтобы позволить navController обрабатывать навигацию
                 NavigationUI.onNavDestinationSelected(item, navController)
 //                navController.navigate(item.itemId, null, navOptions)
                 true

@@ -47,6 +47,7 @@ class AuthorNewsFragment : Fragment() {
         super.onAttach(context)
     }
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

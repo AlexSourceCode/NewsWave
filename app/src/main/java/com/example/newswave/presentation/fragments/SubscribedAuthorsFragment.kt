@@ -71,30 +71,7 @@ class SubscribedAuthorsFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.uiState.collect { uiState ->
-                    Log.d("SubscribedAuthorsFragment", "uiState ${uiState.toString()}")
-                    when (uiState) {
-                        is AuthorState.Error -> Log.d(
-                            "CheckState",
-                            uiState.toString()
-                        )
-
-                        is AuthorState.Loading -> {
-                            showProgressBar()
-                        }
-
-                        is AuthorState.Success -> {
-                            adapter.submitList(uiState.currentList)
-                            hideProgressBar()
-                        }
-                    }
-                }
-            }
-        }
-
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.user.collect { firebaseUser ->
                     Log.d("SubscribedAuthorsFragment", "user ${firebaseUser.toString()}")
@@ -102,6 +79,20 @@ class SubscribedAuthorsFragment : Fragment() {
                         is AuthState.LoggedIn -> {
                             showProgressBar()
                             showLoggedInState()
+                            viewModel.uiState.collect { uiState ->
+                                Log.d("SubscribedAuthorsFragment", "uiState ${uiState.toString()}")
+                                when (uiState) {
+                                    is AuthorState.Error -> {
+                                        Log.d("CheckState", uiState.toString())
+                                        hideProgressBar()
+                                    }
+                                    is AuthorState.Loading -> showProgressBar()
+                                    is AuthorState.Success -> {
+                                        adapter.submitList(uiState.currentList)
+                                        hideProgressBar()
+                                    }
+                                }
+                            }
                         }
                         is AuthState.LoggedOut -> showLoggedOutState()
                     }
