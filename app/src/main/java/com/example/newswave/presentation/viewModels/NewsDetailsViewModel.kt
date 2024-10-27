@@ -55,17 +55,22 @@ class NewsDetailsViewModel @Inject constructor(
                     _user.value = AuthState.LoggedIn(userFirebase)
                 } else{
                     _user.value = AuthState.LoggedOut
+                    _stateAuthor.value = false
                 }
+            }
+        }
+    }
+
+    private fun observeFavoriteAuthor(){
+        viewModelScope.launch {
+            isFavoriteAuthorUseCase().collect { state ->
+                _stateAuthor.value = state
             }
         }
     }
 
     init {
         observeAuthState()
-        viewModelScope.launch {
-            isFavoriteAuthorUseCase().collect{ state ->
-                _stateAuthor.value = state
-            }
-        }
+        observeFavoriteAuthor()
     }
 }

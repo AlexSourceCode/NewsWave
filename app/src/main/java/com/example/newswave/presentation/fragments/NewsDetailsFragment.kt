@@ -31,6 +31,7 @@ import com.example.newswave.utils.CustomArrayAdapter
 import com.example.newswave.utils.DateUtils
 import com.example.newswave.utils.NetworkUtils
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -73,7 +74,6 @@ class NewsDetailsFragment : Fragment() {
         viewModel = ViewModelProvider(this, viewModelFactory)[NewsDetailsViewModel::class.java]
 
         observeViewModel()
-//        setOnClickListener()
         inflateFragment()
     }
 
@@ -146,50 +146,42 @@ class NewsDetailsFragment : Fragment() {
         }
     }
 
-    private fun updateSubscriptionButton(isFavorite: Boolean) {
-        if (isFavorite) {
-            binding.btSubscription.text = getString(R.string.subscribed)
-            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
-            binding.btSubscription.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.white
-                )
-            )
-        } else {
-            binding.btSubscription.text = getString(R.string.subscribe)
-            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
-            binding.btSubscription.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.black
-                )
-            )
-        }
-    }
+
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.stateAuthor.collect { isFavorite ->
-                    if (isFavorite != null) {
-                        updateSubscriptionButton(isFavorite)
-                    }
-                    binding.btSubscription.setOnClickListener {
-                        val checkSubscribed = binding.btSubscription.text.toString()
-                        val author = binding.srAuthors.selectedItem.toString()
-                        val btSub = requireActivity().getString(R.string.subscribe)
-                        if (checkSubscribed == btSub) {
-                            if (isFavorite == null) requestLoginForSubscription()
-                            else viewModel.subscribeOnAuthor(author)
-                        } else {
-                            showUnsubscribeDialog(author)
+                viewModel.user.collect { isAuth ->
+                    handleAuthState(isAuth)
+                    lifecycleScope.launch {
+                        viewModel.stateAuthor.collect { isFavorite ->
+                            if (isFavorite != null) {
+                                updateSubscriptionButton(isFavorite)
+                            }
                         }
                     }
                 }
             }
         }
     }
+
+
+    private fun handleAuthState(isAuth: AuthState) {
+        binding.btSubscription.setOnClickListener {
+            val checkSubscribed = binding.btSubscription.text.toString()
+            val author = binding.srAuthors.selectedItem.toString()
+            val btSub = requireActivity().getString(R.string.subscribe)
+            when (isAuth) {
+                is AuthState.LoggedIn -> {
+                    if (checkSubscribed == btSub) viewModel.subscribeOnAuthor(author)
+                    else showUnsubscribeDialog(author)
+                }
+
+                is AuthState.LoggedOut -> requestLoginForSubscription()
+            }
+        }
+    }
+
 
     private fun requestLoginForSubscription() {
         val builder = AlertDialog.Builder(requireContext())
@@ -226,13 +218,33 @@ class NewsDetailsFragment : Fragment() {
         dialog.show()
     }
 
+    private fun updateSubscriptionButton(isFavorite: Boolean) {
+        if (isFavorite) {
+            setSubscribedButton()
+        } else {
+            setUnsubscribedButton()
+        }
+    }
+
+    private fun setSubscribedButton() {
+        binding.btSubscription.text = getString(R.string.subscribed)
+        binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
+        binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+    }
+
+    private fun setUnsubscribedButton() {
+        binding.btSubscription.text = getString(R.string.subscribe)
+        binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
+        binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         player.release()
         binding.playerView.player = null
     }
 
-    private fun launchSignInFragment(){
+    private fun launchSignInFragment() {
         findNavController().navigate(
             NewsDetailsFragmentDirections.actionNewsDetailsFragmentToLoginFragment()
         )
