@@ -116,18 +116,26 @@ class SubscriptionRepositoryImpl @Inject constructor(
     }
 
     override fun favoriteAuthorCheck(author: String) {
-        authorsReference.child(auth.currentUser?.uid.toString())
-            .orderByChild("author")
-            .equalTo(author)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    _isFavoriteAuthorFlow.value = snapshot.exists()
-                }
+        ioScope.launch {
+            if (auth.currentUser == null) {
+                _authorList.emit(null)
+            } else {
+                authorsReference.child(auth.currentUser?.uid.toString())
+                    .orderByChild("author")
+                    .equalTo(author)
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            ioScope.launch {
+                                _isFavoriteAuthorFlow.value = snapshot.exists()
+                            }
+                        }
 
-                override fun onCancelled(error: DatabaseError) {
-                    error.toException()
-                }
-            })
+                        override fun onCancelled(error: DatabaseError) {
+                            error.toException()
+                        }
+                    })
+            }
+        }
     }
 
     override fun showAuthorsList(){
@@ -163,8 +171,10 @@ class SubscriptionRepositoryImpl @Inject constructor(
                             val author = authorSnapshot.getValue(AuthorItemEntity::class.java)
                             author?.let { authors.add(author) }
                         }
+
                         ioScope.launch {
-                            _authorList.emit(authors)
+                            if (auth.currentUser == null) _authorList.emit(null)
+                            else _authorList.emit(authors)
                         }
                     }
 

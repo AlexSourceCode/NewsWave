@@ -18,10 +18,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentNewsDetailsBinding
+import com.example.newswave.domain.model.AuthState
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
@@ -71,7 +73,7 @@ class NewsDetailsFragment : Fragment() {
         viewModel = ViewModelProvider(this, viewModelFactory)[NewsDetailsViewModel::class.java]
 
         observeViewModel()
-        setOnClickListener()
+//        setOnClickListener()
         inflateFragment()
     }
 
@@ -90,11 +92,12 @@ class NewsDetailsFragment : Fragment() {
         }
     }
 
-    private fun setupSpinner(){
+    private fun setupSpinner() {
         val list = args.news.author.split(",")
         val spinner = binding.srAuthors
 
-        val customAdapter = CustomArrayAdapter(requireActivity().application, R.layout.spinner_item, list)
+        val customAdapter =
+            CustomArrayAdapter(requireActivity().application, R.layout.spinner_item, list)
         customAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
         spinner.adapter = customAdapter
 
@@ -120,18 +123,18 @@ class NewsDetailsFragment : Fragment() {
         }
     }
 
-    private fun setupImage(){
-        if (NetworkUtils.isNetworkAvailable(requireActivity().application)){
+    private fun setupImage() {
+        if (NetworkUtils.isNetworkAvailable(requireActivity().application)) {
             Picasso.get()
                 .load(args.news.image)
                 .resize(800, 600)
                 .into(binding.ivImage)
-        } else{
+        } else {
             binding.ivImage.setImageResource(R.drawable.error_placeholder)
         }
     }
 
-    private fun setupVideoPlayer(){
+    private fun setupVideoPlayer() {
         args.news.video?.let { videoUrl ->
             if (!videoUrl.endsWith("m3u8")) {
                 binding.playerView.visibility = View.VISIBLE
@@ -167,29 +170,43 @@ class NewsDetailsFragment : Fragment() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.stateAuthor.collect { isFavorite ->
-                    if (isFavorite != null){
+                    if (isFavorite != null) {
                         updateSubscriptionButton(isFavorite)
+                    }
+                    binding.btSubscription.setOnClickListener {
+                        val checkSubscribed = binding.btSubscription.text.toString()
+                        val author = binding.srAuthors.selectedItem.toString()
+                        val btSub = requireActivity().getString(R.string.subscribe)
+                        if (checkSubscribed == btSub) {
+                            if (isFavorite == null) requestLoginForSubscription()
+                            else viewModel.subscribeOnAuthor(author)
+                        } else {
+                            showUnsubscribeDialog(author)
+                        }
                     }
                 }
             }
         }
     }
 
+    private fun requestLoginForSubscription() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(getString(R.string.subscription_prompt_message))
+        builder.setMessage(getString(R.string.sign_in_required_message))
 
-    private fun setOnClickListener() {
-        binding.btSubscription.setOnClickListener {
-            val checkSubscribed = binding.btSubscription.text.toString()
-            val author = binding.srAuthors.selectedItem.toString()
-            val btSub = requireActivity().getString(R.string.subscribe)
-            if (checkSubscribed == btSub) {
-                // В зависимости от авторизации диалоговое окно или подписываться
-                viewModel.subscribeOnAuthor(author)
-            } else {
-                showUnsubscribeDialog(author)
-            }
+        builder.setPositiveButton(getString(R.string.sign_in_text)) { dialog, _ ->
+            launchSignInFragment()
+            dialog.dismiss()
         }
+
+        builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun showUnsubscribeDialog(author: String) {
@@ -198,11 +215,10 @@ class NewsDetailsFragment : Fragment() {
         builder.setMessage(getString(R.string.alert_dialog_question, author))
 
         builder.setPositiveButton(getString(R.string.unsubscribe)) { dialog, _ ->
-            Log.d("setPositiveButton", "work")
             viewModel.unsubscribeFromAuthor(author)
             dialog.dismiss()
         }
-        builder.setNegativeButton(getString(R.string.cancel)){ dialog, _ ->
+        builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
             dialog.dismiss()
         }
 
@@ -210,28 +226,16 @@ class NewsDetailsFragment : Fragment() {
         dialog.show()
     }
 
-    private fun requestLoginForSubscription(){
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(getString(R.string.subscription_prompt_message))
-        builder.setMessage(getString(R.string.sign_in_required_message))
-
-        builder.setPositiveButton(getString(R.string.sign_in_text)){ dialog, _ ->
-            //code
-            dialog.dismiss()
-        }
-
-        builder.setNegativeButton(getString(R.string.cancel)){ dialog, _ ->
-            dialog.dismiss()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
-    }
-
-        override fun onDestroyView() {
+    override fun onDestroyView() {
         super.onDestroyView()
         player.release()
         binding.playerView.player = null
+    }
+
+    private fun launchSignInFragment(){
+        findNavController().navigate(
+            NewsDetailsFragmentDirections.actionNewsDetailsFragmentToLoginFragment()
+        )
     }
 
 }
