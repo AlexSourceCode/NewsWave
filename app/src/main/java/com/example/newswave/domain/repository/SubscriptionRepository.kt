@@ -13,9 +13,11 @@ interface SubscriptionRepository {
 
     suspend fun unsubscribeFromAuthor(author: String)
 
-    suspend fun favoriteAuthorCheck(author: String)
+    fun favoriteAuthorCheck(author: String)
 
     fun isFavoriteAuthor(): StateFlow<Boolean?>
+
+    fun showAuthorsList()
 
     suspend fun loadAuthorNews(author: String): SharedFlow<NewsState>
 }

@@ -202,6 +202,7 @@ class TopNewsFragment : Fragment() {
     }
 
     private fun launchNewsDetailsFragment(news: NewsItemEntity) {   // Переход к фрагменту с деталями новости
+        viewModel.preloadAuthorData(news.author)
         findNavController().navigate(
             TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(news, null)
         )

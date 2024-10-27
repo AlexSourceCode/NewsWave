@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.newswave.domain.model.NewsState
 import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
+import com.example.newswave.domain.usecases.ShowAuthorsListUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -26,7 +27,8 @@ import kotlinx.coroutines.flow.asStateFlow
 class SubscribedAuthorsViewModel @Inject constructor(
     private val getAuthorListUseCase: GetAuthorListUseCase,
     private val unsubscribeFromAuthorUseCase: UnsubscribeFromAuthorUseCase,
-    private val observeAuthStateUseCase: ObserveAuthStateUseCase
+    private val observeAuthStateUseCase: ObserveAuthStateUseCase,
+    showAuthorsListUseCase: ShowAuthorsListUseCase
 ) : ViewModel() {
 
 
@@ -70,6 +72,7 @@ class SubscribedAuthorsViewModel @Inject constructor(
 
 
     init {
+        showAuthorsListUseCase()
         getAuthorsList()
         observeAuthState()
     }

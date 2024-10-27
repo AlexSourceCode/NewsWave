@@ -74,13 +74,11 @@ class SubscribedAuthorsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.user.collect { firebaseUser ->
-                    Log.d("SubscribedAuthorsFragment", "user ${firebaseUser.toString()}")
                     when (firebaseUser) {
                         is AuthState.LoggedIn -> {
                             showProgressBar()
                             showLoggedInState()
                             viewModel.uiState.collect { uiState ->
-                                Log.d("SubscribedAuthorsFragment", "uiState ${uiState.toString()}")
                                 when (uiState) {
                                     is AuthorState.Error -> {
                                         Log.d("CheckState", uiState.toString())

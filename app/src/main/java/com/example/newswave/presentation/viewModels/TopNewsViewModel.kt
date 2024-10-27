@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.domain.model.NewsState
+import com.example.newswave.domain.usecases.FavoriteAuthorCheckUseCase
 import com.example.newswave.domain.usecases.FetchErrorLoadDataUseCase
 import com.example.newswave.domain.usecases.FetchTopNewsListUseCase
+import com.example.newswave.domain.usecases.IsFavoriteAuthorUseCase
 import com.example.newswave.domain.usecases.LoadDataUseCase
 import com.example.newswave.domain.usecases.LoadNewsForPreviousDayUseCase
 import com.example.newswave.domain.usecases.SearchNewsByFilterUseCase
@@ -30,7 +32,8 @@ class TopNewsViewModel @Inject constructor(
     private val loadNewsForPreviousDayUseCase: LoadNewsForPreviousDayUseCase,
     private val fetchTopNewsListUseCase: FetchTopNewsListUseCase,
     private val searchNewsByFilterUseCaseFactory: SearchNewsByFilterUseCaseFactory,
-    private val fetchErrorLoadDataUseCase: FetchErrorLoadDataUseCase
+    private val fetchErrorLoadDataUseCase: FetchErrorLoadDataUseCase,
+    private val favoriteAuthorCheckUseCase: FavoriteAuthorCheckUseCase
 ) : ViewModel() {
 
     private lateinit var searchNewsByFilterUseCase: SearchNewsByFilterUseCase
@@ -48,6 +51,12 @@ class TopNewsViewModel @Inject constructor(
             _uiState.value = NewsState.Loading
             _searchArgs.value = Pair(filter,value)
             searchNewsByFilter()
+        }
+    }
+
+    fun preloadAuthorData(author: String){
+        viewModelScope.launch {
+            favoriteAuthorCheckUseCase(author)
         }
     }
 

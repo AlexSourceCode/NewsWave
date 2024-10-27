@@ -169,7 +169,6 @@ class NewsDetailsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED){
                 viewModel.stateAuthor.collect { isFavorite ->
-                    Log.d("repeatOnLifecycle", isFavorite.toString())
                     if (isFavorite != null){
                         updateSubscriptionButton(isFavorite)
                     }

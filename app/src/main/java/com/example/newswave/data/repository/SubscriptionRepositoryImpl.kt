@@ -73,11 +73,11 @@ class SubscriptionRepositoryImpl @Inject constructor(
             .orderByChild("author")
             .equalTo(author)
 
-        authorQuery.addListenerForSingleValueEvent(object : ValueEventListener{
+        authorQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()){
+                if (snapshot.exists()) {
                     return
-                } else{
+                } else {
                     authorsReference.child(userId).push().setValue(authorEntity)
                     ioScope.launch {
                         favoriteAuthorCheck(author)
@@ -115,20 +115,40 @@ class SubscriptionRepositoryImpl @Inject constructor(
         })
     }
 
-    override suspend fun favoriteAuthorCheck(author: String) {
-            authorsReference.child(auth.currentUser?.uid.toString())
-                .orderByChild("author")
-                .equalTo(author)
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        _isFavoriteAuthorFlow.value = snapshot.exists()
-                    }
+    override fun favoriteAuthorCheck(author: String) {
+        authorsReference.child(auth.currentUser?.uid.toString())
+            .orderByChild("author")
+            .equalTo(author)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    _isFavoriteAuthorFlow.value = snapshot.exists()
+                }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        error.toException()
-                    }
-                })
-        }
+                override fun onCancelled(error: DatabaseError) {
+                    error.toException()
+                }
+            })
+    }
+
+    override fun showAuthorsList(){
+        authorsReference.child(auth.currentUser?.uid.toString()).addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val authors = mutableListOf<AuthorItemEntity>()
+                for (authorSnapshot in snapshot.children) {
+                    val author = authorSnapshot.getValue(AuthorItemEntity::class.java)
+                    author?.let { authors.add(author) }
+                }
+                ioScope.launch {
+                    _authorList.emit(authors)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("UserRepositoryImpl", "Failed to read value.", error.toException())
+            }
+
+        })
+    }
 
     override fun isFavoriteAuthor(): StateFlow<Boolean?> = isFavoriteAuthorFlow
 

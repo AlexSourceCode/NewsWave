@@ -104,7 +104,6 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun observeAuthState(): StateFlow<FirebaseUser?> {
         auth.addAuthStateListener {
-            Log.d("UserRepositoryImpl", "observeAuthState")
             _user.value = auth.currentUser
         }
         return user

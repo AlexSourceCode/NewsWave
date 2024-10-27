@@ -18,6 +18,11 @@ import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.NewsRepository
 import com.example.newswave.utils.Filter
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,7 +52,7 @@ class NewsRepositoryImpl @Inject constructor(
     private val application: Application,
     private val newsDao: NewsDao,
     private val mapper: NewsMapper,
-    private val apiService: ApiService
+    private val apiService: ApiService,
 ) : NewsRepository {
 
 
@@ -150,7 +155,7 @@ class NewsRepositoryImpl @Inject constructor(
                     .collect {
                         newsDao.insertNews(it)
                     }
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 _errorLoadData.emit("Error loading news ${e.message}")
             }
         }
