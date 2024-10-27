@@ -47,4 +47,5 @@
     <string name="sign_in_required_message">Хотите подписаться на этот канал?</string>
     <string name="cancel">Отмена</string>
     <string name="unsubscribe">Отписаться</string>
+    <string name="author_unknown">Автор неизвестен</string>
 </resources>

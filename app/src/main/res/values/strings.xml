@@ -51,6 +51,7 @@
     <string name="sign_in_required_message">Sign in to subscribe to this channel</string>
     <string name="cancel">Cancel</string>
     <string name="unsubscribe">Unsubscribe</string>
+    <string name="author_unknown">Author unknown</string>
 
 
 </resources>

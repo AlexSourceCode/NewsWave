@@ -1,5 +1,6 @@
 package com.example.newswave.presentation.viewModels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.domain.model.AuthState
@@ -54,6 +55,7 @@ class NewsDetailsViewModel @Inject constructor(
                 if (userFirebase != null){
                     _user.value = AuthState.LoggedIn(userFirebase)
                 } else{
+                    Log.d("NewsDetailsViewModel", "")
                     _user.value = AuthState.LoggedOut
                     _stateAuthor.value = false
                 }

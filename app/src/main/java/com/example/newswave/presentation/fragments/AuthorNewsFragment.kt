@@ -18,6 +18,7 @@ import com.example.newswave.R
 import com.example.newswave.databinding.FragmentAuthorNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.app.NewsApp
+import com.example.newswave.domain.model.AuthState
 import com.example.newswave.domain.model.NewsState
 import com.example.newswave.presentation.adapters.NewsListAdapter
 import com.example.newswave.presentation.viewModels.AuthorNewsViewModel
@@ -86,7 +87,7 @@ class AuthorNewsFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.loadAuthorNews(args.author)
                 viewModel.uiState.collect { uiState ->
@@ -109,6 +110,13 @@ class AuthorNewsFragment : Fragment() {
                 }
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED){
+                viewModel.user.collect{ authState ->
+                    if (authState is AuthState.LoggedOut) findNavController().popBackStack()
+                }
+            }
+        }
     }
 
 
@@ -123,6 +131,7 @@ class AuthorNewsFragment : Fragment() {
     }
 
     private fun launchNewsDetailsFragment(news: NewsItemEntity) {
+        viewModel.preloadAuthorData(args.author)
         findNavController().navigate(
             AuthorNewsFragmentDirections.actionAuthorNewsFragmentToNewsDetailsFragment3(
                 news,

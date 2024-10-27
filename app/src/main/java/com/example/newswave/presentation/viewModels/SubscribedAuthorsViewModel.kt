@@ -60,9 +60,8 @@ class SubscribedAuthorsViewModel @Inject constructor(
     private fun observeAuthState() {
         viewModelScope.launch {
             observeAuthStateUseCase().collect { userFirebase ->
-                if (userFirebase != null){
-                    _user.value = AuthState.LoggedIn(userFirebase)
-                }
+                if (userFirebase != null) _user.value = AuthState.LoggedIn(userFirebase)
+                else _user.value = AuthState.LoggedOut
             }
         }
     }

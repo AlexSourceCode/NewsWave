@@ -73,8 +73,8 @@ class NewsDetailsFragment : Fragment() {
         binding.playerView.player = player
         viewModel = ViewModelProvider(this, viewModelFactory)[NewsDetailsViewModel::class.java]
 
-        observeViewModel()
         inflateFragment()
+        observeViewModel()
     }
 
     private fun inflateFragment() {
@@ -147,14 +147,28 @@ class NewsDetailsFragment : Fragment() {
     }
 
 
-
     private fun observeViewModel() {
+        if (args.news.author == EMPTY_CATEGORY) {
+            updateUIForUnknownAuthor()
+            return
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.user.collect { isAuth ->
+                    Log.d("NewsDetailsFragment", isAuth.toString())
+                    if (isAuth is AuthState.LoggedOut) {
+                        if (findNavController().currentDestination?.id == R.id.newsDetailsFragment3) {
+                            findNavController().popBackStack(
+                                R.id.subscribedAuthorsFragment,
+                                false
+                            )
+                        }
+                    }
                     handleAuthState(isAuth)
-                    lifecycleScope.launch {
+                    launch {
                         viewModel.stateAuthor.collect { isFavorite ->
+                            Log.d("NewsDetailsFragment", isFavorite.toString())
                             if (isFavorite != null) {
                                 updateSubscriptionButton(isFavorite)
                             }
@@ -186,19 +200,15 @@ class NewsDetailsFragment : Fragment() {
     private fun requestLoginForSubscription() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(getString(R.string.subscription_prompt_message))
-        builder.setMessage(getString(R.string.sign_in_required_message))
-
-        builder.setPositiveButton(getString(R.string.sign_in_text)) { dialog, _ ->
-            launchSignInFragment()
-            dialog.dismiss()
-        }
-
-        builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
-            dialog.dismiss()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
+            .setMessage(getString(R.string.sign_in_required_message))
+            .setPositiveButton(getString(R.string.sign_in_text)) { dialog, _ ->
+                launchSignInFragment()
+                dialog.dismiss()
+            }
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+        builder.create().show()
     }
 
     private fun showUnsubscribeDialog(author: String) {
@@ -226,6 +236,12 @@ class NewsDetailsFragment : Fragment() {
         }
     }
 
+    private fun updateUIForUnknownAuthor() {
+        binding.btSubscription.visibility = View.GONE
+        binding.srAuthors.visibility = View.GONE
+        binding.tvAuthorUnknown.visibility = View.VISIBLE
+    }
+
     private fun setSubscribedButton() {
         binding.btSubscription.text = getString(R.string.subscribed)
         binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
@@ -250,4 +266,7 @@ class NewsDetailsFragment : Fragment() {
         )
     }
 
+    companion object {
+        private const val EMPTY_CATEGORY = "unknownAuthor"
+    }
 }

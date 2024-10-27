@@ -71,7 +71,7 @@ class SubscribedAuthorsFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.user.collect { firebaseUser ->
                     when (firebaseUser) {
@@ -80,11 +80,10 @@ class SubscribedAuthorsFragment : Fragment() {
                             showLoggedInState()
                             viewModel.uiState.collect { uiState ->
                                 when (uiState) {
-                                    is AuthorState.Error -> {
-                                        Log.d("CheckState", uiState.toString())
-                                        hideProgressBar()
-                                    }
+                                    is AuthorState.Error -> hideProgressBar()
+
                                     is AuthorState.Loading -> showProgressBar()
+
                                     is AuthorState.Success -> {
                                         adapter.submitList(uiState.currentList)
                                         hideProgressBar()
@@ -92,6 +91,7 @@ class SubscribedAuthorsFragment : Fragment() {
                                 }
                             }
                         }
+
                         is AuthState.LoggedOut -> showLoggedOutState()
                     }
                 }
