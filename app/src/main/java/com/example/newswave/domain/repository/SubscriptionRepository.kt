@@ -19,5 +19,7 @@ interface SubscriptionRepository {
 
     fun showAuthorsList()
 
+    fun clearState()
+
     suspend fun loadAuthorNews(author: String): SharedFlow<NewsState>
 }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.domain.model.AuthState
+import com.example.newswave.domain.usecases.ClearStateUseCase
 import com.example.newswave.domain.usecases.FavoriteAuthorCheckUseCase
 import com.example.newswave.domain.usecases.IsFavoriteAuthorUseCase
 import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
@@ -13,6 +14,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,13 +25,15 @@ class NewsDetailsViewModel @Inject constructor(
     private val unsubscribeFromAuthorUseCase: UnsubscribeFromAuthorUseCase,
     private val isFavoriteAuthorUseCase: IsFavoriteAuthorUseCase,
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
+    private val clearStateUseCase: ClearStateUseCase
     ): ViewModel() {
 
-    private val _stateAuthor = MutableStateFlow<Boolean?>(null)
+    private var _stateAuthor = MutableStateFlow<Boolean?>(null)
     val stateAuthor: StateFlow<Boolean?> get() = _stateAuthor.asStateFlow()
 
     private var _user = MutableStateFlow<AuthState>(AuthState.LoggedOut)
     val user: StateFlow<AuthState> get() = _user.asStateFlow()
+
 
 
     fun checkAuthorInRepository(author: String){
@@ -54,8 +59,8 @@ class NewsDetailsViewModel @Inject constructor(
             observeAuthStateUseCase().collect { userFirebase ->
                 if (userFirebase != null){
                     _user.value = AuthState.LoggedIn(userFirebase)
+                    observeFavoriteAuthor()
                 } else{
-                    Log.d("NewsDetailsViewModel", "")
                     _user.value = AuthState.LoggedOut
                     _stateAuthor.value = false
                 }
@@ -65,14 +70,18 @@ class NewsDetailsViewModel @Inject constructor(
 
     private fun observeFavoriteAuthor(){
         viewModelScope.launch {
-            isFavoriteAuthorUseCase().collect { state ->
+            isFavoriteAuthorUseCase().collectLatest { state ->
+                if (state == null) return@collectLatest
                 _stateAuthor.value = state
             }
         }
     }
 
+    fun clearState() {
+        clearStateUseCase()
+    }
+
     init {
         observeAuthState()
-        observeFavoriteAuthor()
     }
 }

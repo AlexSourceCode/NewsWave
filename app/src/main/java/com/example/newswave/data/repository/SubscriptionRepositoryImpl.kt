@@ -9,6 +9,7 @@ import com.example.newswave.domain.model.NewsState
 import com.example.newswave.domain.repository.SubscriptionRepository
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -51,7 +52,7 @@ class SubscriptionRepositoryImpl @Inject constructor(
     private val _authorList = MutableSharedFlow<List<AuthorItemEntity>?>()
     private val authorList: SharedFlow<List<AuthorItemEntity>?> get() = _authorList.asSharedFlow()
 
-    private val _isFavoriteAuthorFlow = MutableStateFlow<Boolean?>(null)
+    private var _isFavoriteAuthorFlow = MutableStateFlow<Boolean?>(null)
     private val isFavoriteAuthorFlow: StateFlow<Boolean?> get() = _isFavoriteAuthorFlow.asStateFlow()
 
     private val authorsReference = database.getReference("Authors")
@@ -126,7 +127,11 @@ class SubscriptionRepositoryImpl @Inject constructor(
                     .addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
                             ioScope.launch {
+                                Log.d("TimeUpdateValue", "BeforeUpdateFavotireAuthor")
                                 _isFavoriteAuthorFlow.value = snapshot.exists()
+//                                auth.currentUser?.reload()
+                                Log.d("TimeUpdateValue", "AfterUpdateFavotireAuthor")
+
                             }
                         }
 
@@ -158,10 +163,13 @@ class SubscriptionRepositoryImpl @Inject constructor(
         })
     }
 
+    override fun clearState() {
+        _isFavoriteAuthorFlow.value = null
+    }
+
     override fun isFavoriteAuthor(): StateFlow<Boolean?> = isFavoriteAuthorFlow
 
-
-    init {
+    private fun authorization(){
         auth.addAuthStateListener {
             authorsReference.child(auth.currentUser?.uid.toString())
                 .addValueEventListener(object : ValueEventListener {
@@ -183,6 +191,10 @@ class SubscriptionRepositoryImpl @Inject constructor(
                     }
                 })
         }
+    }
+
+    init {
+        authorization()
 
 
         ioScope.launch {

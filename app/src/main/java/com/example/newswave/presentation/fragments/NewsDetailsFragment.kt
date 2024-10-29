@@ -31,7 +31,9 @@ import com.example.newswave.utils.CustomArrayAdapter
 import com.example.newswave.utils.DateUtils
 import com.example.newswave.utils.NetworkUtils
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -113,8 +115,11 @@ class NewsDetailsFragment : Fragment() {
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @SuppressLint("ResourceAsColor")
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                val selectedItem = p0?.getItemAtPosition(p2).toString()
-                viewModel.checkAuthorInRepository(selectedItem)
+                if (p2 != 0) {
+                    Log.d("onItemSelectedListenerState", "fsfsd")
+                    val selectedItem = p0?.getItemAtPosition(p2).toString()
+                    viewModel.checkAuthorInRepository(selectedItem)
+                }
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -146,6 +151,10 @@ class NewsDetailsFragment : Fragment() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.clearState()
+    }
 
     private fun observeViewModel() {
         if (args.news.author == EMPTY_CATEGORY) {
@@ -155,8 +164,9 @@ class NewsDetailsFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.user.collect { isAuth ->
-                    Log.d("NewsDetailsFragment", isAuth.toString())
+                viewModel.user.collectLatest { isAuth ->
+                    Log.d("NewsDetailsFragmentState", isAuth.toString())
+                    handleAuthState(isAuth)
                     if (isAuth is AuthState.LoggedOut) {
                         if (findNavController().currentDestination?.id == R.id.newsDetailsFragment3) {
                             findNavController().popBackStack(
@@ -164,15 +174,17 @@ class NewsDetailsFragment : Fragment() {
                                 false
                             )
                         }
+                        binding.btSubscription.visibility = View.VISIBLE
+                        return@collectLatest
                     }
-                    handleAuthState(isAuth)
-                    launch {
-                        viewModel.stateAuthor.collect { isFavorite ->
-                            Log.d("NewsDetailsFragment", isFavorite.toString())
+                    Log.d("TimeUpdateValue", "isAuth")
+
+                        viewModel.stateAuthor.collectLatest { isFavorite -> // возможно нужен запуск в launch
+                            Log.d("NewsDetailsFragmentState", isFavorite.toString())
                             if (isFavorite != null) {
                                 updateSubscriptionButton(isFavorite)
                             }
-                        }
+
                     }
                 }
             }
@@ -231,8 +243,10 @@ class NewsDetailsFragment : Fragment() {
     private fun updateSubscriptionButton(isFavorite: Boolean) {
         if (isFavorite) {
             setSubscribedButton()
+            binding.btSubscription.visibility = View.VISIBLE
         } else {
             setUnsubscribedButton()
+            binding.btSubscription.visibility = View.VISIBLE
         }
     }
 

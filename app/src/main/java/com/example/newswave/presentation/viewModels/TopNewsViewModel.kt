@@ -41,6 +41,10 @@ class TopNewsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<NewsState>(NewsState.Loading)
     val uiState: StateFlow<NewsState> = _uiState.asStateFlow()
 
+    private val _isFavoriteAuthor = MutableStateFlow<Boolean?>(null)
+    val isFavoriteAuthor: StateFlow<Boolean?> get() = _isFavoriteAuthor.asStateFlow()
+
+
     private val _searchTrigger = MutableStateFlow(false)
 
     private val _searchArgs = MutableStateFlow<Pair<String, String>?>(null)
