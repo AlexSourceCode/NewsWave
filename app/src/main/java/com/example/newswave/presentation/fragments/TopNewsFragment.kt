@@ -25,6 +25,7 @@ import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.Filter
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -37,6 +38,7 @@ class TopNewsFragment : Fragment() {
     private lateinit var adapter: NewsListAdapter
 
     private lateinit var viewModel: TopNewsViewModel
+
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
@@ -51,6 +53,11 @@ class TopNewsFragment : Fragment() {
     override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("onCreateState", "fsdfdsf")
+        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
@@ -126,6 +133,7 @@ class TopNewsFragment : Fragment() {
                     context.getString(filter.descriptionResId)
                 }
             }
+
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
@@ -148,21 +156,23 @@ class TopNewsFragment : Fragment() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){
-                viewModel.uiState.collect{ uiState ->
-                    when(uiState){
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.uiState.collect { uiState ->
+                    when (uiState) {
                         is NewsState.Error -> {
                             showToast()
                             binding.pgNews.visibility = View.GONE
-                            if (isSearchNews == true){
+                            if (isSearchNews == true) {
                                 binding.tvRetry.visibility = View.VISIBLE
                                 adapter.submitList(emptyList())
                             }
                         }
+
                         is NewsState.Loading -> {
                             binding.tvRetry.visibility = View.GONE
                             binding.pgNews.visibility = View.VISIBLE
                         }
+
                         is NewsState.Success -> {
                             binding.pgNews.visibility = View.GONE
                             binding.tvRetry.visibility = View.GONE
@@ -170,7 +180,16 @@ class TopNewsFragment : Fragment() {
                                 adapter.submitListWithLoadMore(uiState.currentList, null)
                                 adapter.notifyDataSetChanged()
                             } else {
-                                adapter.submitList(uiState.currentList)
+                                adapter.submitList(uiState.currentList) {
+                                    if (viewModel.isFirstLaunch) {
+                                        lifecycleScope.launch {
+                                            delay(700)
+                                            scrollToTop()
+                                        }
+                                        viewModel.isFirstLaunch = false
+                                    }
+                                }
+
                             }
                         }
                     }
@@ -178,6 +197,7 @@ class TopNewsFragment : Fragment() {
             }
         }
     }
+
 
     private fun setupAdapter() {
         adapter = NewsListAdapter(requireActivity().application)
@@ -192,8 +212,12 @@ class TopNewsFragment : Fragment() {
         }
     }
 
-    private fun showToast(){    // Показ уведомления
-        Toast.makeText(requireContext(), requireActivity().getString(R.string.error_load_data), Toast.LENGTH_LONG).show()
+    private fun showToast() {    // Показ уведомления
+        Toast.makeText(
+            requireContext(),
+            requireActivity().getString(R.string.error_load_data),
+            Toast.LENGTH_LONG
+        ).show()
     }
 
 

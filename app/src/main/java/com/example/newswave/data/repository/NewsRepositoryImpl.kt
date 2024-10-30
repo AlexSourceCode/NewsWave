@@ -71,7 +71,7 @@ class NewsRepositoryImpl @Inject constructor(
     private val errorLoadData: SharedFlow<String> get() = _errorLoadData.asSharedFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val topNewsFlow = newsDao.getNewsList()
+    val fetchTopNewsListFlow = newsDao.getNewsList()
         .flatMapConcat { newsList ->
             flow {
                 emit(newsList.map { mapper.mapDbModelToEntity(it) })
@@ -79,11 +79,11 @@ class NewsRepositoryImpl @Inject constructor(
         }.stateIn(
             scope = ioScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList()
+            initialValue = emptyList(),
         )
 
 
-    override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> = topNewsFlow
+    override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> = fetchTopNewsListFlow
 
     override suspend fun loadData() {
         val workManager =

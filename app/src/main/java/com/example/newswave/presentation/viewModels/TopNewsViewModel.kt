@@ -41,16 +41,21 @@ class TopNewsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<NewsState>(NewsState.Loading)
     val uiState: StateFlow<NewsState> = _uiState.asStateFlow()
 
-    private val _isFavoriteAuthor = MutableStateFlow<Boolean?>(null)
-    val isFavoriteAuthor: StateFlow<Boolean?> get() = _isFavoriteAuthor.asStateFlow()
-
-
     private val _searchTrigger = MutableStateFlow(false)
-
     private val _searchArgs = MutableStateFlow<Pair<String, String>?>(null)
 
+    var isFirstLaunch = true // crutch
 
-    fun updateSearchParameters(filter: String, value: String) {
+    init {
+        loadData()
+        fetchErrorLoadData()
+        fetchTopNewsList()
+        setupSearchTrigger()
+        setupSearchArgs()
+    }
+
+
+    fun updateSearchParameters(filter: String, value: String) { // no
         viewModelScope.launch {
             _uiState.value = NewsState.Loading
             _searchArgs.value = Pair(filter,value)
@@ -93,29 +98,36 @@ class TopNewsViewModel @Inject constructor(
         }
     }
 
-    init {
+    private fun loadData() {
         viewModelScope.launch {
             loadDataUseCase()
         }
+    }
 
+    private fun fetchErrorLoadData(){
         viewModelScope.launch {
             fetchErrorLoadDataUseCase()
                 .collect{
                     _uiState.value = NewsState.Error(it)
                 }
         }
+    }
 
+    private fun fetchTopNewsList(){ //yes
         viewModelScope.launch {
             try {
                 fetchTopNewsListUseCase()
                     .collect { news ->
-                        _uiState.value = NewsState.Success(news)
+                        if (news.isEmpty()) _uiState.value = NewsState.Loading
+                        else _uiState.value = NewsState.Success(news)
                     }
             } catch (e: Exception) {
                 _uiState.value = NewsState.Error(e.toString())
             }
         }
+    }
 
+    private fun setupSearchTrigger(){
         viewModelScope.launch {
             try {
                 _searchTrigger
@@ -125,13 +137,15 @@ class TopNewsViewModel @Inject constructor(
                         searchNewsByFilterUseCase()
                             .collect { news ->
                                 _uiState.value = NewsState.Success(news)
-                        }
+                            }
                     }
             } catch (e: Exception) {
                 _uiState.value = NewsState.Error(e.toString())
             }
         }
+    }
 
+    private fun setupSearchArgs(){
         viewModelScope.launch {
             _searchArgs
                 .filterNotNull()
@@ -141,4 +155,5 @@ class TopNewsViewModel @Inject constructor(
                 }
         }
     }
+
 }

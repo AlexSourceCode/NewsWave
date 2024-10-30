@@ -1,6 +1,8 @@
 package com.example.newswave.presentation
 
 import android.os.Bundle
+import android.util.Log
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
@@ -31,10 +33,10 @@ class MainActivity : AppCompatActivity() {
         AndroidThreeTen.init(this)
 
 
-
         val navController = findNavController(R.id.nav_host_fragment)
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
         bottomNavigationView.setupWithNavController(navController)
+
 
         bottomNavigationView.setOnItemSelectedListener { item ->
             if (item.itemId == R.id.topNewsFragment && item.isChecked) {
@@ -55,15 +57,19 @@ class MainActivity : AppCompatActivity() {
 //                 Возвращаем true для всех элементов, чтобы позволить navController обрабатывать навигацию
                 NavigationUI.onNavDestinationSelected(item, navController)
 //                navController.navigate(item.itemId, null, navOptions)
-                true
+//                true
             }
         }
 
+
+
     }
 
-        fun setSelectedMenuItem(itemId: Int) {
-            bottomNavigationView.menu.findItem(itemId).isChecked = true
-        }
+
+
+    fun setSelectedMenuItem(itemId: Int) {
+        bottomNavigationView.menu.findItem(itemId).isChecked = true
+    }
 
 
 }

@@ -7,7 +7,5 @@ import javax.inject.Inject
 
 class FetchTopNewsListUseCase @Inject constructor(private val repository: NewsRepository) {
 
-    suspend operator fun invoke(): StateFlow<List<NewsItemEntity>> {
-        return repository.fetchTopNewsList()
-    }
+    suspend operator fun invoke(): StateFlow<List<NewsItemEntity>> = repository.fetchTopNewsList()
 }

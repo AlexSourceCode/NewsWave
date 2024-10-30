@@ -151,7 +151,7 @@ class NewsDetailsFragment : Fragment() {
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroy() { // crutch
         super.onDestroy()
         viewModel.clearState()
     }
@@ -162,7 +162,7 @@ class NewsDetailsFragment : Fragment() {
             return
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch { // где надо и не надо collectlatest
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.user.collectLatest { isAuth ->
                     Log.d("NewsDetailsFragmentState", isAuth.toString())

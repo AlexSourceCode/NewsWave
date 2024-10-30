@@ -51,16 +51,14 @@
                     android:text="@string/author_unknown"/>
 
                 <Spinner
-                    android:layout_weight="1"
                     android:id="@+id/srAuthors"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
                 <Button
                     android:id="@+id/btSubscription"
                     android:layout_weight="1"
                     android:layout_width="0dp"
-                    android:visibility="gone"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:layout_marginEnd="16dp"
