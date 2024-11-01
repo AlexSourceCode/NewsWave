@@ -52,6 +52,8 @@
     <string name="cancel">Cancel</string>
     <string name="unsubscribe">Unsubscribe</string>
     <string name="author_unknown">Author unknown</string>
+    <string name="please_fill_in_all_the_fields">Please fill in all the fields</string>
+    <string name="please_enter_your_email">Please enter your email</string>
 
 
 </resources>

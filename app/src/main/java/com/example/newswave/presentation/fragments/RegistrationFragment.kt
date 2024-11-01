@@ -41,9 +41,6 @@ class RegistrationFragment : Fragment() {
         super.onAttach(context)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,7 +62,7 @@ class RegistrationFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.user.collect { fireBaseUser ->
-                    if (fireBaseUser != null){
+                    if (fireBaseUser != null) {
                         findNavController().popBackStack()
                     }
                 }
@@ -73,8 +70,9 @@ class RegistrationFragment : Fragment() {
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.error.collect{ errorMessage ->
-                    Toast.makeText(requireActivity().application, errorMessage, Toast.LENGTH_LONG).show()
+                viewModel.error.collect { errorMessage ->
+                    Toast.makeText(requireActivity().application, errorMessage, Toast.LENGTH_LONG)
+                        .show()
                 }
             }
         }
@@ -91,8 +89,31 @@ class RegistrationFragment : Fragment() {
             val password = binding.etPassword.text.toString().trim()
             val firstName = binding.etFirstName.text.toString().trim()
             val lastName = binding.etLastName.text.toString().trim()
-            viewModel.signUp(username,email,password, firstName, lastName)
+
+            if (isFieldNotEmpty(username, email, password, firstName, lastName)){
+                viewModel.signUp(username, email, password, firstName, lastName)
+            } else{
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.please_fill_in_all_the_fields), Toast.LENGTH_LONG
+                )
+                    .show()
+            }
         }
+    }
+
+    private fun isFieldNotEmpty(
+        username: String,
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String
+    ): Boolean {
+        return email.isNotEmpty() &&
+                username.isNotEmpty() &&
+                password.isNotEmpty() &&
+                firstName.isNotEmpty() &&
+                lastName.isNotEmpty()
     }
 
 

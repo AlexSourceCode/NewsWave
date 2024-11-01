@@ -48,4 +48,6 @@
     <string name="cancel">Отмена</string>
     <string name="unsubscribe">Отписаться</string>
     <string name="author_unknown">Автор неизвестен</string>
+    <string name="please_fill_in_all_the_fields">Пожалуйста, заполните все поля</string>
+    <string name="please_enter_your_email">Пожалуйста, введите ваш email</string>
 </resources>

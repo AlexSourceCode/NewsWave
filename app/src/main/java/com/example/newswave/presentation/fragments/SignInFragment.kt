@@ -41,10 +41,6 @@ class SignInFragment : Fragment() {
         super.onAttach(context)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -71,15 +67,27 @@ class SignInFragment : Fragment() {
         binding.btSignIn.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
-            viewModel.signIn(email, password)
+            if (isFieldNotEmpty(email, password)) {
+                viewModel.signIn(email, password)
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.please_fill_in_all_the_fields), Toast.LENGTH_LONG
+                )
+                    .show()
+            }
         }
+    }
+
+    private fun isFieldNotEmpty(email: String, password: String): Boolean {
+        return email.isNotEmpty() && password.isNotEmpty()
     }
 
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.user.collect{ fireBaseUser ->
-                    if (fireBaseUser != null){
+                viewModel.user.collect { fireBaseUser ->
+                    if (fireBaseUser != null) {
                         findNavController().popBackStack()
                     }
                 }
@@ -87,8 +95,9 @@ class SignInFragment : Fragment() {
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.error.collect{ errorMessage->
-                    Toast.makeText(requireActivity().application, errorMessage, Toast.LENGTH_LONG).show()
+                viewModel.error.collect { errorMessage ->
+                    Toast.makeText(requireActivity().application, errorMessage, Toast.LENGTH_LONG)
+                        .show()
                 }
             }
         }

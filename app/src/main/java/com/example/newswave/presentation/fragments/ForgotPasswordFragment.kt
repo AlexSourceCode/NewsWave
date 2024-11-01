@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentForgotPasswordBinding
 import com.example.newswave.presentation.viewModels.ForgotPasswordViewModel
@@ -40,10 +41,6 @@ class ForgotPasswordFragment : Fragment() {
         super.onAttach(context)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,25 +57,43 @@ class ForgotPasswordFragment : Fragment() {
         binding.etEmail.setText(args.email)
 
         binding.btReset.setOnClickListener {
-            viewModel.resetPassword(binding.etEmail.text.toString())
+            val email = binding.etEmail.text.toString().trim()
+            if (isFieldNotEmpty(email)) {
+                viewModel.resetPassword(email)
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.please_enter_your_email), Toast.LENGTH_LONG
+                ).show()
+
+            }
         }
+    }
+
+    private fun isFieldNotEmpty(email: String): Boolean {
+        return email.isNotEmpty()
     }
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){
-                viewModel.isSuccess.collect{ success ->
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.isSuccess.collect { success ->
                     if (success) {
-                        Toast.makeText(requireActivity().application, "The reset link has been successfully sent", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            requireActivity().application,
+                            "The reset link has been successfully sent",
+                            Toast.LENGTH_LONG
+                        ).show()
                         findNavController().popBackStack()
                     }
                 }
             }
         }
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){
-                viewModel.error.collect{ errorMessage ->
-                    Toast.makeText(requireActivity().application, errorMessage, Toast.LENGTH_LONG).show()
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.error.collect { errorMessage ->
+                    Toast.makeText(requireActivity().application, errorMessage, Toast.LENGTH_LONG)
+                        .show()
                 }
             }
         }
