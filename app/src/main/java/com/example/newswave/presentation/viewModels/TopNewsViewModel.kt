@@ -45,6 +45,8 @@ class TopNewsViewModel @Inject constructor(
     private val _searchArgs = MutableStateFlow<Pair<String, String>?>(null)
 
     var isFirstLaunch = true // crutch
+    var scrollPosition: Int? = null
+
 
     init {
         loadData()

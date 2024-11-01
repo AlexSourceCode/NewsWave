@@ -15,11 +15,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentTopNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.model.NewsState
+import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.adapters.NewsListAdapter
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
@@ -55,16 +57,13 @@ class TopNewsFragment : Fragment() {
         super.onAttach(context)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("onCreateState", "fsdfdsf")
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentTopNewsBinding.inflate(layoutInflater)
+        (activity as MainActivity).setSelectedMenuItem(R.id.topNewsFragment)
         return binding.root
     }
 
@@ -79,7 +78,6 @@ class TopNewsFragment : Fragment() {
         handleBackNavigation()      // Обработка нажатия кнопки "Назад"
         setOnClickListener()        // Установка слушателей нажатий
         setupSwipeRefresh()         // Обновление данных при свайпе вниз
-
     }
 
     private fun setOnClickListener() {
@@ -185,8 +183,8 @@ class TopNewsFragment : Fragment() {
                                         lifecycleScope.launch {
                                             delay(700)
                                             scrollToTop()
+                                            viewModel.isFirstLaunch = false
                                         }
-                                        viewModel.isFirstLaunch = false
                                     }
                                 }
 

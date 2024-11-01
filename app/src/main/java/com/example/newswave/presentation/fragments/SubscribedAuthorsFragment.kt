@@ -18,6 +18,7 @@ import com.example.newswave.databinding.FragmentSubscribedAuthorsBinding
 import com.example.newswave.app.NewsApp
 import com.example.newswave.domain.model.AuthState
 import com.example.newswave.domain.model.AuthorState
+import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.adapters.AuthorListAdapter
 import com.example.newswave.presentation.viewModels.SubscribedAuthorsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
@@ -55,6 +56,7 @@ class SubscribedAuthorsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSubscribedAuthorsBinding.inflate(layoutInflater)
+        (activity as MainActivity).setSelectedMenuItem(R.id.subscribedAuthorsFragment)
         return binding.root
     }
 

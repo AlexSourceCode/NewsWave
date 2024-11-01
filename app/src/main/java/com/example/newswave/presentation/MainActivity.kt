@@ -1,9 +1,16 @@
 package com.example.newswave.presentation
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.MenuItem
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -14,6 +21,7 @@ import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.ActivityMainBinding
 import com.example.newswave.presentation.fragments.TopNewsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarMenuView
 import com.jakewharton.threetenabp.AndroidThreeTen
 
 class MainActivity : AppCompatActivity() {
@@ -21,6 +29,8 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
     private lateinit var bottomNavigationView: BottomNavigationView
+    private var backPressedOnce = false
+    private val backPressHandler = Handler(Looper.getMainLooper())
 
     private val component by lazy {
         (application as NewsApp).component
@@ -33,43 +43,67 @@ class MainActivity : AppCompatActivity() {
         AndroidThreeTen.init(this)
 
 
-        val navController = findNavController(R.id.nav_host_fragment)
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        bottomNavigationView = binding.bottomNavigationView
         bottomNavigationView.setupWithNavController(navController)
 
+//        navController.navigate(R.id.subscribedAuthorsFragment, null)
+//        navController.navigate(R.id.settingsFragment, null)
+//        navController.navigate(R.id.topNewsFragment, null)
 
-        bottomNavigationView.setOnItemSelectedListener { item ->
-            if (item.itemId == R.id.topNewsFragment && item.isChecked) {
-                val navHostFragment =
-                    supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-                val fragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
-                if (fragment is TopNewsFragment) {
-                    fragment.scrollToTop()
+//        bottomNavigationView.setOnItemSelectedListener { item ->
+//            when (item.itemId) {
+//                R.id.topNewsFragment -> {
+//                    navController.popBackStack(R.id.topNewsFragment, false)
+//                }
+//
+//                else -> {
+//                    if (navController.currentDestination?.id != item.itemId) {
+//                        val navOptions = NavOptions.Builder()
+//                            .setPopUpTo(item.itemId, false)
+//                            .setLaunchSingleTop(true)
+//                            .build()
+//                        navController.navigate(item.itemId, null, navOptions)
+//                    }
+//                }
+//            }
+//            true
+//        }
+
+
+        bottomNavigationView.setOnItemReselectedListener { item ->
+            if (item.itemId == R.id.topNewsFragment) {
+                if (item.isChecked) {
+                    val fragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
+                    if (fragment is TopNewsFragment) {
+                        fragment.scrollToTop()
+                    }
                 }
-                true // Возвращаем true, чтобы предотвратить дальнейшую обработку
-            } else {
-//                val navOptions = NavOptions.Builder()
-//                    .setEnterAnim(R.anim.fade_in)
-//                    .setExitAnim(R.anim.fade_out)
-//                    .setPopEnterAnim(R.anim.fade_in)
-//                    .setPopExitAnim(R.anim.fade_out)
-//                    .build()
-//                 Возвращаем true для всех элементов, чтобы позволить navController обрабатывать навигацию
-                NavigationUI.onNavDestinationSelected(item, navController)
-//                navController.navigate(item.itemId, null, navOptions)
-//                true
             }
         }
 
-
+//        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() {
+//                if (backPressedOnce) {
+//                    finish()
+//                } else {
+//                    backPressedOnce = true
+//                    Toast.makeText(
+//                        this@MainActivity,
+//                        "Нажмите еще раз, чтобы выйти",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                    backPressHandler.postDelayed({ backPressedOnce = false }, 2000)
+//                }
+//            }
+//        })
 
     }
-
 
 
     fun setSelectedMenuItem(itemId: Int) {
         bottomNavigationView.menu.findItem(itemId).isChecked = true
     }
-
-
 }

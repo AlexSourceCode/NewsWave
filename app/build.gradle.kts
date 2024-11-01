@@ -79,7 +79,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
 
-    //implementation("androidx.navigation.ui.setupWithNavController")
+//    implementation("androidx.navigation.ui.setupWithNavController")
     implementation("androidx.viewpager2:viewpager2:1.1.0")
 
     implementation("androidx.media3:media3-exoplayer:1.0.0")
