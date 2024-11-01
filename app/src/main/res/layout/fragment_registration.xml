@@ -1,202 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/black"
-    tools:context=".presentation.fragments.RegistrationFragment">
+    android:fillViewport="true"
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tvRegistration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="50dp"
-        android:text="@string/registration_text"
-        android:textColor="@color/white"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvHintMessage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:alpha="0.8"
-        android:text="@string/registration_message"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/tvRegistration"
-        app:layout_constraintTop_toBottomOf="@id/tvRegistration" />
-
-    <TextView
-        android:id="@+id/tvLabelUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:alpha="0.6"
-        android:text="@string/username"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/etUsername"
-        app:layout_constraintStart_toStartOf="@id/etUsername" />
-
-    <EditText
-        android:id="@+id/etUsername"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="50dp"
-        android:backgroundTint="@color/white"
-        android:inputType="text"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        app:layout_constraintTop_toBottomOf="@+id/tvHintMessage" />
+        android:background="@color/black"
+        android:paddingBottom="56dp"
+        tools:context=".presentation.fragments.RegistrationFragment">
 
-    <TextView
-        android:id="@+id/tvLabelEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:alpha="0.6"
-        android:text="@string/email"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/etEmail"
-        app:layout_constraintStart_toStartOf="@id/etEmail" />
+        <TextView
+            android:id="@+id/tvRegistration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="50dp"
+            android:text="@string/registration_text"
+            android:textColor="@color/white"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/etEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="50dp"
-        android:autofillHints="emailAddress"
-        android:backgroundTint="@color/white"
-        android:inputType="textEmailAddress"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        app:layout_constraintTop_toBottomOf="@+id/etUsername" />
+        <TextView
+            android:id="@+id/tvHintMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:alpha="0.8"
+            android:text="@string/registration_message"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tvRegistration"
+            app:layout_constraintTop_toBottomOf="@id/tvRegistration" />
 
-    <TextView
-        android:id="@+id/tvLabelPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:alpha="0.6"
-        android:text="@string/password"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/etPassword"
-        app:layout_constraintStart_toStartOf="@id/etPassword" />
+        <TextView
+            android:id="@+id/tvLabelUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.6"
+            android:text="@string/username"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@+id/etUsername"
+            app:layout_constraintStart_toStartOf="@id/etUsername" />
 
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="50dp"
-        android:autofillHints="password"
-        android:backgroundTint="@color/white"
-        android:inputType="textPassword"
-        android:textColor="@color/white"
-        app:layout_constraintTop_toBottomOf="@+id/etEmail" />
+        <EditText
+            android:id="@+id/etUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="64dp"
+            android:layout_marginEnd="50dp"
+            android:backgroundTint="@color/white"
+            android:inputType="text"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            app:layout_constraintTop_toBottomOf="@+id/tvHintMessage" />
 
-    <TextView
-        android:id="@+id/tvLabelFirstName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:alpha="0.6"
-        android:text="@string/first_name"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/etFirstName"
-        app:layout_constraintStart_toStartOf="@id/etFirstName" />
+        <TextView
+            android:id="@+id/tvLabelEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.6"
+            android:text="@string/email"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@+id/etEmail"
+            app:layout_constraintStart_toStartOf="@id/etEmail" />
 
-    <EditText
-        android:id="@+id/etFirstName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="50dp"
-        android:autofillHints="given-name"
-        android:backgroundTint="@color/white"
-        android:inputType="textCapWords"
-        android:textColor="@color/white"
-        app:layout_constraintTop_toBottomOf="@+id/etPassword" />
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="50dp"
+            android:autofillHints="emailAddress"
+            android:backgroundTint="@color/white"
+            android:inputType="textEmailAddress"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            app:layout_constraintTop_toBottomOf="@+id/etUsername" />
 
-    <TextView
-        android:id="@+id/tvLabelLastName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:alpha="0.6"
-        android:text="@string/last_name"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/etLastName"
-        app:layout_constraintStart_toStartOf="@id/etLastName" />
+        <TextView
+            android:id="@+id/tvLabelPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.6"
+            android:text="@string/password"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@+id/etPassword"
+            app:layout_constraintStart_toStartOf="@id/etPassword" />
 
-    <EditText
-        android:id="@+id/etLastName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="50dp"
-        android:autofillHints="family-name"
-        android:backgroundTint="@color/white"
-        android:inputType="textCapWords"
-        android:textColor="@color/white"
-        app:layout_constraintTop_toBottomOf="@+id/etFirstName" />
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="50dp"
+            android:autofillHints="password"
+            android:backgroundTint="@color/white"
+            android:inputType="textPassword"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@+id/etEmail" />
 
-    <Button
-        android:id="@+id/btRegister"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/button_sign_in_orange"
-        android:text="@string/sign_up"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="@id/etLastName"
-        app:layout_constraintStart_toStartOf="@id/etLastName"
-        app:layout_constraintTop_toBottomOf="@id/etLastName" />
+        <TextView
+            android:id="@+id/tvLabelFirstName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.6"
+            android:text="@string/first_name"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@+id/etFirstName"
+            app:layout_constraintStart_toStartOf="@id/etFirstName" />
 
-    <TextView
-        android:id="@+id/tvAlreadyRegistered"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="56dp"
-        android:alpha="0.3"
-        android:text="@string/already_registered_text"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@id/etLastName"
-        app:layout_constraintTop_toBottomOf="@id/btRegister" />
+        <EditText
+            android:id="@+id/etFirstName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="50dp"
+            android:autofillHints="given-name"
+            android:backgroundTint="@color/white"
+            android:inputType="textCapWords"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@+id/etPassword" />
 
-    <TextView
-        android:id="@+id/tvSignIn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="@string/sign_in_text"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@id/tvAlreadyRegistered"
-        app:layout_constraintTop_toTopOf="@id/tvAlreadyRegistered" />
+        <TextView
+            android:id="@+id/tvLabelLastName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.6"
+            android:text="@string/last_name"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@+id/etLastName"
+            app:layout_constraintStart_toStartOf="@id/etLastName" />
 
-    <View
-        android:layout_width="0dp"
-        android:layout_height="2dp"
-        android:background="@color/white"
-        app:layout_constraintEnd_toEndOf="@id/tvSignIn"
-        app:layout_constraintStart_toStartOf="@id/tvSignIn"
-        app:layout_constraintTop_toBottomOf="@id/tvSignIn" />
+        <EditText
+            android:id="@+id/etLastName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="50dp"
+            android:autofillHints="family-name"
+            android:backgroundTint="@color/white"
+            android:inputType="textCapWords"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@+id/etFirstName" />
+
+        <Button
+            android:id="@+id/btRegister"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/button_sign_in_orange"
+            android:text="@string/sign_up"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="@id/etLastName"
+            app:layout_constraintStart_toStartOf="@id/etLastName"
+            app:layout_constraintTop_toBottomOf="@id/etLastName" />
+
+        <TextView
+            android:id="@+id/tvAlreadyRegistered"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="56dp"
+            android:alpha="0.3"
+            android:text="@string/already_registered_text"
+            android:textColor="@color/white"
+            android:layout_marginTop="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/etLastName"
+            app:layout_constraintTop_toBottomOf="@id/btRegister" />
+
+        <TextView
+            android:id="@+id/tvSignIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/sign_in_text"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@id/tvAlreadyRegistered"
+            app:layout_constraintTop_toTopOf="@id/tvAlreadyRegistered" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:background="@color/white"
+            app:layout_constraintEnd_toEndOf="@id/tvSignIn"
+            app:layout_constraintStart_toStartOf="@id/tvSignIn"
+            app:layout_constraintTop_toBottomOf="@id/tvSignIn" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
