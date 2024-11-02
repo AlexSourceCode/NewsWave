@@ -5,6 +5,8 @@
     android:layout_height="wrap_content"
     android:textColor="@color/white"
     android:textSize="12sp"
+    android:singleLine="true"
+    android:ellipsize="end"
     android:textStyle="bold"
     android:paddingTop="16dp">
 </TextView>

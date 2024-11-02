@@ -44,29 +44,36 @@
                     android:id="@+id/tvAuthorUnknown"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingBottom="4dp"
+                    android:text="@string/author_unknown"
                     android:textColor="@color/white"
                     android:textStyle="bold"
-                    android:visibility="gone"
-                    android:paddingBottom="4dp"
-                    android:text="@string/author_unknown"/>
+                    android:visibility="gone" />
+
 
                 <Spinner
                     android:id="@+id/srAuthors"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:minWidth="100dp" />
 
                 <Button
                     android:id="@+id/btSubscription"
-                    android:layout_weight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
+                    android:layout_gravity="start"
                     android:layout_marginEnd="16dp"
-                    android:paddingStart="6dp"
-                    android:paddingEnd="6dp"
-                    android:background="@drawable/button_subscribe"
-                    android:text="@string/subscribe"
-                    android:textAllCaps="false"/>
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:text="Subscribed"
+                    android:background="@drawable/button_subscribed"
+                    android:textAllCaps="false" />
+
+                <View
+                    android:layout_width="43dp"
+                    android:layout_height="wrap_content" />
+
             </LinearLayout>
 
 
@@ -77,8 +84,8 @@
                 android:layout_gravity="start"
                 android:layout_marginStart="16dp"
                 android:layout_marginBottom="8dp"
-                android:textColor="@color/white"
                 android:alpha="0.8"
+                android:textColor="@color/white"
                 tools:text="23.10.22" />
 
             <com.google.android.material.imageview.ShapeableImageView

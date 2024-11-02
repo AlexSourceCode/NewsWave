@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:insetLeft="16dp"
-    android:insetTop="4dp"
-    android:insetRight="16dp"
-    android:insetBottom="4dp">
+    android:insetLeft="10dp"
+    android:insetTop="6dp"
+    android:insetRight="10dp"
+    android:insetBottom="6dp">
     <shape xmlns:android="http://schemas.android.com/apk/res/android">
-        <solid android:color="@color/black" />
+        <solid android:color="@color/white" />
         <corners android:radius="42dp" /> <!-- Радиус углов для создания круглой формы -->
     </shape>
 </inset>

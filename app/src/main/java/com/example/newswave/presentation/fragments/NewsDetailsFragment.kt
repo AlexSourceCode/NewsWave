@@ -99,7 +99,7 @@ class NewsDetailsFragment : Fragment() {
         val spinner = binding.srAuthors
 
         val customAdapter =
-            CustomArrayAdapter(requireActivity().application, R.layout.spinner_item, list)
+            CustomArrayAdapter(requireContext(), R.layout.spinner_item, list)
         customAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
         spinner.adapter = customAdapter
 
@@ -258,14 +258,36 @@ class NewsDetailsFragment : Fragment() {
 
     private fun setSubscribedButton() {
         binding.btSubscription.text = getString(R.string.subscribed)
-        binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
         binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        Log.d("setListenerButton", currentLanguage())
+        if ("RU" == currentLanguage()){
+            Log.d("setListenerButton", "flagExecute")
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed_rus)
+        } else {
+            Log.d("setListenerButton", "flagExecuteEn")
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
+        }
     }
 
     private fun setUnsubscribedButton() {
         binding.btSubscription.text = getString(R.string.subscribe)
-        binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
         binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        Log.d("setListenerButton", currentLanguage())
+        if ("RU" == currentLanguage()){
+            Log.d("setListenerButton", "flagExecute")
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe_rus)
+        } else {
+            Log.d("setListenerButton", "flagExecuteEn")
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
+        }
+
+    }
+
+    private fun currentLanguage(): String {
+        val currentLocale = resources.configuration.locales[0]
+        val currentLanguage = currentLocale.language
+        val currentCountry = currentLocale.country
+        return currentCountry
     }
 
     override fun onDestroyView() {

@@ -122,7 +122,7 @@ class SubscribedAuthorsFragment : Fragment() {
 
 
     private fun setupAdapter() {
-        adapter = AuthorListAdapter()
+        adapter = AuthorListAdapter(requireContext())
         binding.rcAuthors.adapter = adapter
         adapter.onAuthorClickSubscription = { author ->
             showUnsubscribeDialog(author)
