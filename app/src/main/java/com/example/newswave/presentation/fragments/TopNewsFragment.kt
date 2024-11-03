@@ -156,8 +156,10 @@ class TopNewsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.uiState.collect { uiState ->
+                    Log.d("StateUiState", "flagExecute")
                     when (uiState) {
                         is NewsState.Error -> {
+                            Log.d("StateUiState", uiState.toString())
                             showToast()
                             binding.pgNews.visibility = View.GONE
                             if (isSearchNews == true) {
@@ -167,16 +169,18 @@ class TopNewsFragment : Fragment() {
                         }
 
                         is NewsState.Loading -> {
+                            Log.d("StateUiState", uiState.toString())
                             binding.tvRetry.visibility = View.GONE
                             binding.pgNews.visibility = View.VISIBLE
                         }
 
                         is NewsState.Success -> {
+                            Log.d("StateUiState", "Success")
                             binding.pgNews.visibility = View.GONE
                             binding.tvRetry.visibility = View.GONE
                             if (!adapter.shouldHideRetryButton) {
                                 adapter.submitListWithLoadMore(uiState.currentList, null)
-                                adapter.notifyDataSetChanged()
+                                adapter.notifyDataSetChanged() //crutch
                             } else {
                                 adapter.submitList(uiState.currentList) {
                                     if (viewModel.isFirstLaunch) {

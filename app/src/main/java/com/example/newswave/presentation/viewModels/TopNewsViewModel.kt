@@ -45,7 +45,6 @@ class TopNewsViewModel @Inject constructor(
     private val _searchArgs = MutableStateFlow<Pair<String, String>?>(null)
 
     var isFirstLaunch = true // crutch
-    var scrollPosition: Int? = null
 
 
     init {
@@ -110,7 +109,7 @@ class TopNewsViewModel @Inject constructor(
         viewModelScope.launch {
             fetchErrorLoadDataUseCase()
                 .collect{
-                    _uiState.value = NewsState.Error(it)
+                    _uiState.value = NewsState.Error(it) // дважды одно и тоже значение
                 }
         }
     }

@@ -84,6 +84,16 @@ class NewsDetailsFragment : Fragment() {
         setupSpinner()
         setupImage()
         setupVideoPlayer()
+        setupDefaultButton()
+    }
+
+    private fun setupDefaultButton() {
+        binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        if ("RU" == currentLanguage()){
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe_rus)
+        } else {
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
+        }
     }
 
     private fun setupTextViews() {
@@ -259,12 +269,9 @@ class NewsDetailsFragment : Fragment() {
     private fun setSubscribedButton() {
         binding.btSubscription.text = getString(R.string.subscribed)
         binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        Log.d("setListenerButton", currentLanguage())
         if ("RU" == currentLanguage()){
-            Log.d("setListenerButton", "flagExecute")
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed_rus)
         } else {
-            Log.d("setListenerButton", "flagExecuteEn")
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
         }
     }
@@ -272,15 +279,11 @@ class NewsDetailsFragment : Fragment() {
     private fun setUnsubscribedButton() {
         binding.btSubscription.text = getString(R.string.subscribe)
         binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        Log.d("setListenerButton", currentLanguage())
         if ("RU" == currentLanguage()){
-            Log.d("setListenerButton", "flagExecute")
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe_rus)
         } else {
-            Log.d("setListenerButton", "flagExecuteEn")
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
         }
-
     }
 
     private fun currentLanguage(): String {
