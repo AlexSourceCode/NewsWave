@@ -2,6 +2,7 @@ package com.example.newswave.di
 
 import android.app.Application
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import com.example.newswave.data.database.dbNews.NewsDao
 import com.example.newswave.data.database.dbNews.NewsDb
 import com.example.newswave.data.network.api.ApiFactory
@@ -62,6 +63,11 @@ interface DataModule {
         @Provides
         fun provideFirebaseDatabase(): FirebaseDatabase {
             return Firebase.database
+        }
+
+        @Provides
+        fun provideSavedStateHandle(): SavedStateHandle {
+            return SavedStateHandle()
         }
     }
 }

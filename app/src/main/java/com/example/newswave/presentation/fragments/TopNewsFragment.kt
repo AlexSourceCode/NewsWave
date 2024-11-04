@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +24,7 @@ import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.model.NewsState
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.adapters.NewsListAdapter
+import com.example.newswave.presentation.viewModels.SavedStateViewModelFactory
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.Filter
@@ -43,6 +45,9 @@ class TopNewsFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+//    @Inject
+//    lateinit var viewModelFactory: SavedStateViewModelFactory
 
     private val component by lazy {
         (requireActivity().application as NewsApp).component

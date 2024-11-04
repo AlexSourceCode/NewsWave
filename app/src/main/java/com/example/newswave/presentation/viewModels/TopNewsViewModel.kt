@@ -1,6 +1,7 @@
 package com.example.newswave.presentation.viewModels
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.domain.entity.NewsItemEntity
@@ -30,6 +31,7 @@ import javax.inject.Inject
 
 
 class TopNewsViewModel @Inject constructor(
+    var savedStateHandle: SavedStateHandle,
     private val loadDataUseCase: LoadDataUseCase,
     private val loadNewsForPreviousDayUseCase: LoadNewsForPreviousDayUseCase,
     private val fetchTopNewsListUseCase: FetchTopNewsListUseCase,
@@ -61,19 +63,19 @@ class TopNewsViewModel @Inject constructor(
     fun updateSearchParameters(filter: String, value: String) { // no
         viewModelScope.launch {
             _uiState.value = NewsState.Loading
-            _searchArgs.value = Pair(filter,value)
+            _searchArgs.value = Pair(filter, value)
             searchNewsByFilter()
         }
     }
 
-    fun preloadAuthorData(author: String){
+    fun preloadAuthorData(author: String) {
         viewModelScope.launch {
             favoriteAuthorCheckUseCase(author)
         }
     }
 
     fun searchNewsByFilter() {
-        if (!_searchTrigger.value){
+        if (!_searchTrigger.value) {
             _searchTrigger.value = true
             return
         }
@@ -107,37 +109,55 @@ class TopNewsViewModel @Inject constructor(
         }
     }
 
-    private fun fetchErrorLoadData(){
+    private fun fetchErrorLoadData() {
         viewModelScope.launch {
             fetchErrorLoadDataUseCase()
-                .collect{
+                .collect {
                     _uiState.value = NewsState.Error(it) // дважды одно и тоже значение
+                    val savedNews = getTopNews()
+                    if (!savedNews.isNullOrEmpty()){
+                        _uiState.value = NewsState.Success(savedNews)
+                    }
                 }
         }
     }
 
-    private fun fetchTopNewsList(){ //yes
+    private fun fetchTopNewsList() { //yes
         viewModelScope.launch {
-            delay(500)
             try {
                 fetchTopNewsListUseCase()
                     .collect { news ->
                         if (news.isEmpty()) _uiState.value = NewsState.Loading
-                        else _uiState.value = NewsState.Success(news)
+                        else {
+                            _uiState.value = NewsState.Success(news)
+                            saveTopNews(news)
+                        }
                     }
             } catch (e: Exception) {
                 _uiState.value = NewsState.Error(e.toString())
+                val savedNews = getTopNews()
+                if (!savedNews.isNullOrEmpty()){
+                    _uiState.value = NewsState.Success(savedNews)
+                }
             }
         }
     }
 
-    private fun setupSearchTrigger(){
+    private fun getTopNews(): List<NewsItemEntity>? {
+        return savedStateHandle["top_news"]
+    }
+
+    private fun saveTopNews(newsList: List<NewsItemEntity>) {
+        savedStateHandle["top_news"] = newsList
+    }
+
+    private fun setupSearchTrigger() {
         viewModelScope.launch {
             try {
                 _searchTrigger
                     .filter { it }
                     .take(1)
-                    .collect{
+                    .collect {
                         searchNewsByFilterUseCase()
                             .collect { news ->
                                 _uiState.value = NewsState.Success(news)
@@ -149,11 +169,11 @@ class TopNewsViewModel @Inject constructor(
         }
     }
 
-    private fun setupSearchArgs(){
+    private fun setupSearchArgs() {
         viewModelScope.launch {
             _searchArgs
                 .filterNotNull()
-                .collect{ args ->
+                .collect { args ->
                     searchNewsByFilterUseCase =
                         searchNewsByFilterUseCaseFactory.create(args.first, args.second)
                 }

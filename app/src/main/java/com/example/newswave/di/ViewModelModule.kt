@@ -1,6 +1,10 @@
 package com.example.newswave.di
 
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.savedstate.SavedStateRegistryOwner
 import com.example.newswave.presentation.fragments.RegistrationFragment
 import com.example.newswave.presentation.viewModels.AuthorNewsViewModel
 import com.example.newswave.presentation.viewModels.ForgotPasswordViewModel
@@ -12,6 +16,7 @@ import com.example.newswave.presentation.viewModels.SubscribedAuthorsViewModel
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.multibindings.IntoMap
 
 //Модуль со всеми вьюмоделями, для того чтобы все они инжектились в вьюмодель фектори
@@ -57,5 +62,9 @@ interface ViewModelModule {
     @IntoMap
     @ViewModelKey(SettingsViewModel::class)
     fun bindSettingsViewModel(viewModel: SettingsViewModel):ViewModel
+
+    @Binds
+    abstract fun bindViewModelFactory(factory: SavedStateViewModelFactory): ViewModelProvider.Factory
+
 
 }
