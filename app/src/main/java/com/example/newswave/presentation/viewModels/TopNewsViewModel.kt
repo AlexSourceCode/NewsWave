@@ -3,6 +3,7 @@ package com.example.newswave.presentation.viewModels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.model.NewsState
 import com.example.newswave.domain.usecases.FavoriteAuthorCheckUseCase
 import com.example.newswave.domain.usecases.FetchErrorLoadDataUseCase
@@ -12,6 +13,7 @@ import com.example.newswave.domain.usecases.LoadDataUseCase
 import com.example.newswave.domain.usecases.LoadNewsForPreviousDayUseCase
 import com.example.newswave.domain.usecases.SearchNewsByFilterUseCase
 import com.example.newswave.domain.usecases.SearchNewsByFilterUseCaseFactory
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -116,6 +118,7 @@ class TopNewsViewModel @Inject constructor(
 
     private fun fetchTopNewsList(){ //yes
         viewModelScope.launch {
+            delay(500)
             try {
                 fetchTopNewsListUseCase()
                     .collect { news ->

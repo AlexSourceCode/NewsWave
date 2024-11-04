@@ -83,7 +83,8 @@ class NewsRepositoryImpl @Inject constructor(
         )
 
 
-    override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> = fetchTopNewsListFlow
+    override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> =fetchTopNewsListFlow
+
 
     override suspend fun loadData() {
         val workManager =

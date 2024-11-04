@@ -47,7 +47,7 @@ interface ApiService {
 
 
     companion object {
-        private const val QUERY_PARAM_API_KEY = "dd1c0076447947fc921616b08d0af87d"
+        private const val QUERY_PARAM_API_KEY = "dd1c0076447947fc921616b08d0af87dQ"
         private const val QUERY_PARAM_LANGUAGE = "en"
         private const val QUERY_PARAM_SOURCE_COUNTRY = "us"
         private const val QUERY_PARAM_SORT_DIRECTION = "DESC"

@@ -156,13 +156,13 @@ class TopNewsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.uiState.collect { uiState ->
-                    Log.d("StateUiState", "flagExecute")
                     when (uiState) {
                         is NewsState.Error -> {
                             Log.d("StateUiState", uiState.toString())
                             showToast()
                             binding.pgNews.visibility = View.GONE
                             if (isSearchNews == true) {
+                                Log.d("StateUiState", "isSearchNews")
                                 binding.tvRetry.visibility = View.VISIBLE
                                 adapter.submitList(emptyList())
                             }

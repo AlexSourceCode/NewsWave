@@ -29,8 +29,8 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
     private lateinit var bottomNavigationView: BottomNavigationView
-    private var backPressedOnce = false
-    private val backPressHandler = Handler(Looper.getMainLooper())
+//    private var backPressedOnce = false
+//    private val backPressHandler = Handler(Looper.getMainLooper())
 
     private val component by lazy {
         (application as NewsApp).component
@@ -48,6 +48,9 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
         bottomNavigationView = binding.bottomNavigationView
         bottomNavigationView.setupWithNavController(navController)
+
+
+
 
 //        navController.navigate(R.id.subscribedAuthorsFragment, null)
 //        navController.navigate(R.id.settingsFragment, null)

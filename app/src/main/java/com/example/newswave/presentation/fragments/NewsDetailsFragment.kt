@@ -188,13 +188,11 @@ class NewsDetailsFragment : Fragment() {
                         return@collectLatest
                     }
                     Log.d("TimeUpdateValue", "isAuth")
-
                         viewModel.stateAuthor.collectLatest { isFavorite -> // возможно нужен запуск в launch
                             Log.d("NewsDetailsFragmentState", isFavorite.toString())
                             if (isFavorite != null) {
                                 updateSubscriptionButton(isFavorite)
-                            }
-
+                        }
                     }
                 }
             }
