@@ -66,7 +66,6 @@ class NewsDetailsViewModel @Inject constructor(
                 } else {
                     Log.d("CheckStateExecute", "observeAuthStateElse")
                     _user.value = AuthState.LoggedOut
-                    _stateAuthor.value = false
                 }
             }
         }

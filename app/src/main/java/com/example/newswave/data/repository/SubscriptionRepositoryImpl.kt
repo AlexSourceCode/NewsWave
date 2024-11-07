@@ -46,7 +46,7 @@ class SubscriptionRepositoryImpl @Inject constructor(
 
     private val _currentAuthor = MutableSharedFlow<String?>()
 
-    private val _authorNews = MutableSharedFlow<NewsState>()//mb stateflow
+    private val _authorNews = MutableSharedFlow<NewsState>()
     private val authorNews: SharedFlow<NewsState> get() = _authorNews.asSharedFlow()
 
     private val _authorList = MutableSharedFlow<List<AuthorItemEntity>?>()
@@ -129,9 +129,7 @@ class SubscriptionRepositoryImpl @Inject constructor(
                             ioScope.launch {
                                 Log.d("TimeUpdateValue", "BeforeUpdateFavotireAuthor")
                                 _isFavoriteAuthorFlow.value = snapshot.exists()
-//                                auth.currentUser?.reload()
                                 Log.d("TimeUpdateValue", "AfterUpdateFavotireAuthor")
-
                             }
                         }
 

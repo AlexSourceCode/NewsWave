@@ -187,9 +187,8 @@ class NewsDetailsFragment : Fragment() {
                         binding.btSubscription.visibility = View.VISIBLE
                         return@collectLatest
                     }
-                    Log.d("TimeUpdateValue", "isAuth")
+                    viewModel.checkAuthorInRepository(args.news.author)
                         viewModel.stateAuthor.collectLatest { isFavorite -> // возможно нужен запуск в launch
-                            Log.d("NewsDetailsFragmentState", isFavorite.toString())
                             if (isFavorite != null) {
                                 updateSubscriptionButton(isFavorite)
                         }
@@ -298,6 +297,7 @@ class NewsDetailsFragment : Fragment() {
     }
 
     private fun launchSignInFragment() {
+        binding.btSubscription.visibility = View.GONE
         findNavController().navigate(
             NewsDetailsFragmentDirections.actionNewsDetailsFragmentToLoginFragment()
         )
