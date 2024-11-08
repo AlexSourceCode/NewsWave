@@ -81,14 +81,21 @@ class SubscribedAuthorsFragment : Fragment() {
                             showProgressBar()
                             showLoggedInState()
                             viewModel.uiState.collect { uiState ->
+                                Log.d("currentListState", "startcollect")
                                 when (uiState) {
                                     is AuthorState.Error -> hideProgressBar()
 
                                     is AuthorState.Loading -> showProgressBar()
 
                                     is AuthorState.Success -> {
-                                        adapter.submitList(uiState.currentList)
-                                        hideProgressBar()
+                                        if (uiState.currentList?.size == 0){
+                                            showMessageNoAuthors()
+                                            hideProgressBar()
+                                        } else {
+                                            adapter.submitList(uiState.currentList)
+                                            hideMessageNoAuthors()
+                                            hideProgressBar()
+                                        }
                                     }
                                 }
                             }
@@ -99,6 +106,13 @@ class SubscribedAuthorsFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun showMessageNoAuthors(){
+        binding.tvNoAuthors.visibility = View.VISIBLE
+    }
+    private fun hideMessageNoAuthors(){
+        binding.tvNoAuthors.visibility = View.GONE
     }
 
     private fun showLoggedOutState() {

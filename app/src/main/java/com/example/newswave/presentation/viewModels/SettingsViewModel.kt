@@ -2,6 +2,7 @@ package com.example.newswave.presentation.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.domain.entity.UserEntity
 import com.example.newswave.domain.usecases.FetchUserDataUseCase
 import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
@@ -38,8 +39,11 @@ class SettingsViewModel @Inject constructor(
 
     private fun observeAuthState() {
         viewModelScope.launch {
-            observeAuthStateUseCase().collect {
-                _user.value = it
+            observeAuthStateUseCase().collect { stateAuth ->
+                _user.value = stateAuth
+                if (stateAuth != null){
+                    fetchUserData()
+                }
             }
         }
     }
@@ -54,7 +58,6 @@ class SettingsViewModel @Inject constructor(
 
     init {
         observeAuthState()
-        fetchUserData()
     }
 
 }

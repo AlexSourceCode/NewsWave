@@ -2,6 +2,7 @@ package com.example.newswave.data.repository
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.domain.entity.UserEntity
 import com.example.newswave.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -24,8 +25,9 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
-    private val dataBase: FirebaseDatabase
-) : UserRepository {
+    private val dataBase: FirebaseDatabase,
+    private val userPreferences: UserPreferences,
+    ) : UserRepository {
 
     private val usersReference = dataBase.getReference("Users")
 
@@ -88,6 +90,15 @@ class UserRepositoryImpl @Inject constructor(
                         lastName
                     )
                     usersReference.child(user.id).setValue(user)
+                    userPreferences.saveUserData(
+                        UserEntity(
+                            id = firebase.uid,
+                            username = username,
+                            email = email,
+                            firstName = firstName,
+                            lastName =  lastName
+                        )
+                    )
                 }
             }
             .addOnFailureListener { error ->
@@ -114,28 +125,15 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override fun fetchUserData(): StateFlow<UserEntity?> {
+        val user = userPreferences.getUserData()
+        _userData.value = user
         return userData
     }
 
     init {
         auth.addAuthStateListener { firebaseAuth ->
-            val currentUser = firebaseAuth.currentUser
-            currentUser?.let { user ->
-                usersReference.child(user.uid)
-                    .addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            val userData = dataSnapshot.getValue(UserEntity::class.java)
-                            _userData.value = userData
-                        }
 
-                        override fun onCancelled(databaseError: DatabaseError) {
-                            Log.w(
-                                "UserRepositoryImpl", "Failed to read value.",
-                                databaseError.toException()
-                            )
-                        }
-                    })
-            }
+
         }
     }
 

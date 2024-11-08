@@ -55,6 +55,7 @@
     <string name="please_fill_in_all_the_fields">Please fill in all the fields</string>
     <string name="please_enter_your_email">Please enter your email</string>
     <string name="no_internet_connection">No internet connection</string>
+    <string name="the_list_of_authors_is_empty_add_new_authors_to_see_them_here">The list of authors is empty. Add new authors to see them here</string>
 
 
 </resources>

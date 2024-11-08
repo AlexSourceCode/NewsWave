@@ -16,6 +16,18 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
     <!--        tools:listitem="@layout/author_item"-->
 
+    <TextView
+        android:id="@+id/tvNoAuthors"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:text="@string/the_list_of_authors_is_empty_add_new_authors_to_see_them_here"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:paddingStart="36dp"
+        android:paddingEnd="36dp"/>
 
     <LinearLayout
         android:id="@+id/textContainer"

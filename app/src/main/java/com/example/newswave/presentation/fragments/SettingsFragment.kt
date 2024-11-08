@@ -71,6 +71,7 @@ class SettingsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.user.collect { firebaseUser ->
+
                     updateUI(firebaseUser != null)
                 }
             }
@@ -102,7 +103,7 @@ class SettingsFragment : Fragment() {
             binding.cvLogout.visibility = View.GONE
             binding.tvName.visibility = View.GONE
             binding.cvUserData.visibility = View.GONE
-            binding.tvEmail.visibility = View.GONE
+            binding.tvUsername.visibility = View.GONE
         }
     }
 

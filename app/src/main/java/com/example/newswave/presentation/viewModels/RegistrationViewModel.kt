@@ -2,6 +2,8 @@ package com.example.newswave.presentation.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.newswave.data.database.dbNews.UserPreferences
+import com.example.newswave.domain.entity.UserEntity
 import com.example.newswave.domain.usecases.FetchErrorAuthUseCase
 import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
 import com.example.newswave.domain.usecases.SignUpByEmailUseCase
@@ -24,8 +26,6 @@ class RegistrationViewModel @Inject constructor(
     private val fetchErrorAuthUseCase: FetchErrorAuthUseCase
 
 ) : ViewModel() {
-
-    private val auth: FirebaseAuth = Firebase.auth
 
     private var _user = MutableStateFlow<FirebaseUser?>(null)
     val user: StateFlow<FirebaseUser?> get() = _user.asStateFlow()

@@ -25,7 +25,7 @@
             android:visibility="gone" />
 
         <TextView
-            android:id="@+id/tvEmail"
+            android:id="@+id/tvUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -128,15 +128,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="16dp"
-                        android:text="@string/username"
+                        android:text="@string/email"
                         android:textColor="@color/black" />
 
                     <TextView
-                        android:id="@+id/tvUsername"
+                        android:id="@+id/tvEmail"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="start"
+                        android:gravity="end"
                         android:padding="16dp"
                         android:textColor="@color/black" />
 

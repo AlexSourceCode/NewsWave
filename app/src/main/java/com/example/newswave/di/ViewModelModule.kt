@@ -1,10 +1,12 @@
 package com.example.newswave.di
 
+import android.app.Application
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.savedstate.SavedStateRegistryOwner
+import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.presentation.fragments.RegistrationFragment
 import com.example.newswave.presentation.viewModels.AuthorNewsViewModel
 import com.example.newswave.presentation.viewModels.ForgotPasswordViewModel
@@ -65,6 +67,5 @@ interface ViewModelModule {
 
     @Binds
     abstract fun bindViewModelFactory(factory: SavedStateViewModelFactory): ViewModelProvider.Factory
-
 
 }

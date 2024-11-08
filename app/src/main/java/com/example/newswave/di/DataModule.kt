@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import com.example.newswave.data.database.dbNews.NewsDao
 import com.example.newswave.data.database.dbNews.NewsDb
+import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.data.network.api.ApiFactory
 import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.repository.NewsRepositoryImpl
@@ -69,5 +70,10 @@ interface DataModule {
         fun provideSavedStateHandle(): SavedStateHandle {
             return SavedStateHandle()
         }
+
+        @Provides fun provideUserPreferences(application: Application): UserPreferences {
+            return UserPreferences(application)
+        }
+
     }
 }
