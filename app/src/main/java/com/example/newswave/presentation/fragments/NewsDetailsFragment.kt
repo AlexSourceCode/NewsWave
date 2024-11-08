@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -89,7 +90,7 @@ class NewsDetailsFragment : Fragment() {
 
     private fun setupDefaultButton() {
         binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        if ("RU" == currentLanguage()){
+        if ("RU" == currentLanguage()) {
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe_rus)
         } else {
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
@@ -188,10 +189,17 @@ class NewsDetailsFragment : Fragment() {
                         return@collectLatest
                     }
                     viewModel.checkAuthorInRepository(args.news.author)
-                        viewModel.stateAuthor.collectLatest { isFavorite -> // возможно нужен запуск в launch
+                    viewModel.stateAuthor.collectLatest { isFavorite -> // возможно нужен запуск в launch
+                        Log.d("NewsDetailsFragmentState", isFavorite.toString())
+                        if (viewModel.isInternetConnection(requireContext())){
                             if (isFavorite != null) {
                                 updateSubscriptionButton(isFavorite)
+                            }
+                        } else{
+                            updateSubscriptionButton(false)
+                            showToastErrorInternetConnection()
                         }
+
                     }
                 }
             }
@@ -200,19 +208,32 @@ class NewsDetailsFragment : Fragment() {
 
 
     private fun handleAuthState(isAuth: AuthState) {
-        binding.btSubscription.setOnClickListener {
-            val checkSubscribed = binding.btSubscription.text.toString()
-            val author = binding.srAuthors.selectedItem.toString()
-            val btSub = requireActivity().getString(R.string.subscribe)
-            when (isAuth) {
-                is AuthState.LoggedIn -> {
-                    if (checkSubscribed == btSub) viewModel.subscribeOnAuthor(author)
-                    else showUnsubscribeDialog(author)
+            binding.btSubscription.setOnClickListener {
+                if (!viewModel.isInternetConnection(requireContext())){
+                    showToastErrorInternetConnection()
+                    return@setOnClickListener
                 }
+                    val checkSubscribed = binding.btSubscription.text.toString()
+                val author = binding.srAuthors.selectedItem.toString()
+                val btSub = requireActivity().getString(R.string.subscribe)
+                when (isAuth) {
+                    is AuthState.LoggedIn -> {
+                        if (checkSubscribed == btSub) viewModel.subscribeOnAuthor(author)
+                        else showUnsubscribeDialog(author)
+                    }
 
-                is AuthState.LoggedOut -> requestLoginForSubscription()
+                    is AuthState.LoggedOut -> requestLoginForSubscription()
+                }
             }
-        }
+
+    }
+
+    private fun showToastErrorInternetConnection() {
+        Toast.makeText(
+            requireContext(),
+            getString(R.string.no_internet_connection),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
 
@@ -263,10 +284,11 @@ class NewsDetailsFragment : Fragment() {
         binding.tvAuthorUnknown.visibility = View.VISIBLE
     }
 
+
     private fun setSubscribedButton() {
         binding.btSubscription.text = getString(R.string.subscribed)
         binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        if ("RU" == currentLanguage()){
+        if ("RU" == currentLanguage()) {
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed_rus)
         } else {
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
@@ -276,7 +298,7 @@ class NewsDetailsFragment : Fragment() {
     private fun setUnsubscribedButton() {
         binding.btSubscription.text = getString(R.string.subscribe)
         binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        if ("RU" == currentLanguage()){
+        if ("RU" == currentLanguage()) {
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe_rus)
         } else {
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)

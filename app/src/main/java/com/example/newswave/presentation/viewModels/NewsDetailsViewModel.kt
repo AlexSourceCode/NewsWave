@@ -1,5 +1,6 @@
 package com.example.newswave.presentation.viewModels
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +12,7 @@ import com.example.newswave.domain.usecases.IsFavoriteAuthorUseCase
 import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
 import com.example.newswave.domain.usecases.SubscribeToAuthorUseCase
 import com.example.newswave.domain.usecases.UnsubscribeFromAuthorUseCase
+import com.example.newswave.utils.NetworkUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +33,6 @@ class NewsDetailsViewModel @Inject constructor(
 
     private var _stateAuthor = MutableStateFlow<Boolean?>(null)
     val stateAuthor: StateFlow<Boolean?> get() = _stateAuthor.asStateFlow()
-
 
 
     private var _user = MutableStateFlow<AuthState>(AuthState.LoggedOut)
@@ -79,6 +80,10 @@ class NewsDetailsViewModel @Inject constructor(
                 _stateAuthor.value = state
             }
         }
+    }
+
+    fun isInternetConnection(context: Context): Boolean {
+        return NetworkUtils.isNetworkAvailable(context)
     }
 
     fun clearState() {
