@@ -52,4 +52,7 @@
     <string name="please_enter_your_email">Пожалуйста, введите ваш email</string>
     <string name="no_internet_connection">Нет интернет соединения</string>
     <string name="the_list_of_authors_is_empty_add_new_authors_to_see_them_here">Список авторов пуст. Добавьте новых авторов, чтобы увидеть их здесь</string>
+    <string name="content_language">Язык контента</string>
+    <string name="country_of_news_source">Страна источника новостей</string>
+    <string name="interface_language">Язык интерфейса</string>
 </resources>

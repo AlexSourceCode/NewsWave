@@ -67,7 +67,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="Язык интерфейса"
+                    android:text="@string/interface_language"
+                    android:textColor="@color/black" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/black" />
+
+                <TextView
+                    android:id="@+id/tvContentLanguage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="@string/content_language"
                     android:textColor="@color/black" />
 
                 <View
@@ -79,20 +92,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="Язык контента"
+                    android:text="@string/country_of_news_source"
                     android:textColor="@color/black" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="@color/black" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:text="Страна источника новостей"
-                    android:textColor="@color/black" />
 
             </LinearLayout>
 
@@ -151,7 +154,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="Изменить пароль"
+                    android:text="@string/reset_password"
                     android:textColor="@color/black" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>

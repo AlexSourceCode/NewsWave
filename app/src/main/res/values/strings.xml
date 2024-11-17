@@ -56,6 +56,241 @@
     <string name="please_enter_your_email">Please enter your email</string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="the_list_of_authors_is_empty_add_new_authors_to_see_them_here">The list of authors is empty. Add new authors to see them here</string>
+    <string name="content_language">Content Language</string>
+    <string name="country_of_news_source">Country of news source</string>
+    <string name="interface_language">Interface language</string>
 
+    <string-array name="languages_content_array">
+        <item>Qafar</item>
+        <item>አማርኛ</item>
+        <item>العربية</item>
+        <item>বাংলা</item>
+        <item>bosanski</item>
+        <item>български</item>
+        <item>မြန်မာစာ</item>
+        <item>中文</item>
+        <item>hrvatski</item>
+        <item>čeština</item>
+        <item>dansk</item>
+        <item>Nederlands</item>
+        <item>English</item>
+        <item>eesti</item>
+        <item>suomi</item>
+        <item>français</item>
+        <item>Deutsch</item>
+        <item>ελληνικά</item>
+        <item>עברית</item>
+        <item>हिंदी</item>
+        <item>magyar</item>
+        <item>íslenska</item>
+        <item>Bahasa Indonesia</item>
+        <item>italiano</item>
+        <item>日本語</item>
+        <item>한국어</item>
+        <item>ລາວ</item>
+        <item>latviešu</item>
+        <item>lietuvių</item>
+        <item>македонски</item>
+        <item>Bahasa Melayu</item>
+        <item>Malti</item>
+        <item>मराठी</item>
+        <item>te reo Māori</item>
+        <item>नेपाली</item>
+        <item>norsk</item>
+        <item>norsk</item>
+        <item>فارسی</item>
+        <item>polski</item>
+        <item>português</item>
+        <item>română</item>
+        <item>русский</item>
+        <item>српски</item>
+        <item>සිංහල</item>
+        <item>slovenčina</item>
+        <item>slovenščina</item>
+        <item>Soomaali</item>
+        <item>español</item>
+        <item>svenska</item>
+        <item>тоҷикӣ</item>
+        <item>தமிழ்</item>
+        <item>తెలుగు</item>
+        <item>ไทย</item>
+        <item>Türkçe</item>
+        <item>українська</item>
+        <item>اردو</item>
+        <item>oʻzbek</item>
+        <item>Tiếng Việt</item>
+    </string-array>
 
+    <string-array name="languages_source_country_array">
+        <item>افغانستان</item>
+        <item>Shqipëri</item>
+        <item>الجزائر</item>
+        <item>Amerika Sāmoa</item>
+        <item>Anguilla</item>
+        <item>Argentina</item>
+        <item>Australia</item>
+        <item>Österreich</item>
+        <item>The Bahamas</item>
+        <item>البحرين</item>
+        <item>বাংলাদেশ</item>
+        <item>Barbados</item>
+        <item>Беларусь</item>
+        <item>België / Belgique / Belgien</item>
+        <item>Belize</item>
+        <item>Bénin</item>
+        <item>Bermuda</item>
+        <item>འབྲུག་ཡུལ</item>
+        <item>Bosna i Hercegovina</item>
+        <item>Bouvetøya</item>
+        <item>Brasil</item>
+        <item>British Indian Ocean Territory</item>
+        <item>Negara Brunei Darussalam</item>
+        <item>България</item>
+        <item>Burkina Faso</item>
+        <item>Uburundi</item>
+        <item>កម្ពុជា</item>
+        <item>Cameroun</item>
+        <item>Canada</item>
+        <item>Cabo Verde</item>
+        <item>République centrafricaine</item>
+        <item>Chile</item>
+        <item>中国</item>
+        <item>Colombia</item>
+        <item>Komori</item>
+        <item>République Démocratique du Congo</item>
+        <item>République du Congo</item>
+        <item>Costa Rica</item>
+        <item>Côte d\'Ivoire</item>
+        <item>Hrvatska</item>
+        <item>Cuba</item>
+        <item>Κύπρος</item>
+        <item>Česká republika</item>
+        <item>Danmark</item>
+        <item>جيبوتي</item>
+        <item>República Dominicana</item>
+        <item>Ecuador</item>
+        <item>مصر</item>
+        <item>El Salvador</item>
+        <item>ኤርትራ</item>
+        <item>ኢትዮጵያ</item>
+        <item>Viti</item>
+        <item>Suomi</item>
+        <item>France</item>
+        <item>Guyane française</item>
+        <item>Polynésie française</item>
+        <item>The Gambia</item>
+        <item>Deutschland</item>
+        <item>Ghana</item>
+        <item>Ελλάδα</item>
+        <item>Guatemala</item>
+        <item>Guinée</item>
+        <item>Guyana</item>
+        <item>Honduras</item>
+        <item>香港</item>
+        <item>Magyarország</item>
+        <item>Ísland</item>
+        <item>भारत</item>
+        <item>Indonesia</item>
+        <item>ایران</item>
+        <item>العراق</item>
+        <item>Éire</item>
+        <item>ישראל</item>
+        <item>Italia</item>
+        <item>日本</item>
+        <item>الأردن</item>
+        <item>Қазақстан</item>
+        <item>Kenya</item>
+        <item>الكويت</item>
+        <item>ລາວ</item>
+        <item>Latvija</item>
+        <item>لبنان</item>
+        <item>Lesotho</item>
+        <item>Liberia</item>
+        <item>Liechtenstein</item>
+        <item>Lietuva</item>
+        <item>Lëtzebuerg</item>
+        <item>Македонија</item>
+        <item>Madagascar</item>
+        <item>Malawi</item>
+        <item>Malaysia</item>
+        <item>ދިވެހިރާއްޖޭގެ</item>
+        <item>Mali</item>
+        <item>Malta</item>
+        <item>موريتانيا</item>
+        <item>Maurice</item>
+        <item>México</item>
+        <item>Micronesia</item>
+        <item>Moldova</item>
+        <item>Monaco</item>
+        <item>Црна Гора</item>
+        <item>Montserrat</item>
+        <item>المغرب</item>
+        <item>မြန်မာ</item>
+        <item>Namibia</item>
+        <item>नेपाल</item>
+        <item>Nederland</item>
+        <item>Aotearoa</item>
+        <item>Niger</item>
+        <item>Nigeria</item>
+        <item>조선민주주의인민공화국</item>
+        <item>Norge</item>
+        <item>عمان</item>
+        <item>پاکستان</item>
+        <item>فلسطين</item>
+        <item>Paraguay</item>
+        <item>Perú</item>
+        <item>Pilipinas</item>
+        <item>Polska</item>
+        <item>Portugal</item>
+        <item>قطر</item>
+        <item>România</item>
+        <item>Россия</item>
+        <item>Rwanda</item>
+        <item>Saint Kitts and Nevis</item>
+        <item>Saint Vincent and the Grenadines</item>
+        <item>San Marino</item>
+        <item>العربية السعودية</item>
+        <item>Sénégal</item>
+        <item>Србија</item>
+        <item>Seychelles</item>
+        <item>Sierra Leone</item>
+        <item>Singapore</item>
+        <item>Slovensko</item>
+        <item>Slovenija</item>
+        <item>Solomon Islands</item>
+        <item>Soomaaliya</item>
+        <item>Suid-Afrika</item>
+        <item>대한민국</item>
+        <item>España</item>
+        <item>ශ්‍රී ලංකා</item>
+        <item>Suriname</item>
+        <item>Eswatini</item>
+        <item>Sverige</item>
+        <item>Schweiz / Suisse / Svizzera</item>
+        <item>سوريا</item>
+        <item>台灣</item>
+        <item>Тоҷикистон</item>
+        <item>ประเทศไทย</item>
+        <item>Timor-Leste</item>
+        <item>Togo</item>
+        <item>Tonga</item>
+        <item>Trinidad and Tobago</item>
+        <item>Türkiye</item>
+        <item>Tuvalu</item>
+        <item>Україна</item>
+        <item>Uganda</item>
+        <item>الإمارات العربية المتحدة</item>
+        <item>United Kingdom</item>
+        <item>United States of America</item>
+        <item>Uruguay</item>
+        <item>Oʻzbekiston</item>
+        <item>Vanuatu</item>
+        <item>Zambia</item>
+    </string-array>
+
+    <string-array name="languages_interface_array">
+        <item>Русский</item>
+        <item>English</item>
+    </string-array>
 </resources>
+

@@ -2,11 +2,11 @@ package com.example.newswave.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -18,11 +18,6 @@ import com.example.newswave.databinding.FragmentSettingsBinding
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.SettingsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,6 +26,7 @@ class SettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsBinding
     private lateinit var viewModel: SettingsViewModel
+    private lateinit var selectLanguageTextView: TextView
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -65,6 +61,10 @@ class SettingsFragment : Fragment() {
         binding.tvLogout.setOnClickListener {
             viewModel.logout()
         }
+
+        binding.tvContentLanguage.setOnClickListener {
+            showLanguagePopup()
+        }
     }
 
     private fun observeViewModel() {
@@ -78,9 +78,9 @@ class SettingsFragment : Fragment() {
         }
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){
-                viewModel.userData.collect{ user ->
-                    if (user != null){
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.userData.collect { user ->
+                    if (user != null) {
                         binding.tvName.text = "${user.firstName} ${user.lastName}"
                         binding.tvEmail.text = user.email
                         binding.tvUsername.text = user.username
@@ -89,6 +89,13 @@ class SettingsFragment : Fragment() {
             }
         }
     }
+
+
+    private fun showLanguagePopup() {
+        val bottomSheet = LanguageBottomSheetFragment()
+        bottomSheet.show(childFragmentManager, bottomSheet.tag)
+    }
+
 
     private fun updateUI(isUserLoggedIn: Boolean) {
         if (isUserLoggedIn) {
@@ -114,3 +121,4 @@ class SettingsFragment : Fragment() {
     }
 
 }
+

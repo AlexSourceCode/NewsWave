@@ -22,6 +22,12 @@
     </style>
 
 
+    <style name="CustomSettingsAlertDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/enter_animation_window</item>
+        <item name="android:windowExitAnimation">@anim/exit_animation_window</item>
+    </style>
+
+
 
 
     <style name="Theme.NewsWave" parent="Base.Theme.NewsWave" />
