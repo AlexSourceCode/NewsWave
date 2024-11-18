@@ -2,7 +2,6 @@ package com.example.newswave.presentation.fragments
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -11,17 +10,18 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.newswave.R
+import com.example.newswave.databinding.PopupLanguagesSettingsBinding
 import com.example.newswave.utils.LanguageOption
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
 
-    private lateinit var rootView: View
+    private var _binding: PopupLanguagesSettingsBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var behavior: BottomSheetBehavior<FrameLayout>
-    private lateinit var recyclerView: RecyclerView
     private var screenHeight: Int = 0
     private val args by navArgs<LanguageBottomSheetFragmentArgs>()
 
@@ -33,8 +33,8 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        rootView = inflater.inflate(R.layout.popup_languages_settings, container, false)
+    ): View {
+        _binding = PopupLanguagesSettingsBinding.inflate(inflater, container, false)
 
         // Инициализация BottomSheetBehavior
         initializeBottomSheetBehavior()
@@ -42,7 +42,7 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
         // Настройка RecyclerView
         setupRecyclerView()
 
-        return rootView
+        return binding.root
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -55,16 +55,14 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
                 // Получение BottomSheetBehavior
                 behavior = BottomSheetBehavior.from(bottomSheet).apply {
                     skipCollapsed = true
-//                    peekHeight = (screenHeight * 0.67).toInt()
                     state = BottomSheetBehavior.STATE_EXPANDED
-                } // используется для получения экземпляра BottomSheetBehavior, ассоциированного с указанным View
-
+                }
             }
         }
     }
 
     private fun initializeBottomSheetBehavior() {
-        val bottomSheet = rootView.findViewById<FrameLayout>(R.id.bottomSheetContainer)
+        val bottomSheet = binding.bottomSheetContainer
         behavior = BottomSheetBehavior.from(bottomSheet)
 
         bottomSheet.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -84,14 +82,12 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
         })
     }
 
-
     private fun setupRecyclerView() {
-        recyclerView = rootView.findViewById(R.id.rvLanguages)
+        val recyclerView = binding.rvLanguages
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-
         // Получаем массив строк из ресурсов
-        val languageArray = when(args.languageOption){
+        val languageArray = when (args.languageOption) {
             LanguageOption.CONTENT_LANGUAGE -> resources.getStringArray(R.array.languages_content_array).toList()
             LanguageOption.INTERFACE_LANGUAGE -> resources.getStringArray(R.array.languages_interface_array).toList()
             LanguageOption.NEWS_SOURCE_COUNTRY -> resources.getStringArray(R.array.languages_source_country_array).toList()
@@ -103,24 +99,25 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
         // Устанавливаем адаптер для RecyclerView
         recyclerView.adapter = adapter
 
-        recyclerView.setOnTouchListener { _, event -> // пусть будет чтобы при двух элементах, тач не передавался bottomsheet при нажатии на rc
+        recyclerView.setOnTouchListener { _, event -> // Перехват касаний
             when (event.action) {
                 MotionEvent.ACTION_MOVE -> {
                     if (!recyclerView.canScrollVertically(-1)) {
                         // Если RecyclerView не может прокручиваться вверх (на первом элементе)
-                        rootView.parent?.requestDisallowInterceptTouchEvent(false)
+                        binding.root.parent?.requestDisallowInterceptTouchEvent(false)
                     }
                 }
                 MotionEvent.ACTION_DOWN, MotionEvent.ACTION_UP -> {
                     // Передаем управление жестами родителю
-                    rootView.parent?.requestDisallowInterceptTouchEvent(true)
+                    binding.root.parent?.requestDisallowInterceptTouchEvent(true)
                 }
             }
             false // Возвращаем false, чтобы RecyclerView продолжал обрабатывать события прокрутки
         }
-
     }
-//    override fun getTheme(): Int {
-//        return R.style.Theme_NewsWave_BottomSheet
-//    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null // Очищаем binding, чтобы избежать утечек памяти
+    }
 }
