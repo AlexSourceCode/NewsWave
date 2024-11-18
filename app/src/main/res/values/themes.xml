@@ -10,8 +10,9 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
-
-
+    <style name="Theme.NewsWave.BottomSheet" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.MaterialComponents.BottomSheet</item>
+    </style>
 
     <style name="CustomTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabTextAppearance">@style/CustomTabTextAppearance</item>

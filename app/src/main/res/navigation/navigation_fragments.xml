@@ -78,6 +78,9 @@
             android:id="@+id/action_settingsFragment_to_loginFragment"
             app:destination="@id/loginFragment"
             app:popUpTo="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_languageBottomSheetFragment2"
+            app:destination="@id/languageBottomSheetFragment2" />
     </fragment>
     <fragment
         android:id="@+id/authorNewsFragment"
@@ -119,4 +122,13 @@
             android:name="email"
             app:argType="string" />
     </fragment>
+    <dialog
+        android:id="@+id/languageBottomSheetFragment2"
+        android:name="com.example.newswave.presentation.fragments.LanguageBottomSheetFragment"
+        android:label="popup_languages_settings"
+        tools:layout="@layout/popup_languages_settings" >
+        <argument
+            android:name="LanguageOption"
+            app:argType="com.example.newswave.utils.LanguageOption" />
+    </dialog>
 </navigation>

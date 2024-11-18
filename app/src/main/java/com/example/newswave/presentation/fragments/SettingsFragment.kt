@@ -18,6 +18,7 @@ import com.example.newswave.databinding.FragmentSettingsBinding
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.SettingsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
+import com.example.newswave.utils.LanguageOption
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -53,7 +54,12 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory)[SettingsViewModel::class.java]
         observeViewModel()
+        setupOnClickListener()
 
+
+    }
+
+    private fun setupOnClickListener(){
         binding.btSignIn.setOnClickListener {
             launchSignInFragment()
         }
@@ -62,8 +68,15 @@ class SettingsFragment : Fragment() {
             viewModel.logout()
         }
 
+
         binding.tvContentLanguage.setOnClickListener {
-            showLanguagePopup()
+            showLanguagePopup(LanguageOption.CONTENT_LANGUAGE)
+        }
+        binding.tvInterfaceLanguage.setOnClickListener {
+            showLanguagePopup(LanguageOption.INTERFACE_LANGUAGE)
+        }
+        binding.tvNewsSourceCountry.setOnClickListener {
+            showLanguagePopup(LanguageOption.NEWS_SOURCE_COUNTRY)
         }
     }
 
@@ -71,7 +84,6 @@ class SettingsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.user.collect { firebaseUser ->
-
                     updateUI(firebaseUser != null)
                 }
             }
@@ -91,9 +103,9 @@ class SettingsFragment : Fragment() {
     }
 
 
-    private fun showLanguagePopup() {
-        val bottomSheet = LanguageBottomSheetFragment()
-        bottomSheet.show(childFragmentManager, bottomSheet.tag)
+    private fun showLanguagePopup(option: LanguageOption) {
+        val action = SettingsFragmentDirections.actionSettingsFragmentToLanguageBottomSheetFragment2(option)
+        findNavController().navigate(action)
     }
 
 

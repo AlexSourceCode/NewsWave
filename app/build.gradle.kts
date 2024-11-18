@@ -58,7 +58,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
-    implementation("com.google.android.material:material:1.6.0")
+    implementation("com.google.android.material:material:1.9.0")
 
     implementation("com.squareup.picasso:picasso:2.8")
     implementation("io.coil-kt:coil-compose:2.7.0")

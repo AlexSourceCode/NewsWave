@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <dimen name="bottom_sheet_min_height">200dp</dimen>
 
 
 </resources>
