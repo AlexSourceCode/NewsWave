@@ -81,6 +81,10 @@
         <action
             android:id="@+id/action_settingsFragment_to_languageBottomSheetFragment2"
             app:destination="@id/languageBottomSheetFragment2" />
+        <argument
+            android:name="selectedLanguage"
+            app:argType="string"
+            android:defaultValue="System" />
     </fragment>
     <fragment
         android:id="@+id/authorNewsFragment"
@@ -130,5 +134,8 @@
         <argument
             android:name="LanguageOption"
             app:argType="com.example.newswave.utils.LanguageOption" />
+        <argument
+            android:name="LanguageValue"
+            app:argType="string" />
     </dialog>
 </navigation>

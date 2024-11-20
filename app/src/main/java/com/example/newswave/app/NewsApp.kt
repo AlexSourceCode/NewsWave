@@ -3,6 +3,7 @@ package com.example.newswave.app
 import android.app.Application
 import android.content.Context
 import androidx.work.Configuration
+import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.data.workers.RefreshDataWorkerFactory
 import com.example.newswave.di.DaggerApplicationComponent
 import javax.inject.Inject
@@ -22,6 +23,9 @@ class NewsApp: Application(), Configuration.Provider {
     override fun onCreate() {
         component.inject(this)
         super.onCreate()
+
+        val userPreferences = UserPreferences(this)
+        userPreferences.initializeDefaultSettings()
     }
 
     override val workManagerConfiguration: Configuration

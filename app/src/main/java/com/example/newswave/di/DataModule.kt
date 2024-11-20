@@ -71,7 +71,8 @@ interface DataModule {
             return SavedStateHandle()
         }
 
-        @Provides fun provideUserPreferences(application: Application): UserPreferences {
+        @Provides
+        fun provideUserPreferences(application: Application): UserPreferences {
             return UserPreferences(application)
         }
 

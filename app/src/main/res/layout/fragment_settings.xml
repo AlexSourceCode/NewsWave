@@ -180,7 +180,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:text="Выход"
+                android:text="@string/sign_out"
                 android:textColor="@color/black" />
         </androidx.cardview.widget.CardView>
 

@@ -60,7 +60,11 @@
     <string name="country_of_news_source">Country of news source</string>
     <string name="interface_language">Interface language</string>
 
+    <string name="system">Match system language</string>
+    <string name="sign_out">Sign out</string>
+
     <string-array name="languages_interface_array">
+        <item>Match system language</item>
         <item>Русский</item>
         <item>English</item>
     </string-array>

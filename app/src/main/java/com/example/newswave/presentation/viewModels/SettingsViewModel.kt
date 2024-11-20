@@ -22,7 +22,8 @@ import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
-    private val fetchUserDataUseCase: FetchUserDataUseCase
+    private val fetchUserDataUseCase: FetchUserDataUseCase,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
     private val auth: FirebaseAuth = Firebase.auth
 
@@ -54,6 +55,14 @@ class SettingsViewModel @Inject constructor(
                 _userData.value = userData
             }
         }
+    }
+
+    fun getInterfaceLanguage(): String {
+        return userPreferences.getInterfaceLanguage()
+    }
+
+    fun setInterfaceLanguage(language: String) {
+        userPreferences.saveInterfaceLanguage(language)
     }
 
     init {
