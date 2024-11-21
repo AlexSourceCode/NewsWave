@@ -6,7 +6,9 @@ data class UserEntity(
     val email: String,
     val password: String? = null,
     val firstName: String,
-    val lastName: String
+    val lastName: String,
+    val newsContent: String,
+    val newsSourceCountry: String
 ){
-    constructor() : this("","","","","","")
+    constructor() : this("","","","","","","","")
 }

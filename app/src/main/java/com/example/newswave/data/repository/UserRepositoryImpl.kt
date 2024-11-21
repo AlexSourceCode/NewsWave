@@ -76,8 +76,10 @@ class UserRepositoryImpl @Inject constructor(
         email: String,
         password: String,
         firstName: String,
-        lastName: String
+        lastName: String,
     ) {
+        val newsContent = "ru"
+        val newsSourceCountry = "ru"
         auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
                 val firebase = authResult.user
@@ -88,7 +90,9 @@ class UserRepositoryImpl @Inject constructor(
                         email,
                         password,
                         firstName,
-                        lastName
+                        lastName,
+                        newsContent,
+                        newsSourceCountry
                     )
                     usersReference.child(user.id).setValue(user)
                     userPreferences.saveUserData(
@@ -97,7 +101,9 @@ class UserRepositoryImpl @Inject constructor(
                             username = username,
                             email = email,
                             firstName = firstName,
-                            lastName = lastName
+                            lastName = lastName,
+                            newsContent =  newsContent,
+                            newsSourceCountry =  newsSourceCountry
                         )
                     )
                 }
