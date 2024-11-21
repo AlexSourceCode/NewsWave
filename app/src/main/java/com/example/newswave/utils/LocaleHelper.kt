@@ -10,9 +10,11 @@ import java.util.Locale
 
 object LocaleHelper {
 
+    const val SYSTEM_DEFAULT = "system"
+
+
     fun setLocale(context: Context, languageCode: String): Context { // languageCode тут в маленьком регистре
-        Log.d("LocaleHelperLanguageCodeState", languageCode) // сделать условие, если передается system
-        val locale = if (languageCode == "system") Locale(getSystemLanguage()) else Locale(languageCode)
+        val locale = if (languageCode == SYSTEM_DEFAULT) Locale(getSystemLanguage()) else Locale(languageCode)
         Locale.setDefault(locale)
 
         val config = android.content.res.Configuration(context.resources.configuration)

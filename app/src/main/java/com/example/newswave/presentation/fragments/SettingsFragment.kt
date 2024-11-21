@@ -34,10 +34,15 @@ class SettingsFragment : Fragment() {
 
     private val languageMap by lazy {
         mapOf(
-            getString(R.string.system) to "system", // Устройство по умолчанию
+            getString(R.string.system) to LocaleHelper.SYSTEM_DEFAULT, // Устройство по умолчанию
             "Русский" to "ru", // Русский
             "English" to "en"  // Английский
         )
+    }
+
+    companion object{
+        private const val KEY_SELECTED_LANGUAGE = "selected_language"
+        private const val LANGUAGE_SELECTION_RESULT = "language_selection_result"
     }
 
     @Inject
@@ -73,14 +78,12 @@ class SettingsFragment : Fragment() {
         setupOnClickListener()
 
         parentFragmentManager.setFragmentResultListener(
-            "language_selection_result",
+            LANGUAGE_SELECTION_RESULT,
             this
         ) { _, bundle ->
-            val selectedLanguage = bundle.getString("selected_language")
+            val selectedLanguage = bundle.getString(KEY_SELECTED_LANGUAGE)
             selectedLanguage?.let {
-                Log.d("SettingsFragmentGetLanguage", "selectedLanguage $selectedLanguage")
-                val languageCode = getLanguageCode(it) // тут в верхнем регистре значение
-                Log.d("SettingsFragmentGetLanguage", "languageCode $languageCode")
+                val languageCode = getLanguageCode(it)
                 handleSelectedLanguage(languageCode)
                 applyLocaleChanges()
             }
@@ -88,16 +91,12 @@ class SettingsFragment : Fragment() {
     }
 
     private fun getLanguageCode(selectedLanguage: String): String { // получение из полного названия языка в languagecode
-        return languageMap[selectedLanguage] ?: "system"
+        return languageMap[selectedLanguage] ?: LocaleHelper.SYSTEM_DEFAULT
     }
 
     private fun getLanguageName(languageCode: String): String { // получение из languagecode в полного названия языка
-        Log.d(
-            "SettingsFragment",
-            "getLanguageNameResult ${languageMap.entries.find { it.value == languageCode }?.key}"
-        )
         return languageMap.entries.find { it.value == languageCode }?.key
-            ?: "system" // Значение по умолчанию
+            ?: LocaleHelper.SYSTEM_DEFAULT // Значение по умолчанию
     }
 
     private fun handleSelectedLanguage(language: String) {
@@ -122,10 +121,9 @@ class SettingsFragment : Fragment() {
 //        }
         binding.tvInterfaceLanguage.setOnClickListener {
             val languageCode = viewModel.getInterfaceLanguage()
-            Log.d("SettingsFragment", "languageCodeTradeToBottomSheet $languageCode")
             val languageName = getLanguageName(languageCode)
-            Log.d("SettingsFragment", "TradeToBottomSheetLanguagenAME $languageName")
-            if (languageName == "system")
+
+            if (languageName == LocaleHelper.SYSTEM_DEFAULT)
                 showLanguagePopup(LanguageOption.INTERFACE_LANGUAGE, requireContext().getString(R.string.system))
              else
                 showLanguagePopup(LanguageOption.INTERFACE_LANGUAGE, languageName)

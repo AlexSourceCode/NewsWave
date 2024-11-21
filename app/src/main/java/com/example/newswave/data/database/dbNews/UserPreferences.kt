@@ -21,17 +21,19 @@ class UserPreferences(private val context: Context) {
         private const val KEY_INTERFACE_LANGUAGE = "interface_language"
         private const val KEY_USER_DATA = "user_data"
         private const val KEY_FIRST_LAUNCH = "first_launch"
-        private const val SYSTEM_DEFAULT = "system"
+        private const val TAG = "UserPreference"
     }
 
     fun saveUserData(user: UserEntity) {
         val json = Gson().toJson(user)
+        Log.d(TAG, "saveUser ${json.toString()}")
         editor.putString(KEY_USER_DATA, json)
         editor.apply()
     }
 
     fun getUserData(): UserEntity? {
         val json = sharedPreferences.getString(KEY_USER_DATA, null)
+        Log.d(TAG, "getUser ${json.toString()}")
         return if (json != null) Gson().fromJson(json, UserEntity::class.java) else null
     }
 
@@ -46,8 +48,7 @@ class UserPreferences(private val context: Context) {
 
     fun initializeDefaultSettings() { // Если это первый запуск, то устанавливается язык устройства системы
         if (isFirstLaunch()) {
-            Log.d("UserPreferences", "executeflag")
-            saveInterfaceLanguage(SYSTEM_DEFAULT) // Устанавливаем "Как в системе" по умолчанию
+            saveInterfaceLanguage(LocaleHelper.SYSTEM_DEFAULT) // Устанавливаем "Как в системе" по умолчанию
 //            saveContentLanguage("ru") // По умолчанию язык контента — "ru"
 //            saveSourceCountry("ru") // По умолчанию страна источника — "ru"
             setFirstLaunchCompleted() // Фиксируем, что первый запуск завершен
@@ -60,9 +61,9 @@ class UserPreferences(private val context: Context) {
     }
 
     fun getInterfaceLanguage(): String { //Получение текущего языка приложение, если оно не установленно, то по умолчанию берется язык устройства системы
-        val savedLanguage = sharedPreferences.getString(KEY_INTERFACE_LANGUAGE, SYSTEM_DEFAULT)
-        return if (savedLanguage == SYSTEM_DEFAULT) {
-            SYSTEM_DEFAULT
+        val savedLanguage = sharedPreferences.getString(KEY_INTERFACE_LANGUAGE, LocaleHelper.SYSTEM_DEFAULT)
+        return if (savedLanguage == LocaleHelper.SYSTEM_DEFAULT) {
+            LocaleHelper.SYSTEM_DEFAULT
         } else savedLanguage!!
     }
 
