@@ -31,9 +31,14 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
     private var screenHeight: Int = 0
     private val args by navArgs<LanguageBottomSheetFragmentArgs>()
 
-    companion object{
-        private const val KEY_SELECTED_LANGUAGE = "selected_language"
-        private const val LANGUAGE_SELECTION_RESULT = "language_selection_result"
+    companion object {
+        private const val KEY_SELECTION_RESULT = "selected_result"
+        private const val INTERFACE_LANGUAGE_SELECTION_RESULT =
+            "interface_language_selection_result"
+        private const val CONTENT_LANGUAGE_SELECTION_RESULT = "content_language_selection_result"
+        private const val SOURCE_COUNTRY_LANGUAGE_SELECTION_RESULT =
+            "source_country_language_selection_result"
+
 
         private const val BOTTOM_SHEET_DIM_AMOUNT = 0.4f
         private const val BOTTOM_SHEET_HEIGHT_RATIO = 0.67
@@ -104,14 +109,24 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
 
         // Получаем массив строк из ресурсов
         val languageArray = when (args.languageOption) {
-            LanguageOption.CONTENT_LANGUAGE -> resources.getStringArray(R.array.languages_content_array)
-                .toList()
+            LanguageOption.CONTENT_LANGUAGE -> {
+                binding.tvTitle.text = requireContext().getString(R.string.content_language)
+                resources.getStringArray(R.array.languages_content_array)
+                    .toList()
+            }
 
-            LanguageOption.INTERFACE_LANGUAGE -> resources.getStringArray(R.array.languages_interface_array)
-                .toList()
+            LanguageOption.INTERFACE_LANGUAGE -> {
+                binding.tvTitle.text = requireContext().getString(R.string.interface_language)
+                resources.getStringArray(R.array.languages_interface_array)
+                    .toList()
 
-            LanguageOption.NEWS_SOURCE_COUNTRY -> resources.getStringArray(R.array.languages_source_country_array)
-                .toList()
+            }
+
+            LanguageOption.NEWS_SOURCE_COUNTRY -> {
+                binding.tvTitle.text = requireContext().getString(R.string.country_of_news_source)
+                resources.getStringArray(R.array.languages_source_country_array)
+                    .toList()
+            }
         }
 
         // Создаем адаптер для RecyclerView
@@ -121,25 +136,36 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
         recyclerView.adapter = adapter
 
         adapter.currentLanguageChecked = { listItem ->
-            if (args.languageValue == ""){
-
-            }
             args.languageValue == listItem
         }
 
         adapter.onLanguageClick = { language ->
-            launchSettingsFragment(language)
+            when (args.languageOption) {
+
+                LanguageOption.INTERFACE_LANGUAGE -> {
+                    launchSettingsFragment(language, INTERFACE_LANGUAGE_SELECTION_RESULT)
+                }
+
+                LanguageOption.CONTENT_LANGUAGE -> {
+                    launchSettingsFragment(language, CONTENT_LANGUAGE_SELECTION_RESULT)
+                }
+
+                LanguageOption.NEWS_SOURCE_COUNTRY -> {
+                    launchSettingsFragment(language, SOURCE_COUNTRY_LANGUAGE_SELECTION_RESULT)
+                }
+            }
         }
 
     }
 
-    private fun launchSettingsFragment(language: String){
+    private fun launchSettingsFragment(language: String, resultKey: String) {
         val resultBundle = Bundle().apply {
-            putString(KEY_SELECTED_LANGUAGE, language)
+            putString(KEY_SELECTION_RESULT, language)
         }
-        parentFragmentManager.setFragmentResult(LANGUAGE_SELECTION_RESULT, resultBundle)
+        parentFragmentManager.setFragmentResult(resultKey, resultBundle)
         dismiss() // Закрыть BottomSheet
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

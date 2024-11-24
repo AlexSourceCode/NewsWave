@@ -19,7 +19,7 @@
 
     <string name="subscribe">Subscribe</string>
     <string name="subscribed">Subscribed</string>
-    
+
     <string name="confirmation">Confirmation</string>
     <string name="positive_answer">Yes</string>
     <string name="negative_answer">No</string>
@@ -71,229 +71,229 @@
 
 
     <string-array name="languages_content_array">
-        <item>Qafar</item>
-        <item>አማርኛ</item>
-        <item>العربية</item>
-        <item>বাংলা</item>
-        <item>bosanski</item>
-        <item>български</item>
-        <item>မြန်မာစာ</item>
-        <item>中文</item>
-        <item>hrvatski</item>
-        <item>čeština</item>
-        <item>dansk</item>
-        <item>Nederlands</item>
+        <item>Afar</item>
+        <item>Amharic</item>
+        <item>Arabic</item>
+        <item>Bengali</item>
+        <item>Bosnian</item>
+        <item>Bulgarian</item>
+        <item>Burmese</item>
+        <item>Chinese</item>
+        <item>Croatian</item>
+        <item>Czech</item>
+        <item>Danish</item>
+        <item>Dutch</item>
         <item>English</item>
-        <item>eesti</item>
-        <item>suomi</item>
-        <item>français</item>
-        <item>Deutsch</item>
-        <item>ελληνικά</item>
-        <item>עברית</item>
-        <item>हिंदी</item>
-        <item>magyar</item>
-        <item>íslenska</item>
-        <item>Bahasa Indonesia</item>
-        <item>italiano</item>
-        <item>日本語</item>
-        <item>한국어</item>
-        <item>ລາວ</item>
-        <item>latviešu</item>
-        <item>lietuvių</item>
-        <item>македонски</item>
-        <item>Bahasa Melayu</item>
-        <item>Malti</item>
-        <item>मराठी</item>
-        <item>te reo Māori</item>
-        <item>नेपाली</item>
-        <item>norsk</item>
-        <item>norsk</item>
-        <item>فارسی</item>
-        <item>polski</item>
-        <item>português</item>
-        <item>română</item>
-        <item>русский</item>
-        <item>српски</item>
-        <item>සිංහල</item>
-        <item>slovenčina</item>
-        <item>slovenščina</item>
-        <item>Soomaali</item>
-        <item>español</item>
-        <item>svenska</item>
-        <item>тоҷикӣ</item>
-        <item>தமிழ்</item>
-        <item>తెలుగు</item>
-        <item>ไทย</item>
-        <item>Türkçe</item>
-        <item>українська</item>
-        <item>اردو</item>
-        <item>oʻzbek</item>
-        <item>Tiếng Việt</item>
+        <item>Estonian</item>
+        <item>Finnish</item>
+        <item>French</item>
+        <item>German</item>
+        <item>Greek</item>
+        <item>Hebrew</item>
+        <item>Hindi</item>
+        <item>Hungarian</item>
+        <item>Icelandic</item>
+        <item>Indonesian</item>
+        <item>Italian</item>
+        <item>Japanese</item>
+        <item>Korean</item>
+        <item>Lao</item>
+        <item>Latvian</item>
+        <item>Lithuanian</item>
+        <item>Macedonian</item>
+        <item>Malay</item>
+        <item>Maltese</item>
+        <item>Marathi</item>
+        <item>Māori</item>
+        <item>Nepali</item>
+        <item>Norwegian</item>
+        <item>Persian</item>
+        <item>Polish</item>
+        <item>Portuguese</item>
+        <item>Romanian</item>
+        <item>Russian</item>
+        <item>Serbian</item>
+        <item>Sinhalese</item>
+        <item>Slovak</item>
+        <item>Slovene</item>
+        <item>Somali</item>
+        <item>Spanish</item>
+        <item>Swedish</item>
+        <item>Tajik</item>
+        <item>Tamil</item>
+        <item>Telugu</item>
+        <item>Thai</item>
+        <item>Turkish</item>
+        <item>Ukrainian</item>
+        <item>Urdu</item>
+        <item>Uzbek</item>
+        <item>Vietnamese</item>
+
     </string-array>
 
     <string-array name="languages_source_country_array">
-        <item>افغانستان</item>
-        <item>Shqipëri</item>
-        <item>الجزائر</item>
-        <item>Amerika Sāmoa</item>
+        <item>Afghanistan</item>
+        <item>Albania</item>
+        <item>Algeria</item>
+        <item>American Samoa</item>
         <item>Anguilla</item>
         <item>Argentina</item>
         <item>Australia</item>
-        <item>Österreich</item>
-        <item>The Bahamas</item>
-        <item>البحرين</item>
-        <item>বাংলাদেশ</item>
+        <item>Austria</item>
+        <item>Bahamas</item>
+        <item>Bahrain</item>
+        <item>Bangladesh</item>
         <item>Barbados</item>
-        <item>Беларусь</item>
-        <item>België / Belgique / Belgien</item>
+        <item>Belarus</item>
+        <item>Belgium</item>
         <item>Belize</item>
-        <item>Bénin</item>
+        <item>Benin</item>
         <item>Bermuda</item>
-        <item>འབྲུག་ཡུལ</item>
-        <item>Bosna i Hercegovina</item>
-        <item>Bouvetøya</item>
-        <item>Brasil</item>
+        <item>Bhutan</item>
+        <item>Bosnia And Herzegovina</item>
+        <item>Bouvet Island</item>
+        <item>Brazil</item>
         <item>British Indian Ocean Territory</item>
-        <item>Negara Brunei Darussalam</item>
-        <item>България</item>
+        <item>Brunei Darussalam</item>
+        <item>Bulgaria</item>
         <item>Burkina Faso</item>
-        <item>Uburundi</item>
-        <item>កម្ពុជា</item>
-        <item>Cameroun</item>
+        <item>Burundi</item>
+        <item>Cambodia</item>
+        <item>Cameroon</item>
         <item>Canada</item>
-        <item>Cabo Verde</item>
-        <item>République centrafricaine</item>
+        <item>Cape Verde</item>
+        <item>Central African Republic</item>
         <item>Chile</item>
-        <item>中国</item>
+        <item>China</item>
         <item>Colombia</item>
-        <item>Komori</item>
-        <item>République Démocratique du Congo</item>
-        <item>République du Congo</item>
+        <item>Comoros</item>
+        <item>Congo, Democratic Republic Of The</item>
+        <item>Congo, Republic Of The</item>
         <item>Costa Rica</item>
-        <item>Côte d\'Ivoire</item>
-        <item>Hrvatska</item>
+        <item>Cote D\'ivoire</item>
+        <item>Croatia</item>
         <item>Cuba</item>
-        <item>Κύπρος</item>
-        <item>Česká republika</item>
-        <item>Danmark</item>
-        <item>جيبوتي</item>
-        <item>República Dominicana</item>
+        <item>Cyprus</item>
+        <item>Czech Republic</item>
+        <item>Denmark</item>
+        <item>Djibouti</item>
+        <item>Dominican Republic</item>
         <item>Ecuador</item>
-        <item>مصر</item>
+        <item>Egypt</item>
         <item>El Salvador</item>
-        <item>ኤርትራ</item>
-        <item>ኢትዮጵያ</item>
-        <item>Viti</item>
-        <item>Suomi</item>
+        <item>Eritrea</item>
+        <item>Ethiopia</item>
+        <item>Fiji</item>
+        <item>Finland</item>
         <item>France</item>
-        <item>Guyane française</item>
-        <item>Polynésie française</item>
-        <item>The Gambia</item>
-        <item>Deutschland</item>
+        <item>French Guiana</item>
+        <item>French Polynesia</item>
+        <item>Gambia</item>
+        <item>Germany</item>
         <item>Ghana</item>
-        <item>Ελλάδα</item>
+        <item>Greece</item>
         <item>Guatemala</item>
-        <item>Guinée</item>
+        <item>Guinea</item>
         <item>Guyana</item>
         <item>Honduras</item>
-        <item>香港</item>
-        <item>Magyarország</item>
-        <item>Ísland</item>
-        <item>भारत</item>
+        <item>Hong Kong</item>
+        <item>Hungary</item>
+        <item>Iceland</item>
+        <item>India</item>
         <item>Indonesia</item>
-        <item>ایران</item>
-        <item>العراق</item>
-        <item>Éire</item>
-        <item>ישראל</item>
-        <item>Italia</item>
-        <item>日本</item>
-        <item>الأردن</item>
-        <item>Қазақстан</item>
+        <item>Iran</item>
+        <item>Iraq</item>
+        <item>Ireland</item>
+        <item>Israel</item>
+        <item>Italy</item>
+        <item>Japan</item>
+        <item>Jordan</item>
+        <item>Kazakhstan</item>
         <item>Kenya</item>
-        <item>الكويت</item>
-        <item>ລາວ</item>
-        <item>Latvija</item>
-        <item>لبنان</item>
+        <item>Kuwait</item>
+        <item>Laos</item>
+        <item>Latvia</item>
+        <item>Lebanon</item>
         <item>Lesotho</item>
         <item>Liberia</item>
         <item>Liechtenstein</item>
-        <item>Lietuva</item>
-        <item>Lëtzebuerg</item>
-        <item>Македонија</item>
+        <item>Lithuania</item>
+        <item>Luxembourg</item>
+        <item>Macedonia</item>
         <item>Madagascar</item>
         <item>Malawi</item>
         <item>Malaysia</item>
-        <item>ދިވެހިރާއްޖޭގެ</item>
+        <item>Maldives</item>
         <item>Mali</item>
         <item>Malta</item>
-        <item>موريتانيا</item>
-        <item>Maurice</item>
-        <item>México</item>
-        <item>Micronesia</item>
+        <item>Mauritania</item>
+        <item>Mauritius</item>
+        <item>Mexico</item>
+        <item>Micronesia, Federated States Of</item>
         <item>Moldova</item>
         <item>Monaco</item>
-        <item>Црна Гора</item>
+        <item>Montenegro</item>
         <item>Montserrat</item>
-        <item>المغرب</item>
-        <item>မြန်မာ</item>
+        <item>Morocco</item>
+        <item>Myanmar</item>
         <item>Namibia</item>
-        <item>नेपाल</item>
-        <item>Nederland</item>
-        <item>Aotearoa</item>
+        <item>Nepal</item>
+        <item>Netherlands</item>
+        <item>New Zealand</item>
         <item>Niger</item>
         <item>Nigeria</item>
-        <item>조선민주주의인민공화국</item>
-        <item>Norge</item>
-        <item>عمان</item>
-        <item>پاکستان</item>
-        <item>فلسطين</item>
+        <item>North Korea</item>
+        <item>Norway</item>
+        <item>Oman</item>
+        <item>Pakistan</item>
+        <item>Palestinian Territory</item>
         <item>Paraguay</item>
-        <item>Perú</item>
-        <item>Pilipinas</item>
-        <item>Polska</item>
+        <item>Peru</item>
+        <item>Philippines</item>
+        <item>Poland</item>
         <item>Portugal</item>
-        <item>قطر</item>
-        <item>România</item>
-        <item>Россия</item>
+        <item>Qatar</item>
+        <item>Romania</item>
+        <item>Russia</item>
         <item>Rwanda</item>
-        <item>Saint Kitts and Nevis</item>
-        <item>Saint Vincent and the Grenadines</item>
+        <item>Saint Kitts And Nevis</item>
+        <item>Saint Vincent And The Grenadines</item>
         <item>San Marino</item>
-        <item>العربية السعودية</item>
-        <item>Sénégal</item>
-        <item>Србија</item>
+        <item>Saudi Arabia</item>
+        <item>Senegal</item>
+        <item>Serbia</item>
         <item>Seychelles</item>
         <item>Sierra Leone</item>
         <item>Singapore</item>
-        <item>Slovensko</item>
-        <item>Slovenija</item>
+        <item>Slovakia</item>
+        <item>Slovenia</item>
         <item>Solomon Islands</item>
-        <item>Soomaaliya</item>
-        <item>Suid-Afrika</item>
-        <item>대한민국</item>
-        <item>España</item>
-        <item>ශ්‍රී ලංකා</item>
+        <item>Somalia</item>
+        <item>South Africa</item>
+        <item>South Korea</item>
+        <item>Spain</item>
+        <item>Sri Lanka</item>
         <item>Suriname</item>
-        <item>Eswatini</item>
-        <item>Sverige</item>
-        <item>Schweiz / Suisse / Svizzera</item>
-        <item>سوريا</item>
-        <item>台灣</item>
-        <item>Тоҷикистон</item>
-        <item>ประเทศไทย</item>
-        <item>Timor-Leste</item>
+        <item>Swaziland</item>
+        <item>Sweden</item>
+        <item>Switzerland</item>
+        <item>Syria</item>
+        <item>Taiwan</item>
+        <item>Tajikistan</item>
+        <item>Thailand</item>
+        <item>Timor-leste</item>
         <item>Togo</item>
         <item>Tonga</item>
-        <item>Trinidad and Tobago</item>
-        <item>Türkiye</item>
+        <item>Trinidad And Tobago</item>
+        <item>Turkey</item>
         <item>Tuvalu</item>
-        <item>Україна</item>
+        <item>Ukraine</item>
         <item>Uganda</item>
-        <item>الإمارات العربية المتحدة</item>
+        <item>United Arab Emirates</item>
         <item>United Kingdom</item>
-        <item>United States of America</item>
+        <item>United States Of America</item>
         <item>Uruguay</item>
-        <item>Oʻzbekiston</item>
+        <item>Uzbekistan</item>
         <item>Vanuatu</item>
         <item>Zambia</item>
     </string-array>

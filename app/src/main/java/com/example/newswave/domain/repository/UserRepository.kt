@@ -20,6 +20,18 @@ interface UserRepository {
         lastName: String
     )
 
+    fun signOut()
+
+    fun syncUserSettings()
+
+    fun getContentLanguage(): String
+
+    fun saveContentLanguage(language: String)
+
+    fun getSourceCountry(): String
+
+    fun saveSourceCountry(country: String)
+
     fun fetchIsSuccessAuth(): SharedFlow<Boolean>
 
     fun observeAuthState(): StateFlow<FirebaseUser?>
@@ -27,5 +39,9 @@ interface UserRepository {
     fun fetchErrorAuth(): SharedFlow<String>
 
     fun fetchUserData(): StateFlow<UserEntity?>
+
+    fun fetchContentLanguage(): StateFlow<String>
+
+    fun fetchSourceCountry(): StateFlow<String>
 
 }

@@ -22,7 +22,7 @@ object LocaleHelper {
         return context.createConfigurationContext(config)
     }
 
-    private fun getSystemLanguage(): String = Resources.getSystem().configuration.locales[0].language
+    fun getSystemLanguage(): String = Resources.getSystem().configuration.locales[0].language
 
 
 

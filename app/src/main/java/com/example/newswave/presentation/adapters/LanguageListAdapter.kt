@@ -34,7 +34,10 @@ class LanguageListAdapter(private val languages: List<String>) :
 
         if (currentLanguageChecked?.invoke(language) == true) {
             holder.binding.checkedImage.visibility = View.VISIBLE
+        } else {
+            holder.binding.checkedImage.visibility = View.GONE
         }
+
 
         holder.binding.textItem.setOnClickListener {
             onLanguageClick?.invoke(language)

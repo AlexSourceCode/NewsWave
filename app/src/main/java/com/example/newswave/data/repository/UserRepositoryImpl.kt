@@ -46,6 +46,16 @@ class UserRepositoryImpl @Inject constructor(
     private var _isSuccess = MutableSharedFlow<Boolean>()
     val isSuccess: SharedFlow<Boolean> get() = _isSuccess.asSharedFlow()
 
+    private val _contentLanguage = MutableStateFlow<String>(getContentLanguage())
+    val contentLanguage: StateFlow<String> = _contentLanguage
+
+    private val _sourceCountry = MutableStateFlow<String>(getSourceCountry())
+    val sourceCountry: StateFlow<String> = _sourceCountry
+
+    companion object {
+        private const val DEFAULT_LANGUAGE = "ru"
+    }
+
     override fun resetPassword(email: String) {
         auth.sendPasswordResetEmail(email)
             .addOnSuccessListener {
@@ -78,8 +88,6 @@ class UserRepositoryImpl @Inject constructor(
         firstName: String,
         lastName: String,
     ) {
-        val newsContent = "ru"
-        val newsSourceCountry = "ru"
         auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
                 val firebase = authResult.user
@@ -91,8 +99,8 @@ class UserRepositoryImpl @Inject constructor(
                         password,
                         firstName,
                         lastName,
-                        newsContent,
-                        newsSourceCountry
+                        DEFAULT_LANGUAGE,
+                        DEFAULT_LANGUAGE
                     )
                     usersReference.child(user.id).setValue(user)
                     userPreferences.saveUserData(
@@ -102,8 +110,8 @@ class UserRepositoryImpl @Inject constructor(
                             email = email,
                             firstName = firstName,
                             lastName = lastName,
-                            newsContent =  newsContent,
-                            newsSourceCountry =  newsSourceCountry
+                            newsContent = DEFAULT_LANGUAGE,
+                            newsSourceCountry = DEFAULT_LANGUAGE
                         )
                     )
                 }
@@ -114,6 +122,109 @@ class UserRepositoryImpl @Inject constructor(
                 }
             }
     }
+
+    override fun signOut() {
+        userPreferences.clearUserData()
+
+        auth.signOut()
+
+        ioScope.launch {
+            _user.emit(null)
+            _userData.emit(null)
+        }
+
+    }
+
+    override fun syncUserSettings() {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            usersReference.child(currentUser.uid)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val userEntity = snapshot.getValue<UserEntity>()
+                        if (userEntity != null) {
+                            userPreferences.saveUserData(userEntity)
+                            ioScope.launch {
+                                _userData.emit(userEntity)
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        ioScope.launch {
+                            _error.emit("Failed to sync user settings: ${error.message}")
+                        }
+                    }
+                })
+        } else {
+            ioScope.launch {
+                _error.emit("No authenticated user found to sync settings.")
+            }
+        }
+    }
+
+    override fun getContentLanguage(): String {
+        val content =userPreferences.getUserData()?.newsContent ?: userPreferences.getContentLanguage()
+        Log.d("CheckChangedUserData", "getContentLanguageFromImpl $content")
+        return content
+    }
+
+    override fun saveContentLanguage(language: String) {
+        _contentLanguage.value = language
+        userPreferences.saveContentLanguage(language)
+
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            usersReference.child(currentUser.uid).child("newsContent").setValue(language)
+                .addOnSuccessListener {
+                    val updatedUser = userPreferences.getUserData()?.copy(newsContent = language)
+                    if (updatedUser != null) {
+                        userPreferences.saveUserData(updatedUser)
+                        ioScope.launch {
+                            _userData.value = updatedUser
+                        }
+                    }
+                }
+                .addOnFailureListener { error ->
+                    ioScope.launch {
+                        _error.emit("Failed to save content language: ${error.message}")
+                    }
+                }
+        } else {
+        }
+    }
+
+    override fun getSourceCountry(): String {
+        return userPreferences.getUserData()?.newsSourceCountry
+            ?: userPreferences.getSourceCountry()
+    }
+
+    override fun saveSourceCountry(country: String) {
+        _sourceCountry.value = country
+        userPreferences.saveSourceCountry(country)
+
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            usersReference.child(currentUser.uid).child("newsSourceCountry").setValue(country)
+                .addOnSuccessListener {
+                    val updatedUser =
+                        userPreferences.getUserData()?.copy(newsSourceCountry = country)
+                    if (updatedUser != null) {
+                        userPreferences.saveUserData(updatedUser)
+                        ioScope.launch {
+                            _userData.value = updatedUser
+                        }
+                    }
+                }
+                .addOnFailureListener { error ->
+                    ioScope.launch {
+                        _error.emit("Failed to save source country: ${error.message}")
+                    }
+                }
+        } else {
+        }
+    }
+
 
     override fun fetchIsSuccessAuth(): SharedFlow<Boolean> {
         return isSuccess
@@ -131,10 +242,20 @@ class UserRepositoryImpl @Inject constructor(
         return error
     }
 
+
+
     override fun fetchUserData(): StateFlow<UserEntity?> {
         val user = userPreferences.getUserData()
         _userData.value = user
         return userData
+    }
+
+    override fun fetchContentLanguage(): StateFlow<String> {
+        return contentLanguage
+    }
+
+    override fun fetchSourceCountry(): StateFlow<String> {
+        return sourceCountry
     }
 
     init {
@@ -147,10 +268,19 @@ class UserRepositoryImpl @Inject constructor(
                                 snapshot.getValue<UserEntity>() as UserEntity
                             _userData.value = userData
                             userPreferences.saveUserData(userData)
+                            _contentLanguage.value = userData.newsContent
+                            _sourceCountry.value = userData.newsSourceCountry
+                            userPreferences.saveContentLanguage(userData.newsContent)
+                            Log.d("CheckChangedUserData", "AfterSaveContent ${getContentLanguage()}")
+                            userPreferences.saveSourceCountry(userData.newsSourceCountry)
+                            Log.d("CheckChangedUserData", "content ${_contentLanguage.value} \n ${_sourceCountry.value}")
                         }
 
                         override fun onCancelled(error: DatabaseError) {
-                            Log.e("UserRepositoryImpl", "Error fetching user data: ${error.message}")
+                            Log.e(
+                                "UserRepositoryImpl",
+                                "Error fetching user data: ${error.message}"
+                            )
                         }
 
                     })

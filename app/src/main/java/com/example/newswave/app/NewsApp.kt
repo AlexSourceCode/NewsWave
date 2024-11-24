@@ -6,11 +6,17 @@ import androidx.work.Configuration
 import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.data.workers.RefreshDataWorkerFactory
 import com.example.newswave.di.DaggerApplicationComponent
+import com.example.newswave.domain.repository.UserRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class NewsApp: Application(), Configuration.Provider {
 
     @Inject lateinit var workerFactory: RefreshDataWorkerFactory
+    @Inject
+    lateinit var userRepository: UserRepository
 
     val component by lazy {
         DaggerApplicationComponent.factory()
@@ -26,7 +32,24 @@ class NewsApp: Application(), Configuration.Provider {
 
         val userPreferences = UserPreferences(this)
         userPreferences.initializeDefaultSettings()
+//        syncUserDataIfNeeded()
+
+
     }
+
+//    private fun syncUserDataIfNeeded() { //под вопросом
+//        val currentUser = userRepository.observeAuthState().value
+//
+//        if (currentUser != null) {
+//            CoroutineScope(Dispatchers.IO).launch {
+//                try {
+//                    userRepository.syncUserSettings()
+//                } catch (e: Exception) {
+//                    e.printStackTrace()
+//                }
+//            }
+//        }
+//    }
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
