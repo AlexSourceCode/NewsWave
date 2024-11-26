@@ -173,8 +173,11 @@ class TopNewsFragment : Fragment() {
 
                             when(uiState.message){
                                 "No Internet connection" -> {
+                                    if (adapter.currentList.isEmpty()){
+                                        binding.tvRetry.visibility = View.VISIBLE
+
+                                    }
                                     showToast()
-                                    binding.tvRetry.visibility = View.VISIBLE
                                     binding.tvRetry.setOnClickListener {
                                         viewModel.refreshData() // Функция повторного запроса данных
                                     }
@@ -258,7 +261,7 @@ class TopNewsFragment : Fragment() {
         Toast.makeText(
             requireContext(),
             requireActivity().getString(R.string.error_load_data),
-            Toast.LENGTH_LONG
+            Toast.LENGTH_SHORT
         ).show()
     }
 

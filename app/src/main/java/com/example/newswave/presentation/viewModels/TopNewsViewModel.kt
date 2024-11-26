@@ -116,10 +116,10 @@ class TopNewsViewModel @Inject constructor(
                 .collect {
                     Log.d("CheckErrorMessage", "execute fetchErrorLoadData")
                     _uiState.value = NewsState.Error(it) // дважды одно и тоже значение
-                    val savedNews = getTopNews()
-                    if (!savedNews.isNullOrEmpty()){
-                        _uiState.value = NewsState.Success(savedNews)
-                    }
+//                    val savedNews = getTopNews()
+//                    if (!savedNews.isNullOrEmpty()){
+//                        _uiState.value = NewsState.Success(savedNews)
+//                    }
                 }
         }
     }

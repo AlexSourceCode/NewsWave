@@ -379,6 +379,11 @@ class SettingsFragment : Fragment() {
             launchSignInFragment()
         }
 
+        binding.tvChangePassword.setOnClickListener {
+            val email = binding.tvEmailValue.text.toString()
+            launchForgotPasswordFragment(email)
+        }
+
         binding.tvLogout.setOnClickListener {
             viewModel.signOut()
             applyLocaleChanges()
@@ -488,6 +493,12 @@ class SettingsFragment : Fragment() {
     private fun launchSignInFragment() {
         findNavController().navigate(
             SettingsFragmentDirections.actionSettingsFragmentToLoginFragment()
+        )
+    }
+
+    private fun launchForgotPasswordFragment(email: String) {
+        findNavController().navigate(
+            SettingsFragmentDirections.actionSettingsFragmentToForgotPasswordFragment(email)
         )
     }
 

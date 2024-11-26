@@ -42,7 +42,7 @@
     <string name="sign_up">Зарегистрироваться</string>
     <string name="already_registered_text">У вас уже есть учетная запись</string>
     <string name="reset_password_hint">Введите адрес электронной почты, на который будет отправлено письмо для сброса пароля</string>
-    <string name="reset_password">Сбросить пароль</string>
+    <string name="change_password">Изменить пароль</string>
     <string name="subscription_prompt_message">Хотите подписаться на этот канал?</string>
     <string name="sign_in_required_message">Хотите подписаться на этот канал?</string>
     <string name="cancel">Отмена</string>

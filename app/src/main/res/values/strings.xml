@@ -46,7 +46,7 @@
     <string name="sign_up">Sign up</string>
     <string name="already_registered_text">Already have an account,</string>
     <string name="reset_password_hint">Enter the email address to which the password reset email will be sent</string>
-    <string name="reset_password">Reset password</string>
+    <string name="change_password">Change password</string>
     <string name="subscription_prompt_message">Want to subscribe to this channel?</string>
     <string name="sign_in_required_message">Sign in to subscribe to this channel</string>
     <string name="cancel">Cancel</string>

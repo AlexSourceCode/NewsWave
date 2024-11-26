@@ -201,7 +201,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-medium"
-                        android:text="@string/country_of_news_source"
+                        android:text="@string/email"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
 
@@ -221,12 +221,13 @@
                     android:background="@color/black" />
 
                 <TextView
+                    android:id="@+id/tvChangePassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
                     android:textSize="16sp"
                     android:padding="16dp"
-                    android:text="@string/reset_password"
+                    android:text="@string/change_password"
                     android:textColor="@color/black" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
