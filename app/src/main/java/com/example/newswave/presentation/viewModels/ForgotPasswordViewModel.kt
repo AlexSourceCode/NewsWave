@@ -35,11 +35,11 @@ class ForgotPasswordViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch {
-            fetchErrorAuthUseCase().collect{
-                _error.emit(it)
-            }
-        }
+//        viewModelScope.launch {
+//            fetchErrorAuthUseCase().collect{
+//                _error.emit(it)
+//            }
+//        }
         viewModelScope.launch {
             fetchIsSuccessAuthUseCase().collect{
                 _isSuccess.emit(it)

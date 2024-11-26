@@ -66,11 +66,13 @@ class UserRepositoryImpl @Inject constructor(
         auth.sendPasswordResetEmail(email)
             .addOnSuccessListener {
                 ioScope.launch {
+                    Log.d("CheckErrorState", "success execute from UserRepositoryImpl")
                     _isSuccess.emit(true)
                 }
             }
             .addOnFailureListener { error ->
                 ioScope.launch {
+                    Log.d("CheckErrorState", "failed execute from UserRepositoryImpl")
                     _error.emit(error.message.toString())
                 }
             }
@@ -82,6 +84,7 @@ class UserRepositoryImpl @Inject constructor(
             .addOnSuccessListener {}
             .addOnFailureListener { error ->
                 ioScope.launch {
+                    Log.d("CheckErrorState", " execute from signInByEmailImpl")
                     _error.emit(error.message.toString())
                 }
             }
@@ -124,6 +127,7 @@ class UserRepositoryImpl @Inject constructor(
             }
             .addOnFailureListener { error ->
                 ioScope.launch {
+                    Log.d("CheckErrorState", " execute from signUpByEmail Impl")
                     _error.emit(error.message.toString())
                 }
             }

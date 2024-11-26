@@ -76,13 +76,17 @@ class SignInFragment : Fragment() {
                 viewModel.signIn(email, password)
                 sessionViewModel.notifyRefreshRequired()
             } else {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.please_fill_in_all_the_fields), Toast.LENGTH_LONG
-                )
-                    .show()
+                showToast(getString(R.string.please_fill_in_all_the_fields))
             }
         }
+    }
+
+    private fun showToast(message: String){
+        Toast.makeText(
+            requireContext(),
+            message,
+            Toast.LENGTH_LONG
+        ).show()
     }
 
     private fun isFieldNotEmpty(email: String, password: String): Boolean {
@@ -100,10 +104,10 @@ class SignInFragment : Fragment() {
             }
         }
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.error.collect { errorMessage ->
-                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG)
-                        .show()
+                    Log.d("CheckErrorState", "execute from SignInFragment")
+                    showToast(errorMessage)
                 }
             }
         }

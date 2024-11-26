@@ -1,5 +1,6 @@
 package com.example.newswave.presentation.viewModels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.domain.usecases.FetchErrorAuthUseCase
@@ -47,6 +48,7 @@ class SignInViewModel @Inject constructor(
         observeAuthState()
         viewModelScope.launch {
             fetchErrorAuthUseCase().collect{
+                Log.d("CheckErrorState", " execute from SignInViewModel")
                 _error.emit(it)
             }
         }

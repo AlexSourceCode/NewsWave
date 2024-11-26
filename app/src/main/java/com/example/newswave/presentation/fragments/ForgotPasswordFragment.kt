@@ -3,6 +3,7 @@ package com.example.newswave.presentation.fragments
 import android.content.Context
 import androidx.fragment.app.viewModels
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -61,11 +62,8 @@ class ForgotPasswordFragment : Fragment() {
             if (isFieldNotEmpty(email)) {
                 viewModel.resetPassword(email)
             } else {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.please_enter_your_email), Toast.LENGTH_LONG
-                ).show()
-
+                Log.d("CheckErrorState", "execute from ForgotPassword")
+                showToast(getString(R.string.please_enter_your_email))
             }
         }
     }
@@ -79,11 +77,7 @@ class ForgotPasswordFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.isSuccess.collect { success ->
                     if (success) {
-                        Toast.makeText(
-                            requireContext(),
-                            "The reset link has been successfully sent",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        showToast("The reset link has been successfully sent")
                         findNavController().popBackStack()
                     }
                 }
@@ -95,6 +89,14 @@ class ForgotPasswordFragment : Fragment() {
 //            }
 //        }
 
+    }
+
+    private fun showToast(message: String){
+        Toast.makeText(
+            requireContext(),
+            message,
+            Toast.LENGTH_LONG
+        ).show()
     }
 
 }

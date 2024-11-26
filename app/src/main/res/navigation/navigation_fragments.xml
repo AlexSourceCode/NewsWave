@@ -113,7 +113,8 @@
             app:popUpTo="@id/loginFragment" />
         <action
             android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
-            app:destination="@id/forgotPasswordFragment" />
+            app:destination="@id/forgotPasswordFragment"
+            app:launchSingleTop="false" />
     </fragment>
     <fragment
         android:id="@+id/registrationFragment"
