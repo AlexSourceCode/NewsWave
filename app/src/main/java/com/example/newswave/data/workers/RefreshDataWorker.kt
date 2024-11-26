@@ -47,11 +47,6 @@ class RefreshDataWorker(
 
     override suspend fun doWork(): Result {
         return try {
-//            Log.d("CheckErrorMessage", "before conditions from dowork")
-//            if (!isNetworkAvailable(context)) {
-//                Log.d("CheckErrorMessage", "execute conditions from dowork")
-//                throw Exception("No Internet connection")
-//            }
             loadData()
             Result.success()
         } catch (e: Exception) {

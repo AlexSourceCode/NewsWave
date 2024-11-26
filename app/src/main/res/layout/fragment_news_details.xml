@@ -71,9 +71,6 @@
                     android:text="@string/subscribe"
                     android:textAllCaps="false" />
 
-                <View
-                    android:layout_width="43dp"
-                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
