@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -25,11 +26,13 @@ import com.example.newswave.domain.model.NewsState
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.adapters.NewsListAdapter
 import com.example.newswave.presentation.viewModels.SavedStateViewModelFactory
+import com.example.newswave.presentation.viewModels.SessionViewModel
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.Filter
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -42,12 +45,11 @@ class TopNewsFragment : Fragment() {
     private lateinit var adapter: NewsListAdapter
 
     private lateinit var viewModel: TopNewsViewModel
+    private val sessionViewModel: SessionViewModel by activityViewModels { viewModelFactory }
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-//    @Inject
-//    lateinit var viewModelFactory: SavedStateViewModelFactory
 
     private val component by lazy {
         (requireActivity().application as NewsApp).component
@@ -83,6 +85,10 @@ class TopNewsFragment : Fragment() {
         handleBackNavigation()      // Обработка нажатия кнопки "Назад"
         setOnClickListener()        // Установка слушателей нажатий
         setupSwipeRefresh()         // Обновление данных при свайпе вниз
+        parentFragmentManager.setFragmentResultListener("refresh_request", this) { _, _ ->
+            Log.d("TopNewsFragmentState", "execute")
+            viewModel.refreshData() // Повторный запрос данных
+        }
     }
 
     private fun setOnClickListener() {
@@ -180,7 +186,8 @@ class TopNewsFragment : Fragment() {
                         }
 
                         is NewsState.Success -> {
-                            Log.d("StateUiState", "Success")
+//                            Log.d("StateUiState", "Success")
+//                            Log.d("StateUiState", uiState.currentList.get(0).title.toString())
                             binding.pgNews.visibility = View.GONE
                             binding.tvRetry.visibility = View.GONE
                             if (!adapter.shouldHideRetryButton) {
@@ -200,6 +207,13 @@ class TopNewsFragment : Fragment() {
                             }
                         }
                     }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED){
+                sessionViewModel.refreshEvent.collect{
+                        viewModel.refreshData()
                 }
             }
         }

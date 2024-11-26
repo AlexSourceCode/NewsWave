@@ -336,7 +336,6 @@ class SettingsFragment : Fragment() {
             selectedLanguage?.let {
                 val languageCode = getLanguageCode(it, languageContentLanguage)
                 viewModel.saveContentLanguage(languageCode)
-
                 applyLocaleChanges()
 
             }
@@ -382,12 +381,12 @@ class SettingsFragment : Fragment() {
 
         binding.tvLogout.setOnClickListener {
             viewModel.signOut()
+            applyLocaleChanges()
         }
 
 
         binding.llContentLanguage.setOnClickListener {
             val languageName = binding.tvContentLanguageValue.text.toString()
-//            val languageName = getLanguageName(languageCode, languageContentLanguage)
             showLanguagePopup(LanguageOption.CONTENT_LANGUAGE, languageName)
         }
         binding.llInterfaceLanguage.setOnClickListener {
@@ -404,7 +403,6 @@ class SettingsFragment : Fragment() {
         }
         binding.llNewsSourceCountry.setOnClickListener {
             val languageName = binding.tvNewsSourceCountryValue.text.toString()
-//            val languageName = getLanguageName(languageCode, languageSourceCountry)
             showLanguagePopup(LanguageOption.NEWS_SOURCE_COUNTRY, languageName)
         }
     }
@@ -483,6 +481,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun applyLocaleChanges() {
+        parentFragmentManager.setFragmentResult("refresh_request", Bundle.EMPTY)
         requireActivity().recreate() // Перезапускает Activity, сохраняя состояние фрагментов.
     }
 

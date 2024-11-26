@@ -127,6 +127,7 @@ class TopNewsViewModel @Inject constructor(
             try {
                 fetchTopNewsListUseCase()
                     .collect { news ->
+                        Log.d("fetchTopNewsListUseCase",  news.toString())
                         if (news.isEmpty()) _uiState.value = NewsState.Loading
                         else {
                             _uiState.value = NewsState.Success(news)

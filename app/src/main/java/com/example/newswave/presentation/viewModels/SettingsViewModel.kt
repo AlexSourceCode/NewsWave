@@ -85,7 +85,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun initContentLanguage() {
         viewModelScope.launch {
-            getContentLanguageUseCase().collect{
+            getContentLanguageUseCase().collect {
                 _contentLanguage.value = it
             }
         }
@@ -101,7 +101,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun initSourceCountry() {
         viewModelScope.launch {
-            getSourceCountryUseCase().collect{
+            getSourceCountryUseCase().collect {
                 _sourceCountry.value = it
             }
         }

@@ -26,6 +26,8 @@ interface UserRepository {
 
     fun getContentLanguage(): String
 
+    fun isUserDataUpdated(): StateFlow<Boolean>
+
     fun saveContentLanguage(language: String)
 
     fun getSourceCountry(): String

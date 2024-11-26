@@ -11,6 +11,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.example.newswave.data.database.dbNews.NewsDao
 import com.example.newswave.data.database.dbNews.NewsDb
+import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.mapper.flattenToList
 import com.example.newswave.data.network.api.ApiFactory
@@ -37,9 +38,9 @@ class RefreshDataWorker(
     private var workerParameters: WorkerParameters,
     private val apiService: ApiService,
     private val newsInfoDao: NewsDao,
-    private val mapper: NewsMapper
+    private val mapper: NewsMapper,
+    private val userPreferences: UserPreferences
 ) : CoroutineWorker(context, workerParameters) {
-
 
 
     override suspend fun doWork(): Result {
@@ -53,27 +54,56 @@ class RefreshDataWorker(
     }
 
 
-
     private suspend fun loadData() {
         var date = DateUtils.formatCurrentDate()
+        val country = userPreferences.getSourceCountry()
+        val language = userPreferences.getContentLanguage()
+        Log.d("loadDataStateArgs", country)
+        Log.d("loadDataStateArgs", language)
+
+
         val jsonContainer: Flow<TopNewsResponseDto> = flow {
-            while (true){
-                val response = apiService.getNewsByDate(date = date).first()
+                val response = apiService.getListTopNews(
+                    sourceCountry = country,
+                    language = language,
+                    date = "2024-11-24"
+                ).first()
                 if (response.news.isNotEmpty()) {
                     emit(response)
-                    break
                 }
                 date = DateUtils.formatDateToYesterday()
-            }
+
         }
         jsonContainer
             .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
             .flatMapConcat { newsList -> flow { emit(newsList.map { mapper.mapDtoToDbModel(it) }) } }
-            .map { it.distinctBy { it.title } }
+            .map { it.distinctBy {
+//                Log.d("loadDataStateArgs", it.title.toString())
+
+                it.title }
+            }
             .collect { news -> newsInfoDao.insertNews(news) }
+
+//        val jsonContainer: Flow<TopNewsResponseDto> = flow {
+//            while (true) {
+//                val response = apiService.getListTopNews(
+//                    sourceCountry = country,
+//                    language = language,
+//                    date = date
+//                ).first()
+//                if (response.news.isNotEmpty()) {
+//                    emit(response)
+//                    break
+//                }
+//                date = DateUtils.formatDateToYesterday()
+//            }
+//        }
+//        jsonContainer
+//            .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
+//            .flatMapConcat { newsList -> flow { emit(newsList.map { mapper.mapDtoToDbModel(it) }) } }
+//            .map { it.distinctBy { it.title } }
+//            .collect { news -> newsInfoDao.insertNews(news) }
     }
-
-
 
 
     companion object {

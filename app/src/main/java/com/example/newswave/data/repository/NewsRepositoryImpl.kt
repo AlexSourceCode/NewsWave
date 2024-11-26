@@ -8,6 +8,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import retrofit2.HttpException
 import com.example.newswave.data.database.dbNews.NewsDao
+import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.mapper.flattenToList
 import com.example.newswave.data.network.api.ApiService
@@ -53,6 +54,7 @@ class NewsRepositoryImpl @Inject constructor(
     private val newsDao: NewsDao,
     private val mapper: NewsMapper,
     private val apiService: ApiService,
+    private val userPreferences: UserPreferences
 ) : NewsRepository {
 
 
@@ -74,6 +76,7 @@ class NewsRepositoryImpl @Inject constructor(
     val fetchTopNewsListFlow = newsDao.getNewsList()
         .flatMapConcat { newsList ->
             flow {
+//                Log.d("fetchTopNewsListUseCase",  newsList.get(0).title.toString())
                 emit(newsList.map { mapper.mapDbModelToEntity(it) })
             }
         }.stateIn(
@@ -83,7 +86,7 @@ class NewsRepositoryImpl @Inject constructor(
         )
 
 
-    override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> =fetchTopNewsListFlow
+    override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> = fetchTopNewsListFlow
 
 
     override suspend fun loadData() {
@@ -136,7 +139,11 @@ class NewsRepositoryImpl @Inject constructor(
 
     @SuppressLint("NewApi")
     override suspend fun loadNewsForPreviousDay() {
+
         ioScope.launch {
+            val country = userPreferences.getSourceCountry()
+            val language = userPreferences.getContentLanguage()
+
             currentEndDate = currentEndDate.minusDays(1)
             val previousDate = currentEndDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
@@ -145,7 +152,11 @@ class NewsRepositoryImpl @Inject constructor(
                 return@launch
             }
             try {
-                apiService.getListTopNews(date = previousDate)
+                apiService.getListTopNews(
+                    sourceCountry = country,
+                    language = language,
+                    date = previousDate
+                )
                     .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }//преобразование в List<NewsItemDto>
                     .flatMapConcat { newList ->
                         flow {
@@ -177,7 +188,13 @@ class NewsRepositoryImpl @Inject constructor(
 
     private suspend fun getNewsByText(text: String): Flow<List<NewsItemDto>> {
         try {
-            return apiService.getNewsByText(text = text).map { it.news }
+            val country = userPreferences.getSourceCountry()
+            val language = userPreferences.getContentLanguage()
+
+            return apiService.getNewsByText(
+                sourceCountry = country,
+                language = language,
+                text = text).map { it.news }
         } catch (e: Exception) {
             _errorLoadData.emit("Error loading news by text: ${e.message}")
             return flow { emptyList<NewsItemDto>() }
@@ -186,7 +203,14 @@ class NewsRepositoryImpl @Inject constructor(
 
     private suspend fun getNewsByAuthor(author: String): Flow<List<NewsItemDto>> {
         try {
-            return apiService.getNewsByAuthor(author = author).map { it.news }
+            val country = userPreferences.getSourceCountry()
+            val language = userPreferences.getContentLanguage()
+
+            return apiService.getNewsByAuthor(
+                sourceCountry = country,
+                language = language,
+                author = author)
+                .map { it.news }
         } catch (e: Exception) {
             _errorLoadData.emit("Error loading news by text: ${e.message}")
             return flow { emptyList<NewsItemDto>() }
@@ -195,7 +219,13 @@ class NewsRepositoryImpl @Inject constructor(
 
     private suspend fun getNewsByDate(date: String): Flow<List<NewsItemDto>> {
         try {
-            return apiService.getNewsByDate(date = date)
+            val country = userPreferences.getSourceCountry()
+            val language = userPreferences.getContentLanguage()
+
+            return apiService.getNewsByDate(
+                sourceCountry = country,
+                language = language,
+                date = date)
                 .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
         } catch (e: Exception) {
             _errorLoadData.emit("Error loading news by text: ${e.message}")

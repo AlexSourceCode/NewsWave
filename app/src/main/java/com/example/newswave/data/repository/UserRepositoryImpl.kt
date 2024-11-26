@@ -2,6 +2,7 @@ package com.example.newswave.data.repository
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.example.newswave.data.database.dbNews.NewsDao
 import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.domain.entity.AuthorItemEntity
 import com.example.newswave.domain.entity.UserEntity
@@ -22,12 +23,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val dataBase: FirebaseDatabase,
     private val userPreferences: UserPreferences,
+    private val newsDao: NewsDao
 ) : UserRepository {
 
     private val usersReference = dataBase.getReference("Users")
@@ -51,6 +54,9 @@ class UserRepositoryImpl @Inject constructor(
 
     private val _sourceCountry = MutableStateFlow<String>(getSourceCountry())
     val sourceCountry: StateFlow<String> = _sourceCountry
+
+    private val _isUserDataUpdatedFlow = MutableStateFlow(false)
+    val isUserDataUpdatedFlow: StateFlow<Boolean> = _isUserDataUpdatedFlow
 
     companion object {
         private const val DEFAULT_LANGUAGE = "ru"
@@ -169,9 +175,20 @@ class UserRepositoryImpl @Inject constructor(
         return content
     }
 
+    override fun isUserDataUpdated(): StateFlow<Boolean> {
+        return isUserDataUpdatedFlow
+    }
+
     override fun saveContentLanguage(language: String) {
         _contentLanguage.value = language
         userPreferences.saveContentLanguage(language)
+        ioScope.launch {
+            try {
+                newsDao.deleteAllNews()
+            } catch (e: Exception) {
+                Log.e("DatabaseOperation", "Ошибка при очистке базы данных: ${e.message}", e)
+            }
+        }
 
         val currentUser = auth.currentUser
         if (currentUser != null) {
@@ -202,6 +219,13 @@ class UserRepositoryImpl @Inject constructor(
     override fun saveSourceCountry(country: String) {
         _sourceCountry.value = country
         userPreferences.saveSourceCountry(country)
+        ioScope.launch {
+            try {
+                newsDao.deleteAllNews()
+            } catch (e: Exception) {
+                Log.e("DatabaseOperation", "Ошибка при очистке базы данных: ${e.message}", e)
+            }
+        }
 
         val currentUser = auth.currentUser
         if (currentUser != null) {
@@ -266,13 +290,20 @@ class UserRepositoryImpl @Inject constructor(
                         override fun onDataChange(snapshot: DataSnapshot) {
                             val userData =
                                 snapshot.getValue<UserEntity>() as UserEntity
+                            ioScope.launch {
+                                newsDao.deleteAllNews()
+                            }
+                            userPreferences.saveContentLanguage(userData.newsContent)
+                            userPreferences.saveSourceCountry(userData.newsSourceCountry)
                             _userData.value = userData
                             userPreferences.saveUserData(userData)
                             _contentLanguage.value = userData.newsContent
                             _sourceCountry.value = userData.newsSourceCountry
-                            userPreferences.saveContentLanguage(userData.newsContent)
+
+                            _isUserDataUpdatedFlow.value = true // Уведомляем, что данные обновлены
+
+
                             Log.d("CheckChangedUserData", "AfterSaveContent ${getContentLanguage()}")
-                            userPreferences.saveSourceCountry(userData.newsSourceCountry)
                             Log.d("CheckChangedUserData", "content ${_contentLanguage.value} \n ${_sourceCountry.value}")
                         }
 

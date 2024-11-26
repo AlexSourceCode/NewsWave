@@ -16,6 +16,7 @@ abstract class NewsDb : RoomDatabase() {
         private var db: NewsDb? = null
         private const val DB_NAME = "news.db"
 
+
         fun getInstance(context: Context): NewsDb {
             synchronized(LOCK) {
                 db?.let { return it }

@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -22,6 +23,8 @@ import com.example.newswave.app.NewsApp
 import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.databinding.ActivityMainBinding
 import com.example.newswave.presentation.fragments.TopNewsFragment
+import com.example.newswave.presentation.viewModels.SessionViewModel
+import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.LocaleHelper
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarMenuView
@@ -35,6 +38,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
 //    private var backPressedOnce = false
 //    private val backPressHandler = Handler(Looper.getMainLooper())
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val sessionViewModel: SessionViewModel by viewModels { viewModelFactory }
+
 
     private val component by lazy {
         (application as NewsApp).component

@@ -73,7 +73,6 @@ class UserPreferences(private val context: Context) {
     }
 
     fun saveContentLanguage(language: String) { // Изменяет текущий язык
-        Log.d("CheckChangedUserData", "ExecuteChangeContentFromUserPreference: language $language")
         editor.putString(KEY_CONTENT_LANGUAGE, language)
         editor.apply()
     }

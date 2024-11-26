@@ -13,6 +13,7 @@ import com.example.newswave.presentation.viewModels.ForgotPasswordViewModel
 import com.example.newswave.presentation.viewModels.SignInViewModel
 import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.RegistrationViewModel
+import com.example.newswave.presentation.viewModels.SessionViewModel
 import com.example.newswave.presentation.viewModels.SettingsViewModel
 import com.example.newswave.presentation.viewModels.SubscribedAuthorsViewModel
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
@@ -64,6 +65,12 @@ interface ViewModelModule {
     @IntoMap
     @ViewModelKey(SettingsViewModel::class)
     fun bindSettingsViewModel(viewModel: SettingsViewModel):ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(SessionViewModel::class)
+    fun bindSessionViewModel(viewModel: SessionViewModel):ViewModel
+
 
     @Binds
     abstract fun bindViewModelFactory(factory: SavedStateViewModelFactory): ViewModelProvider.Factory

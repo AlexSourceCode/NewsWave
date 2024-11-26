@@ -2,11 +2,13 @@ package com.example.newswave.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -15,11 +17,13 @@ import androidx.navigation.fragment.findNavController
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentSignInBinding
+import com.example.newswave.presentation.viewModels.SessionViewModel
 import com.example.newswave.presentation.viewModels.SignInViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,6 +32,7 @@ class SignInFragment : Fragment() {
 
     private lateinit var binding: FragmentSignInBinding
     private lateinit var viewModel: SignInViewModel
+    private val sessionViewModel: SessionViewModel by activityViewModels { viewModelFactory }
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -69,6 +74,7 @@ class SignInFragment : Fragment() {
             val password = binding.etPassword.text.toString().trim()
             if (isFieldNotEmpty(email, password)) {
                 viewModel.signIn(email, password)
+                sessionViewModel.notifyRefreshRequired()
             } else {
                 Toast.makeText(
                     requireContext(),
