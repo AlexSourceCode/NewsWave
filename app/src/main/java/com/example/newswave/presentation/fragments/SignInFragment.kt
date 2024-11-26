@@ -102,7 +102,7 @@ class SignInFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.error.collect { errorMessage ->
-                    Toast.makeText(requireActivity().application, errorMessage, Toast.LENGTH_LONG)
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG)
                         .show()
                 }
             }

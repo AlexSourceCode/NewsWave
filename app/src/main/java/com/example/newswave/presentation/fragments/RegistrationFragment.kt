@@ -3,6 +3,8 @@ package com.example.newswave.presentation.fragments
 import android.content.Context
 import androidx.fragment.app.viewModels
 import android.os.Bundle
+import android.util.Log
+import android.util.Patterns
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -68,14 +70,11 @@ class RegistrationFragment : Fragment() {
                 }
             }
         }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.error.collect { errorMessage ->
-                    Toast.makeText(requireActivity().application, errorMessage, Toast.LENGTH_LONG)
-                        .show()
-                }
-            }
-        }
+//        lifecycleScope.launch {
+//            repeatOnLifecycle(Lifecycle.State.CREATED) {
+//                viewModel.error.collect()
+//            }
+//        }
     }
 
     private fun setupOnClickListener() {
@@ -90,30 +89,54 @@ class RegistrationFragment : Fragment() {
             val firstName = binding.etFirstName.text.toString().trim()
             val lastName = binding.etLastName.text.toString().trim()
 
-            if (isFieldNotEmpty(username, email, password, firstName, lastName)){
+
+            if (validateInputFields(username, email, password, firstName, lastName)) {
                 viewModel.signUp(username, email, password, firstName, lastName)
-            } else{
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.please_fill_in_all_the_fields), Toast.LENGTH_LONG
-                )
-                    .show()
             }
         }
     }
 
-    private fun isFieldNotEmpty(
+    private fun validateInputFields(
         username: String,
         email: String,
         password: String,
         firstName: String,
         lastName: String
     ): Boolean {
-        return email.isNotEmpty() &&
-                username.isNotEmpty() &&
-                password.isNotEmpty() &&
-                firstName.isNotEmpty() &&
-                lastName.isNotEmpty()
+        if (username.length < 3 || username.length > 20) {
+            showToast(getString(R.string.invalid_username_length))
+            return false
+        }
+
+        // Проверка формата email
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            showToast(getString(R.string.invalid_email_format))
+            return false
+        }
+
+        if (password.isEmpty()) {
+            showToast(getString(R.string.invalid_password_length))
+            return false
+        }
+
+        // Проверка длины имени
+        if (firstName.length < 2 || firstName.length > 20) {
+            showToast(getString(R.string.invalid_first_name_length))
+            return false
+        }
+
+        // Проверка длины фамилии
+        if (lastName.length < 2 || lastName.length > 20) {
+            showToast(getString(R.string.invalid_last_name_length))
+            return false
+        }
+
+        return true
+    }
+
+    private fun showToast(message: String) {
+        Log.d("CheckCalledCount", "flag showToast: ")
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
 
 

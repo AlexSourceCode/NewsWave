@@ -60,6 +60,13 @@
     <string name="country_of_news_source">Country of news source</string>
     <string name="interface_language">Interface language</string>
 
+    <string name="invalid_username_length" translatable="false">Username must be between 3 and 20 characters long</string>
+    <string name="invalid_email_format" translatable="false">Invalid email format</string>
+    <string name="invalid_password_length" translatable="false">The given password is invalid. [ Password should be at least 6 characters ]</string>
+    <string name="invalid_first_name_length" translatable="false">First name must be between 2 and 20 characters long</string>
+    <string name="invalid_last_name_length" translatable="false">Last name must be between 2 and 20 characters long</string>
+
+
     <string name="system">Match system language</string>
     <string name="sign_out">Sign out</string>
     <string name="no_news_for_criteria">No news found for the selected search criteria. Please try adjusting the country or language settings</string>

@@ -80,7 +80,7 @@ class ForgotPasswordFragment : Fragment() {
                 viewModel.isSuccess.collect { success ->
                     if (success) {
                         Toast.makeText(
-                            requireActivity().application,
+                            requireContext(),
                             "The reset link has been successfully sent",
                             Toast.LENGTH_LONG
                         ).show()
@@ -89,14 +89,11 @@ class ForgotPasswordFragment : Fragment() {
                 }
             }
         }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.error.collect { errorMessage ->
-                    Toast.makeText(requireActivity().application, errorMessage, Toast.LENGTH_LONG)
-                        .show()
-                }
-            }
-        }
+//        lifecycleScope.launch {
+//            repeatOnLifecycle(Lifecycle.State.CREATED) {
+//                viewModel.error.collect()
+//            }
+//        }
 
     }
 

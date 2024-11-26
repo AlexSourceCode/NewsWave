@@ -427,7 +427,12 @@ class SettingsFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.userData.collect { user ->
                     if (user != null) {
-                        binding.tvName.text = "${user.firstName} ${user.lastName}"
+                        val fullName = "${user.firstName} ${user.lastName}"
+                        if (fullName.length > 20) {
+                            binding.tvName.text = "${user.firstName}\n${user.lastName}"
+                        } else{
+                            binding.tvName.text = fullName
+                        }
                         binding.tvEmailValue.text = user.email
                         binding.tvUsername.text = user.username
                     }
