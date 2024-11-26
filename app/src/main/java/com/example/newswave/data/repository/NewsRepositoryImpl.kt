@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
@@ -76,7 +77,6 @@ class NewsRepositoryImpl @Inject constructor(
     val fetchTopNewsListFlow = newsDao.getNewsList()
         .flatMapConcat { newsList ->
             flow {
-//                Log.d("fetchTopNewsListUseCase",  newsList.get(0).title.toString())
                 emit(newsList.map { mapper.mapDbModelToEntity(it) })
             }
         }.stateIn(
@@ -90,6 +90,8 @@ class NewsRepositoryImpl @Inject constructor(
 
 
     override suspend fun loadData() {
+        Log.d("CheckErrorMessage", "execute funloaddata")
+
         val workManager =
             WorkManager.getInstance(application.applicationContext)     // Получаем экземпляр WorkManager для управления задачами
         val workRequest =
@@ -111,14 +113,17 @@ class NewsRepositoryImpl @Inject constructor(
                                 WorkInfo.State.ENQUEUED -> {
                                     if (!isNetworkAvailable(application)) {
                                         _errorLoadData.emit("No Internet connection")
+                                        cancel()
                                     }
                                 }
 
                                 WorkInfo.State.FAILED -> {
+                                    Log.d("CheckErrorMessage", "execute loadata implweknfwejknfjkwenjkf")
                                     val error = workInfo.outputData.getString("error")
                                     if (error != null) {
                                         _errorLoadData.emit(error)
                                     }
+                                    cancel()
                                 }
 
                                 WorkInfo.State.SUCCEEDED -> {

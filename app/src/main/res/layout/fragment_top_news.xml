@@ -91,6 +91,20 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <TextView
+        android:id="@+id/tvErrorAvailableNews"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="@string/no_news_for_criteria"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingStart="34dp"
+        android:paddingEnd="34dp"
+        android:textColor="#7F7F7F"
+        android:textSize="16sp" />
+
     <ProgressBar
         android:id="@+id/pgNews"
         android:layout_width="wrap_content"

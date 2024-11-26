@@ -99,6 +99,7 @@ class TopNewsViewModel @Inject constructor(
 
     fun refreshData() {
         viewModelScope.launch {
+            _uiState.value = NewsState.Loading
             loadDataUseCase()
         }
     }
@@ -113,6 +114,7 @@ class TopNewsViewModel @Inject constructor(
         viewModelScope.launch {
             fetchErrorLoadDataUseCase()
                 .collect {
+                    Log.d("CheckErrorMessage", "execute fetchErrorLoadData")
                     _uiState.value = NewsState.Error(it) // дважды одно и тоже значение
                     val savedNews = getTopNews()
                     if (!savedNews.isNullOrEmpty()){

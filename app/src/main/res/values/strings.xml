@@ -62,6 +62,7 @@
 
     <string name="system">Match system language</string>
     <string name="sign_out">Sign out</string>
+    <string name="no_news_for_criteria">No news found for the selected search criteria. Please try adjusting the country or language settings</string>
 
     <string-array name="languages_interface_array">
         <item>Match system language</item>

@@ -19,12 +19,14 @@ import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.network.model.TopNewsResponseDto
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.utils.DateUtils
+import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -34,7 +36,7 @@ import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.launch
 
 class RefreshDataWorker(
-    context: Context,
+    private val context: Context,
     private var workerParameters: WorkerParameters,
     private val apiService: ApiService,
     private val newsInfoDao: NewsDao,
@@ -45,6 +47,11 @@ class RefreshDataWorker(
 
     override suspend fun doWork(): Result {
         return try {
+//            Log.d("CheckErrorMessage", "before conditions from dowork")
+//            if (!isNetworkAvailable(context)) {
+//                Log.d("CheckErrorMessage", "execute conditions from dowork")
+//                throw Exception("No Internet connection")
+//            }
             loadData()
             Result.success()
         } catch (e: Exception) {
@@ -55,6 +62,7 @@ class RefreshDataWorker(
 
 
     private suspend fun loadData() {
+        Log.d("CheckErrorMessage", "execute loadData from dowork")
         var date = DateUtils.formatCurrentDate()
         val country = userPreferences.getSourceCountry()
         val language = userPreferences.getContentLanguage()
@@ -63,46 +71,33 @@ class RefreshDataWorker(
 
 
         val jsonContainer: Flow<TopNewsResponseDto> = flow {
+            for (attempt in 1..2) {
                 val response = apiService.getListTopNews(
                     sourceCountry = country,
                     language = language,
-                    date = "2024-11-24"
+                    date = date
                 ).first()
+
                 if (response.news.isNotEmpty()) {
                     emit(response)
+                    break
                 }
                 date = DateUtils.formatDateToYesterday()
-
+            }
         }
-        jsonContainer
+
+        val newsList = jsonContainer
             .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
             .flatMapConcat { newsList -> flow { emit(newsList.map { mapper.mapDtoToDbModel(it) }) } }
-            .map { it.distinctBy {
-//                Log.d("loadDataStateArgs", it.title.toString())
+            .map { it.distinctBy { it.title } }
+            .firstOrNull()
 
-                it.title }
-            }
-            .collect { news -> newsInfoDao.insertNews(news) }
+        if (newsList.isNullOrEmpty()) {
+            throw Exception("News list is empty or invalid parameters!") // Генерируем ошибку
+        }
 
-//        val jsonContainer: Flow<TopNewsResponseDto> = flow {
-//            while (true) {
-//                val response = apiService.getListTopNews(
-//                    sourceCountry = country,
-//                    language = language,
-//                    date = date
-//                ).first()
-//                if (response.news.isNotEmpty()) {
-//                    emit(response)
-//                    break
-//                }
-//                date = DateUtils.formatDateToYesterday()
-//            }
-//        }
-//        jsonContainer
-//            .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
-//            .flatMapConcat { newsList -> flow { emit(newsList.map { mapper.mapDtoToDbModel(it) }) } }
-//            .map { it.distinctBy { it.title } }
-//            .collect { news -> newsInfoDao.insertNews(news) }
+        newsInfoDao.insertNews(newsList)
+
     }
 
 
@@ -117,7 +112,7 @@ class RefreshDataWorker(
 
         private fun makeConstraints(): Constraints {
             return Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED) // как сделать так, чтобы запросы шли только если есть интернет
+//                .setRequiredNetworkType(NetworkType.CONNECTED) // как сделать так, чтобы запросы шли только если есть интернет
                 .build()
         }
     }

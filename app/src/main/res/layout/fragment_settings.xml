@@ -186,29 +186,33 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-
                 <LinearLayout
-                    android:id="@+id/tvUserData"
+                    android:id="@+id/llUserData"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="16dp"
-                        android:text="@string/email"
-                        android:textColor="@color/black" />
+                    android:orientation="vertical"
+                    android:paddingStart="12dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="8dp">
 
                     <TextView
                         android:id="@+id/tvEmail"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="end"
-                        android:padding="16dp"
-                        android:textColor="@color/black" />
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/country_of_news_source"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
 
+                    <TextView
+                        android:id="@+id/tvEmailValue"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:textColor="#F28A30"
+                        android:textSize="12sp"
+                        tools:text="lucik904@yandex.ru" />
                 </LinearLayout>
 
                 <View
@@ -219,6 +223,8 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="16sp"
                     android:padding="16dp"
                     android:text="@string/reset_password"
                     android:textColor="@color/black" />
@@ -234,7 +240,6 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:background="#363636"
-            android:visibility="gone"
             app:cardCornerRadius="8dp"
             app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
@@ -243,9 +248,10 @@
                 android:id="@+id/tvLogout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="16sp"
                 android:padding="16dp"
                 android:text="@string/sign_out"
-                android:textColor="@color/black" />
+                android:textColor="@android:color/holo_red_light" />
         </androidx.cardview.widget.CardView>
 
     </LinearLayout>

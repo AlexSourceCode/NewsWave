@@ -169,9 +169,29 @@ class TopNewsFragment : Fragment() {
                 viewModel.uiState.collect { uiState ->
                     when (uiState) {
                         is NewsState.Error -> {
-                            Log.d("StateUiState", uiState.toString())
-                            showToast()
                             binding.pgNews.visibility = View.GONE
+
+                            when(uiState.message){
+                                "No Internet connection" -> {
+                                    showToast()
+                                    binding.tvRetry.visibility = View.VISIBLE
+                                    binding.tvRetry.setOnClickListener {
+                                        viewModel.refreshData() // Функция повторного запроса данных
+                                    }
+                                }
+                                "News list is empty or invalid parameters!" -> {
+                                    binding.tvRetry.visibility = View.GONE
+                                    binding.tvErrorAvailableNews.visibility = View.VISIBLE
+                                }
+                                else -> { // Другие ошибки
+                                    showToast()
+                                    binding.tvRetry.visibility = View.VISIBLE
+                                    binding.tvRetry.setOnClickListener {
+                                        viewModel.refreshData()
+                                    }
+                                }
+                            }
+
                             if (isSearchNews == true) {
                                 Log.d("StateUiState", "isSearchNews")
                                 binding.tvRetry.visibility = View.VISIBLE
@@ -181,13 +201,14 @@ class TopNewsFragment : Fragment() {
 
                         is NewsState.Loading -> {
                             Log.d("StateUiState", uiState.toString())
+                            binding.tvErrorAvailableNews.visibility = View.GONE
                             binding.tvRetry.visibility = View.GONE
                             binding.pgNews.visibility = View.VISIBLE
                         }
 
                         is NewsState.Success -> {
-//                            Log.d("StateUiState", "Success")
-//                            Log.d("StateUiState", uiState.currentList.get(0).title.toString())
+                            Log.d("StateUiState", "Success")
+                            binding.tvErrorAvailableNews.visibility = View.GONE
                             binding.pgNews.visibility = View.GONE
                             binding.tvRetry.visibility = View.GONE
                             if (!adapter.shouldHideRetryButton) {

@@ -423,7 +423,7 @@ class SettingsFragment : Fragment() {
                 viewModel.userData.collect { user ->
                     if (user != null) {
                         binding.tvName.text = "${user.firstName} ${user.lastName}"
-                        binding.tvEmail.text = user.email
+                        binding.tvEmailValue.text = user.email
                         binding.tvUsername.text = user.username
                     }
                 }

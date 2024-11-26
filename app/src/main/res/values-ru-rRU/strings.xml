@@ -58,6 +58,7 @@
 
     <string name="system">Как в системе</string>
     <string name="sign_out">Выход</string>
+    <string name="no_news_for_criteria">Новости не найдены по выбранным критериям поиска. Попробуйте изменить настройки страны или языка</string>
 
 
     <string-array name="languages_interface_array">
