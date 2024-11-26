@@ -38,7 +38,11 @@ interface UserRepository {
 
     fun observeAuthState(): StateFlow<FirebaseUser?>
 
-    fun fetchErrorAuth(): SharedFlow<String>
+    fun fetchErrorSignIn(): SharedFlow<String>
+
+    fun fetchErrorSignUp(): SharedFlow<String>
+
+    fun fetchErrorForgotPassword(): SharedFlow<String>
 
     fun fetchUserData(): StateFlow<UserEntity?>
 

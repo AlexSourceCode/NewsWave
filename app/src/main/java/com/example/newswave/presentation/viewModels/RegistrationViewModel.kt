@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.domain.entity.UserEntity
-import com.example.newswave.domain.usecases.FetchErrorAuthUseCase
+import com.example.newswave.domain.usecases.FetchErrorSignUpUseCase
 import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
 import com.example.newswave.domain.usecases.SignUpByEmailUseCase
 import com.google.firebase.auth.FirebaseAuth
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class RegistrationViewModel @Inject constructor(
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
     private val signUpByEmailUseCase: SignUpByEmailUseCase,
-    private val fetchErrorAuthUseCase: FetchErrorAuthUseCase
+    private val fetchErrorSignUpUseCase: FetchErrorSignUpUseCase
 
 ) : ViewModel() {
 
@@ -54,7 +54,7 @@ class RegistrationViewModel @Inject constructor(
     init {
         observeAuthState()
         viewModelScope.launch {
-            fetchErrorAuthUseCase().collect{
+            fetchErrorSignUpUseCase().collect{
                 _error.emit(it)
             }
         }

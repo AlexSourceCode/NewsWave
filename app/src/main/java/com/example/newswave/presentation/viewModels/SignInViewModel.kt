@@ -3,7 +3,7 @@ package com.example.newswave.presentation.viewModels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.domain.usecases.FetchErrorAuthUseCase
+import com.example.newswave.domain.usecases.FetchErrorSignInUseCase
 import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
 import com.example.newswave.domain.usecases.SignInByEmailUseCase
 import com.google.firebase.auth.FirebaseAuth
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class SignInViewModel @Inject constructor(
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
     private val signInByEmailUseCase: SignInByEmailUseCase,
-    private val fetchErrorAuthUseCase: FetchErrorAuthUseCase
+    private val fetchErrorSignInUseCase: FetchErrorSignInUseCase
 ): ViewModel() {
 
     private var _error = MutableSharedFlow<String>()
@@ -47,7 +47,7 @@ class SignInViewModel @Inject constructor(
     init {
         observeAuthState()
         viewModelScope.launch {
-            fetchErrorAuthUseCase().collect{
+            fetchErrorSignInUseCase().collect{
                 Log.d("CheckErrorState", " execute from SignInViewModel")
                 _error.emit(it)
             }

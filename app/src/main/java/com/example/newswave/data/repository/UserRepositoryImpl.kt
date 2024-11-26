@@ -40,8 +40,14 @@ class UserRepositoryImpl @Inject constructor(
     private var _user = MutableStateFlow<FirebaseUser?>(null)
     val user: StateFlow<FirebaseUser?> get() = _user.asStateFlow()
 
-    private var _error = MutableSharedFlow<String>()
-    val error: SharedFlow<String> get() = _error.asSharedFlow()
+    private val _signInError = MutableSharedFlow<String>()
+    val signInError: SharedFlow<String> get() = _signInError
+
+    private val _forgotPasswordError = MutableSharedFlow<String>()
+    val forgotPasswordError: SharedFlow<String> get() = _forgotPasswordError
+
+    private val _signUpError = MutableSharedFlow<String>()
+    val signUpError: SharedFlow<String> get() = _signUpError
 
     private var _userData = MutableStateFlow<UserEntity?>(null)
     val userData: StateFlow<UserEntity?> get() = _userData.asStateFlow()
@@ -73,7 +79,7 @@ class UserRepositoryImpl @Inject constructor(
             .addOnFailureListener { error ->
                 ioScope.launch {
                     Log.d("CheckErrorState", "failed execute from UserRepositoryImpl")
-                    _error.emit(error.message.toString())
+                    _forgotPasswordError.emit(error.message.toString())
                 }
             }
     }
@@ -85,7 +91,7 @@ class UserRepositoryImpl @Inject constructor(
             .addOnFailureListener { error ->
                 ioScope.launch {
                     Log.d("CheckErrorState", " execute from signInByEmailImpl")
-                    _error.emit(error.message.toString())
+                    _signInError.emit(error.message.toString())
                 }
             }
     }
@@ -128,7 +134,7 @@ class UserRepositoryImpl @Inject constructor(
             .addOnFailureListener { error ->
                 ioScope.launch {
                     Log.d("CheckErrorState", " execute from signUpByEmail Impl")
-                    _error.emit(error.message.toString())
+                    _signUpError.emit(error.message.toString())
                 }
             }
     }
@@ -161,15 +167,15 @@ class UserRepositoryImpl @Inject constructor(
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        ioScope.launch {
-                            _error.emit("Failed to sync user settings: ${error.message}")
-                        }
+//                        ioScope.launch {
+//                            _error.emit("Failed to sync user settings: ${error.message}")
+//                        }
                     }
                 })
         } else {
-            ioScope.launch {
-                _error.emit("No authenticated user found to sync settings.")
-            }
+//            ioScope.launch {
+//                _error.emit("No authenticated user found to sync settings.")
+//            }
         }
     }
 
@@ -208,7 +214,7 @@ class UserRepositoryImpl @Inject constructor(
                 }
                 .addOnFailureListener { error ->
                     ioScope.launch {
-                        _error.emit("Failed to save content language: ${error.message}")
+//                        _error.emit("Failed to save content language: ${error.message}")
                     }
                 }
         } else {
@@ -246,7 +252,7 @@ class UserRepositoryImpl @Inject constructor(
                 }
                 .addOnFailureListener { error ->
                     ioScope.launch {
-                        _error.emit("Failed to save source country: ${error.message}")
+//                        _error.emit("Failed to save source country: ${error.message}")
                     }
                 }
         } else {
@@ -266,10 +272,17 @@ class UserRepositoryImpl @Inject constructor(
         return user
     }
 
-    override fun fetchErrorAuth(): SharedFlow<String> {
-        return error
+    override fun fetchErrorSignIn(): SharedFlow<String> {
+        return signInError
     }
 
+    override fun fetchErrorSignUp(): SharedFlow<String> {
+        return signUpError
+    }
+
+    override fun fetchErrorForgotPassword(): SharedFlow<String> {
+        return forgotPasswordError
+    }
 
 
     override fun fetchUserData(): StateFlow<UserEntity?> {

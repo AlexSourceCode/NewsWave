@@ -83,11 +83,13 @@ class ForgotPasswordFragment : Fragment() {
                 }
             }
         }
-//        lifecycleScope.launch {
-//            repeatOnLifecycle(Lifecycle.State.CREATED) {
-//                viewModel.error.collect()
-//            }
-//        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.error.collect{
+                    showToast(it)
+                }
+            }
+        }
 
     }
 
