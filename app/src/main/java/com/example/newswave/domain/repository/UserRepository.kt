@@ -26,7 +26,7 @@ interface UserRepository {
 
     fun getContentLanguage(): String
 
-    fun isUserDataUpdated(): StateFlow<Boolean>
+    fun isUserDataUpdated(): SharedFlow<Unit>
 
     fun saveContentLanguage(language: String)
 

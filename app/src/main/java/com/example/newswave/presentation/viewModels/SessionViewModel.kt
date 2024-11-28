@@ -15,27 +15,18 @@ class SessionViewModel @Inject constructor(
     private val isUserDataUpdatedUseCase: IsUserDataUpdatedUseCase
 ): ViewModel() {
 
-    private val _refreshEvent = MutableSharedFlow<Unit>()
-    val refreshEvent: SharedFlow<Unit> = _refreshEvent
-
-    init {
-        observeUserDataUpdates()
-    }
-
-    private fun observeUserDataUpdates() {
-        viewModelScope.launch {
-            isUserDataUpdatedUseCase().collect { updated ->
-                if (updated) {
-                    _refreshEvent.emit(Unit) // Уведомляем о необходимости обновления
-                }
-            }
-        }
-    }
-
-    fun notifyRefreshRequired() {
-        viewModelScope.launch {
-            _refreshEvent.emit(Unit)
-        }
-    }
+    val refreshEvent: SharedFlow<Unit> = isUserDataUpdatedUseCase()
+//
+//    init {
+//        observeUserDataUpdates()
+//    }
+//
+//    private fun observeUserDataUpdates() {
+//        viewModelScope.launch {
+//            isUserDataUpdatedUseCase().collect { updated ->
+//                    _refreshEvent.emit(Unit) // Уведомляем о необходимости обновления
+//            }
+//        }
+//    }
 
 }

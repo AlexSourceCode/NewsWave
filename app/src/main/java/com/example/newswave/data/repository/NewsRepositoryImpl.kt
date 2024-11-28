@@ -74,7 +74,7 @@ class NewsRepositoryImpl @Inject constructor(
     private val errorLoadData: SharedFlow<String> get() = _errorLoadData.asSharedFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val fetchTopNewsListFlow = newsDao.getNewsList()
+    private val fetchTopNewsListFlow = newsDao.getNewsList()
         .flatMapConcat { newsList ->
             flow {
                 emit(newsList.map { mapper.mapDbModelToEntity(it) })
@@ -90,7 +90,7 @@ class NewsRepositoryImpl @Inject constructor(
 
 
     override suspend fun loadData() {
-        Log.d("CheckErrorMessage", "execute funloaddata")
+        Log.d("CheckErrorMessage", "start fun loaddata")
 
         val workManager =
             WorkManager.getInstance(application.applicationContext)     // Получаем экземпляр WorkManager для управления задачами
@@ -111,6 +111,7 @@ class NewsRepositoryImpl @Inject constructor(
                         if (workInfo != null) {
                             when (workInfo.state) {
                                 WorkInfo.State.ENQUEUED -> {
+                                    Log.d("CheckErrorMessage", "execute loadata State = ENQUEUED ")
                                     if (!isNetworkAvailable(application)) {
                                         _errorLoadData.emit("No Internet connection")
                                         cancel()
@@ -118,8 +119,8 @@ class NewsRepositoryImpl @Inject constructor(
                                 }
 
                                 WorkInfo.State.FAILED -> {
-                                    Log.d("CheckErrorMessage", "execute loadata implweknfwejknfjkwenjkf")
                                     val error = workInfo.outputData.getString("error")
+                                    Log.d("CheckErrorMessage", "execute loadata State = FAILED: $error ")
                                     if (error != null) {
                                         _errorLoadData.emit(error)
                                     }
@@ -127,6 +128,7 @@ class NewsRepositoryImpl @Inject constructor(
                                 }
 
                                 WorkInfo.State.SUCCEEDED -> {
+                                    Log.d("CheckErrorMessage", "Success")
                                     cancel() // Прекращаем слежение при успешном завершении работы
                                 }
 

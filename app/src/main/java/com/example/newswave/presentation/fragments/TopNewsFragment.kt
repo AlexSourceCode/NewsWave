@@ -44,6 +44,7 @@ class TopNewsFragment : Fragment() {
     private lateinit var binding: FragmentTopNewsBinding
     private lateinit var adapter: NewsListAdapter
 
+
     private lateinit var viewModel: TopNewsViewModel
     private val sessionViewModel: SessionViewModel by activityViewModels { viewModelFactory }
 
@@ -64,6 +65,12 @@ class TopNewsFragment : Fragment() {
         super.onAttach(context)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("TopNewsFragmentState", "onCreate")
+        super.onCreate(savedInstanceState)
+        observeViewModel() // хз почему не краш
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -78,7 +85,6 @@ class TopNewsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory)[TopNewsViewModel::class.java]
         setupAdapter()              // Настройка адаптера для RecyclerView
-        observeViewModel()          // Подписка на обновления данных из ViewModel
         setupTabLayout()            // Настройка вкладок (TabLayout)
         selectedFilter = requireActivity().application.getString(Filter.TEXT.descriptionResId)
         searchByFilterListener()    // Добавление слушателя поиска
@@ -87,6 +93,7 @@ class TopNewsFragment : Fragment() {
         setupSwipeRefresh()         // Обновление данных при свайпе вниз
         parentFragmentManager.setFragmentResultListener("refresh_request", this) { _, _ ->
             Log.d("TopNewsFragmentState", "execute")
+//            adapter.submitList(emptyList())
             viewModel.refreshData() // Повторный запрос данных
         }
     }
@@ -116,16 +123,7 @@ class TopNewsFragment : Fragment() {
             })
     }
 
-    private fun setupSwipeRefresh() {
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            if (isSearchNews == true) {
-                viewModel.searchNewsByFilter()
-            } else {
-                viewModel.refreshData()
-            }
-            binding.swipeRefreshLayout.isRefreshing = false
-        }
-    }
+
 
     private fun setupTabLayout() {
         val tabLayout: TabLayout = binding.tabLayout
@@ -163,30 +161,58 @@ class TopNewsFragment : Fragment() {
         }
     }
 
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            if (isSearchNews == true) {
+                Log.d("TopNewsFragmentState", "refresh isSearchNews")
+                viewModel.searchNewsByFilter()
+            } else {
+                Log.d("TopNewsFragmentState", "refresh")
+                viewModel.refreshData()
+            }
+            binding.swipeRefreshLayout.isRefreshing = false
+        }
+    }
+
     private fun observeViewModel() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                Log.d("TopNewsFragmentState", "collect execute")
                 viewModel.uiState.collect { uiState ->
+                    Log.d("TopNewsFragmentState", "TopNewsFragment collect ")
                     when (uiState) {
                         is NewsState.Error -> {
                             binding.pgNews.visibility = View.GONE
-
-                            when(uiState.message){
+                            when (uiState.message) {
                                 "No Internet connection" -> {
-                                    if (adapter.currentList.isEmpty()){
+                                    if (adapter.currentList.isEmpty()) {
                                         binding.tvRetry.visibility = View.VISIBLE
-
                                     }
-                                    showToast()
                                     binding.tvRetry.setOnClickListener {
                                         viewModel.refreshData() // Функция повторного запроса данных
                                     }
+                                    Log.d(
+                                        "TopNewsFragmentState",
+                                        "TopNewsFragment Error: No Internet connection ${uiState.message}"
+                                    )
+                                    showToast()
                                 }
+
                                 "News list is empty or invalid parameters!" -> {
+                                    Log.d(
+                                        "TopNewsFragmentState",
+                                        "TopNewsFragment Error: News list is empty or invalid parameters! ${uiState.message}"
+                                    )
                                     binding.tvRetry.visibility = View.GONE
                                     binding.tvErrorAvailableNews.visibility = View.VISIBLE
                                 }
+
                                 else -> { // Другие ошибки
+                                    Log.d(
+                                        "TopNewsFragmentState",
+                                        "TopNewsFragment Error: else conditions ${uiState.message.toString()}"
+                                    )
                                     showToast()
                                     binding.tvRetry.visibility = View.VISIBLE
                                     binding.tvRetry.setOnClickListener {
@@ -196,21 +222,21 @@ class TopNewsFragment : Fragment() {
                             }
 
                             if (isSearchNews == true) {
-                                Log.d("StateUiState", "isSearchNews")
+                                Log.d("TopNewsFragmentState", "isSearchNews")
                                 binding.tvRetry.visibility = View.VISIBLE
                                 adapter.submitList(emptyList())
                             }
                         }
 
                         is NewsState.Loading -> {
-                            Log.d("StateUiState", uiState.toString())
+                            Log.d("TopNewsFragmentState", "Loading")
                             binding.tvErrorAvailableNews.visibility = View.GONE
                             binding.tvRetry.visibility = View.GONE
                             binding.pgNews.visibility = View.VISIBLE
                         }
 
                         is NewsState.Success -> {
-                            Log.d("StateUiState", "Success")
+                            Log.d("TopNewsFragmentState", "Success")
                             binding.tvErrorAvailableNews.visibility = View.GONE
                             binding.pgNews.visibility = View.GONE
                             binding.tvRetry.visibility = View.GONE
@@ -218,6 +244,7 @@ class TopNewsFragment : Fragment() {
                                 adapter.submitListWithLoadMore(uiState.currentList, null)
                                 adapter.notifyDataSetChanged() //crutch
                             } else {
+                                Log.d("TopNewsFragmentState", "AfterSignIn ${uiState.currentList.get(0).title}")
                                 adapter.submitList(uiState.currentList) {
                                     if (viewModel.isFirstLaunch) {
                                         lifecycleScope.launch {
@@ -235,9 +262,10 @@ class TopNewsFragment : Fragment() {
             }
         }
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){
-                sessionViewModel.refreshEvent.collect{
-                        viewModel.refreshData()
+            repeatOnLifecycle(Lifecycle.State.CREATED) { //started?
+                sessionViewModel.refreshEvent.collect {
+                    Log.d("TopNewsFragmentState", "CHECK COUNT ")//почему-то срабатывает
+                    viewModel.refreshData()
                 }
             }
         }
@@ -258,6 +286,7 @@ class TopNewsFragment : Fragment() {
     }
 
     private fun showToast() {    // Показ уведомления
+        Log.d("CheckErrorMessage", "TopNewsFragment Error: fun showToast")
         Toast.makeText(
             requireContext(),
             requireActivity().getString(R.string.error_load_data),

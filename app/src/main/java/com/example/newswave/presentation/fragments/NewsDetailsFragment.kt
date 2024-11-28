@@ -164,7 +164,7 @@ class NewsDetailsFragment : Fragment() {
 
     override fun onDestroy() { // crutch
         super.onDestroy()
-        viewModel.clearState()
+        viewModel.clearState() // crutch
     }
 
     private fun observeViewModel() {
@@ -197,6 +197,7 @@ class NewsDetailsFragment : Fragment() {
                             }
                         } else{
                             updateSubscriptionButton(false)
+                            Log.d("CheckErrorMessage", "execute toast in newsdetails")
                             showToastErrorInternetConnection()
                         }
 

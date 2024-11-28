@@ -74,7 +74,6 @@ class SignInFragment : Fragment() {
             val password = binding.etPassword.text.toString().trim()
             if (isFieldNotEmpty(email, password)) {
                 viewModel.signIn(email, password)
-                sessionViewModel.notifyRefreshRequired()
             } else {
                 showToast(getString(R.string.please_fill_in_all_the_fields))
             }

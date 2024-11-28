@@ -61,8 +61,10 @@ class UserRepositoryImpl @Inject constructor(
     private val _sourceCountry = MutableStateFlow<String>(getSourceCountry())
     val sourceCountry: StateFlow<String> = _sourceCountry
 
-    private val _isUserDataUpdatedFlow = MutableStateFlow(false)
-    val isUserDataUpdatedFlow: StateFlow<Boolean> = _isUserDataUpdatedFlow
+    private val _isUserDataUpdatedFlow = MutableSharedFlow<Unit>()
+    val isUserDataUpdatedFlow: SharedFlow<Unit> = _isUserDataUpdatedFlow
+
+    private var isFirstAuth = true
 
     companion object {
         private const val DEFAULT_LANGUAGE = "ru"
@@ -141,10 +143,10 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun signOut() {
         userPreferences.clearUserData()
-
         auth.signOut()
 
         ioScope.launch {
+            newsDao.deleteAllNews()
             _user.emit(null)
             _userData.emit(null)
         }
@@ -185,7 +187,7 @@ class UserRepositoryImpl @Inject constructor(
         return content
     }
 
-    override fun isUserDataUpdated(): StateFlow<Boolean> {
+    override fun isUserDataUpdated(): SharedFlow<Unit> {
         return isUserDataUpdatedFlow
     }
 
@@ -305,11 +307,17 @@ class UserRepositoryImpl @Inject constructor(
                 usersReference.child(firebaseUser.uid)
                     .addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
+
+                            if (!isFirstAuth){
+                                ioScope.launch {
+                                    _isUserDataUpdatedFlow.emit(Unit) // Уведомляем, что данные обновлены
+                                    newsDao.deleteAllNews()
+                                }
+                                isFirstAuth = false
+                            }
+
                             val userData =
                                 snapshot.getValue<UserEntity>() as UserEntity
-                            ioScope.launch {
-                                newsDao.deleteAllNews()
-                            }
                             userPreferences.saveContentLanguage(userData.newsContent)
                             userPreferences.saveSourceCountry(userData.newsSourceCountry)
                             _userData.value = userData
@@ -317,7 +325,6 @@ class UserRepositoryImpl @Inject constructor(
                             _contentLanguage.value = userData.newsContent
                             _sourceCountry.value = userData.newsSourceCountry
 
-                            _isUserDataUpdatedFlow.value = true // Уведомляем, что данные обновлены
 
 
                             Log.d("CheckChangedUserData", "AfterSaveContent ${getContentLanguage()}")

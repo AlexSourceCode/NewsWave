@@ -100,6 +100,7 @@ class TopNewsViewModel @Inject constructor(
     fun refreshData() {
         viewModelScope.launch {
             _uiState.value = NewsState.Loading
+            Log.d("refreshDataState", "execute")
             loadDataUseCase()
         }
     }
@@ -113,13 +114,13 @@ class TopNewsViewModel @Inject constructor(
     private fun fetchErrorLoadData() {
         viewModelScope.launch {
             fetchErrorLoadDataUseCase()
-                .collect {
+                .collect { errorMessage ->
                     Log.d("CheckErrorMessage", "execute fetchErrorLoadData")
-                    _uiState.value = NewsState.Error(it) // дважды одно и тоже значение
-//                    val savedNews = getTopNews()
-//                    if (!savedNews.isNullOrEmpty()){
-//                        _uiState.value = NewsState.Success(savedNews)
-//                    }
+                    _uiState.value = NewsState.Error(errorMessage) // дважды одно и тоже значение
+                    val savedNews = getTopNews()
+                    if (!savedNews.isNullOrEmpty() && errorMessage!= "News list is empty or invalid parameters!"){
+                        _uiState.value = NewsState.Success(savedNews)
+                    }
                 }
         }
     }
@@ -129,7 +130,7 @@ class TopNewsViewModel @Inject constructor(
             try {
                 fetchTopNewsListUseCase()
                     .collect { news ->
-                        Log.d("fetchTopNewsListUseCase",  news.toString())
+                        Log.d("fetchTopNewsListUseCase",  "execute collect")
                         if (news.isEmpty()) _uiState.value = NewsState.Loading
                         else {
                             _uiState.value = NewsState.Success(news)

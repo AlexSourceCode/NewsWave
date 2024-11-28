@@ -44,6 +44,7 @@ class RefreshDataWorker(
     private val userPreferences: UserPreferences
 ) : CoroutineWorker(context, workerParameters) {
 
+    private val ioScope = CoroutineScope(Dispatchers.IO)
 
     override suspend fun doWork(): Result {
         return try {
@@ -91,7 +92,16 @@ class RefreshDataWorker(
             throw Exception("News list is empty or invalid parameters!") // Генерируем ошибку
         }
 
-        newsInfoDao.insertNews(newsList)
+//        val currentNews = newsInfoDao.getNewsList().firstOrNull()?.map { mapper.mapDbModelToEntity(it) }
+//        if (newsList != currentNews) {
+//            Log.d("checkloaddata","Execute if")
+//            newsInfoDao.insertNews(newsList)
+//        } else {
+            ioScope.launch {
+                newsInfoDao.deleteAllNews()
+                newsInfoDao.insertNews(newsList)
+            }
+//        }
 
     }
 

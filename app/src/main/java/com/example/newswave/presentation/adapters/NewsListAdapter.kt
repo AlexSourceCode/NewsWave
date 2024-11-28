@@ -37,12 +37,19 @@ class NewsListAdapter(
                 tvText.text = TextUtils.sentenceDivision(news.text)
                 tvTitle.text = news.title
                 tvDate.text = DateUtils.dateFormat(context, news.publishDate)
-                if (NetworkUtils.isNetworkAvailable(context)){
-                    Picasso.get()
-                        .load(image)
-                        .resize(800, 600)
-                        .into(ivImage)
-                } else ivImage.setImageResource(R.drawable.error_placeholder)
+                Log.d("CheckPathImage", news.title.toString())
+                Log.d("CheckPathImage", news.image.toString())
+                try {
+                    if (NetworkUtils.isNetworkAvailable(context)){
+                        Picasso.get()
+                            .load(image)
+                            .resize(800, 600)
+                            .into(ivImage)
+                    } else ivImage.setImageResource(R.drawable.error_placeholder)
+                } catch (e: Exception){
+                    Log.d("CheckPathImage", e.message.toString())
+                }
+
             }
         }
 
