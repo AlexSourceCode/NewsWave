@@ -214,8 +214,8 @@ class NewsRepositoryImpl @Inject constructor(
             val language = userPreferences.getContentLanguage()
 
             return apiService.getNewsByAuthor(
-                sourceCountry = country,
-                language = language,
+//                sourceCountry = country,
+//                language = language,
                 author = author)
                 .map { it.news }
         } catch (e: Exception) {

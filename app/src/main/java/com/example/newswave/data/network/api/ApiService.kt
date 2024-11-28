@@ -30,11 +30,11 @@ interface ApiService {
 
     @GET("search-news")
     suspend fun getNewsByAuthor(
-        @Query("language") language: String = QUERY_PARAM_LANGUAGE,
+//        @Query("language") language: String = QUERY_PARAM_LANGUAGE,
         @Query("api-key") apiKey: String = QUERY_PARAM_API_KEY,
         @Query("authors") author: String,
         @Query("sort-direction") sortDirection: String = QUERY_PARAM_SORT_DIRECTION,
-        @Query("source-country") sourceCountry: String = QUERY_PARAM_SOURCE_COUNTRY,
+//        @Query("source-country") sourceCountry: String = QUERY_PARAM_SOURCE_COUNTRY,
         @Query("sort") sort: String = QUERY_PARAM_SORT,
         @Query("number") limit: Int = QUERY_PARAM_LIMIT
     ): Flow<NewsResponseDto>
@@ -49,7 +49,7 @@ interface ApiService {
 
 
     companion object {
-        private const val QUERY_PARAM_API_KEY = "dd1c0076447947fc921616b08d0af87d"
+        private const val QUERY_PARAM_API_KEY = "b6ef41d59ba74add937bb849af4656b4"
         private const val QUERY_PARAM_LANGUAGE = "en"
         private const val QUERY_PARAM_SOURCE_COUNTRY = "us"
         private const val QUERY_PARAM_SORT_DIRECTION = "DESC"

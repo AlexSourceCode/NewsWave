@@ -89,7 +89,13 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun signInByEmail(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
-            .addOnSuccessListener {}
+            .addOnSuccessListener {
+                ioScope.launch {
+                    Log.d("sessionViewModel.refreshEvent", "execute trigger in userrepository")
+                    _isUserDataUpdatedFlow.emit(Unit) // Уведомляем, что данные обновлены
+                    newsDao.deleteAllNews()
+                }
+            }
             .addOnFailureListener { error ->
                 ioScope.launch {
                     Log.d("CheckErrorState", " execute from signInByEmailImpl")
@@ -107,6 +113,11 @@ class UserRepositoryImpl @Inject constructor(
     ) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
+                ioScope.launch {
+                    Log.d("sessionViewModel.refreshEvent", "execute trigger in userrepository")
+                    _isUserDataUpdatedFlow.emit(Unit) // Уведомляем, что данные обновлены
+                    newsDao.deleteAllNews()
+                }
                 val firebase = authResult.user
                 if (firebase != null) {
                     val user = UserEntity(
@@ -307,14 +318,15 @@ class UserRepositoryImpl @Inject constructor(
                 usersReference.child(firebaseUser.uid)
                     .addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
-
-                            if (!isFirstAuth){
-                                ioScope.launch {
-                                    _isUserDataUpdatedFlow.emit(Unit) // Уведомляем, что данные обновлены
-                                    newsDao.deleteAllNews()
-                                }
-                                isFirstAuth = false
-                            }
+                            Log.d("sessionViewModel.refreshEvent", "execute before trigger in userrepository")
+//                            if (!isFirstAuth){
+//                                ioScope.launch {
+//                                    Log.d("sessionViewModel.refreshEvent", "execute trigger in userrepository")
+//                                    _isUserDataUpdatedFlow.emit(Unit) // Уведомляем, что данные обновлены
+//                                    newsDao.deleteAllNews()
+//                                }
+//                                isFirstAuth = false
+//                            }
 
                             val userData =
                                 snapshot.getValue<UserEntity>() as UserEntity

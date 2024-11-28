@@ -264,7 +264,7 @@ class TopNewsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) { //started?
                 sessionViewModel.refreshEvent.collect {
-                    Log.d("TopNewsFragmentState", "CHECK COUNT ")//почему-то срабатывает
+                    Log.d("sessionViewModel.refreshEvent", "execute in topnewsfragment ")
                     viewModel.refreshData()
                 }
             }
