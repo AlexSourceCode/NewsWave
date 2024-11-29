@@ -16,28 +16,34 @@ import androidx.navigation.fragment.findNavController
 import com.example.newswave.R
 import com.example.newswave.databinding.FragmentSubscribedAuthorsBinding
 import com.example.newswave.app.NewsApp
+import com.example.newswave.domain.model.AuthState
 import com.example.newswave.domain.model.AuthorState
+import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.adapters.AuthorListAdapter
 import com.example.newswave.presentation.viewModels.SubscribedAuthorsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
 class SubscribedAuthorsFragment : Fragment() {
 
     private lateinit var binding: FragmentSubscribedAuthorsBinding
+    private lateinit var adapter: AuthorListAdapter
 
     private val component by lazy {
         (requireActivity().application as NewsApp).component
     }
-
-    private lateinit var adapter: AuthorListAdapter
-
     private lateinit var viewModel: SubscribedAuthorsViewModel
+
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-
 
 
     override fun onAttach(context: Context) {
@@ -50,37 +56,87 @@ class SubscribedAuthorsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSubscribedAuthorsBinding.inflate(layoutInflater)
+        (activity as MainActivity).setSelectedMenuItem(R.id.subscribedAuthorsFragment)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory)[SubscribedAuthorsViewModel::class.java]
+        viewModel =
+            ViewModelProvider(this, viewModelFactory)[SubscribedAuthorsViewModel::class.java]
         setupAdapter()
         observeViewModel()
+
+        binding.btLogin.setOnClickListener {
+            launchLoginFragment()
+        }
     }
 
-    private fun observeViewModel(){
+    private fun observeViewModel() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){
-                viewModel.uiState.collect{ uiState ->
-                    when(uiState){
-                        is AuthorState.Error -> Log.d("CheckState", uiState.toString()) // When will be repository then need to change handle error.
-                        is AuthorState.Loading -> {
-                            binding.pgNews.visibility = View.VISIBLE
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.user.collect { firebaseUser ->
+                    when (firebaseUser) {
+                        is AuthState.LoggedIn -> {
+                            showProgressBar()
+                            showLoggedInState()
+                            viewModel.uiState.collect { uiState ->
+                                Log.d("currentListState", "startcollect")
+                                when (uiState) {
+                                    is AuthorState.Error -> hideProgressBar()
+
+                                    is AuthorState.Loading -> showProgressBar()
+
+                                    is AuthorState.Success -> {
+                                        if (uiState.currentList?.size == 0){
+                                            showMessageNoAuthors()
+                                            hideProgressBar()
+                                        } else {
+                                            adapter.submitList(uiState.currentList)
+                                            hideMessageNoAuthors()
+                                            hideProgressBar()
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        is AuthorState.Success -> {
-                            binding.pgNews.visibility = View.GONE
-                            adapter.submitList(uiState.currentList)
-                        }
+
+                        is AuthState.LoggedOut -> showLoggedOutState()
                     }
                 }
             }
         }
     }
 
-    private fun setupAdapter(){
-        adapter = AuthorListAdapter()
+    private fun showMessageNoAuthors(){
+        binding.tvNoAuthors.visibility = View.VISIBLE
+    }
+    private fun hideMessageNoAuthors(){
+        binding.tvNoAuthors.visibility = View.GONE
+    }
+
+    private fun showLoggedOutState() {
+        binding.textContainer.visibility = View.VISIBLE
+        binding.rcAuthors.visibility = View.GONE
+    }
+
+    private fun showLoggedInState() {
+        binding.rcAuthors.visibility = View.VISIBLE
+        binding.textContainer.visibility = View.GONE
+    }
+
+
+    private fun showProgressBar() {
+        binding.pgNews.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        binding.pgNews.visibility = View.GONE
+    }
+
+
+    private fun setupAdapter() {
+        adapter = AuthorListAdapter(requireContext())
         binding.rcAuthors.adapter = adapter
         adapter.onAuthorClickSubscription = { author ->
             showUnsubscribeDialog(author)
@@ -99,7 +155,7 @@ class SubscribedAuthorsFragment : Fragment() {
             viewModel.unsubscribeFromAuthor(author)
             dialog.dismiss()
         }
-        builder.setNegativeButton(getString(R.string.negative_answer)){ dialog, _ ->
+        builder.setNegativeButton(getString(R.string.negative_answer)) { dialog, _ ->
             dialog.dismiss()
         }
 
@@ -107,9 +163,17 @@ class SubscribedAuthorsFragment : Fragment() {
         dialog.show()
     }
 
-    private fun launchAuthorNewsFragment(author: String){
+    private fun launchAuthorNewsFragment(author: String) {
         findNavController().navigate(
-            SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToAuthorNewsFragment(author)
+            SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToAuthorNewsFragment(
+                author
+            )
+        )
+    }
+
+    private fun launchLoginFragment() {
+        findNavController().navigate(
+            SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToLoginFragment()
         )
     }
 

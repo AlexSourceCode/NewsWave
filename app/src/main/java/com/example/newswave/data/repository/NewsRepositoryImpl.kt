@@ -8,6 +8,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import retrofit2.HttpException
 import com.example.newswave.data.database.dbNews.NewsDao
+import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.mapper.flattenToList
 import com.example.newswave.data.network.api.ApiService
@@ -18,6 +19,11 @@ import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.NewsRepository
 import com.example.newswave.utils.Filter
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,6 +36,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
@@ -47,7 +54,8 @@ class NewsRepositoryImpl @Inject constructor(
     private val application: Application,
     private val newsDao: NewsDao,
     private val mapper: NewsMapper,
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val userPreferences: UserPreferences
 ) : NewsRepository {
 
 
@@ -66,7 +74,7 @@ class NewsRepositoryImpl @Inject constructor(
     private val errorLoadData: SharedFlow<String> get() = _errorLoadData.asSharedFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val topNewsFlow = newsDao.getNewsList()
+    private val fetchTopNewsListFlow = newsDao.getNewsList()
         .flatMapConcat { newsList ->
             flow {
                 emit(newsList.map { mapper.mapDbModelToEntity(it) })
@@ -74,13 +82,16 @@ class NewsRepositoryImpl @Inject constructor(
         }.stateIn(
             scope = ioScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList()
+            initialValue = emptyList(),
         )
 
 
-    override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> = topNewsFlow
+    override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> = fetchTopNewsListFlow
+
 
     override suspend fun loadData() {
+        Log.d("CheckErrorMessage", "start fun loaddata")
+
         val workManager =
             WorkManager.getInstance(application.applicationContext)     // Получаем экземпляр WorkManager для управления задачами
         val workRequest =
@@ -100,19 +111,24 @@ class NewsRepositoryImpl @Inject constructor(
                         if (workInfo != null) {
                             when (workInfo.state) {
                                 WorkInfo.State.ENQUEUED -> {
+                                    Log.d("CheckErrorMessage", "execute loadata State = ENQUEUED ")
                                     if (!isNetworkAvailable(application)) {
                                         _errorLoadData.emit("No Internet connection")
+                                        cancel()
                                     }
                                 }
 
                                 WorkInfo.State.FAILED -> {
                                     val error = workInfo.outputData.getString("error")
+                                    Log.d("CheckErrorMessage", "execute loadata State = FAILED: $error ")
                                     if (error != null) {
                                         _errorLoadData.emit(error)
                                     }
+                                    cancel()
                                 }
 
                                 WorkInfo.State.SUCCEEDED -> {
+                                    Log.d("CheckErrorMessage", "Success")
                                     cancel() // Прекращаем слежение при успешном завершении работы
                                 }
 
@@ -130,7 +146,11 @@ class NewsRepositoryImpl @Inject constructor(
 
     @SuppressLint("NewApi")
     override suspend fun loadNewsForPreviousDay() {
+
         ioScope.launch {
+            val country = userPreferences.getSourceCountry()
+            val language = userPreferences.getContentLanguage()
+
             currentEndDate = currentEndDate.minusDays(1)
             val previousDate = currentEndDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
@@ -139,7 +159,11 @@ class NewsRepositoryImpl @Inject constructor(
                 return@launch
             }
             try {
-                apiService.getListTopNews(date = previousDate)
+                apiService.getListTopNews(
+                    sourceCountry = country,
+                    language = language,
+                    date = previousDate
+                )
                     .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }//преобразование в List<NewsItemDto>
                     .flatMapConcat { newList ->
                         flow {
@@ -150,7 +174,7 @@ class NewsRepositoryImpl @Inject constructor(
                     .collect {
                         newsDao.insertNews(it)
                     }
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 _errorLoadData.emit("Error loading news ${e.message}")
             }
         }
@@ -171,7 +195,13 @@ class NewsRepositoryImpl @Inject constructor(
 
     private suspend fun getNewsByText(text: String): Flow<List<NewsItemDto>> {
         try {
-            return apiService.getNewsByText(text = text).map { it.news }
+            val country = userPreferences.getSourceCountry()
+            val language = userPreferences.getContentLanguage()
+
+            return apiService.getNewsByText(
+                sourceCountry = country,
+                language = language,
+                text = text).map { it.news }
         } catch (e: Exception) {
             _errorLoadData.emit("Error loading news by text: ${e.message}")
             return flow { emptyList<NewsItemDto>() }
@@ -180,7 +210,14 @@ class NewsRepositoryImpl @Inject constructor(
 
     private suspend fun getNewsByAuthor(author: String): Flow<List<NewsItemDto>> {
         try {
-            return apiService.getNewsByAuthor(author = author).map { it.news }
+            val country = userPreferences.getSourceCountry()
+            val language = userPreferences.getContentLanguage()
+
+            return apiService.getNewsByAuthor(
+//                sourceCountry = country,
+//                language = language,
+                author = author)
+                .map { it.news }
         } catch (e: Exception) {
             _errorLoadData.emit("Error loading news by text: ${e.message}")
             return flow { emptyList<NewsItemDto>() }
@@ -189,7 +226,13 @@ class NewsRepositoryImpl @Inject constructor(
 
     private suspend fun getNewsByDate(date: String): Flow<List<NewsItemDto>> {
         try {
-            return apiService.getNewsByDate(date = date)
+            val country = userPreferences.getSourceCountry()
+            val language = userPreferences.getContentLanguage()
+
+            return apiService.getNewsByDate(
+                sourceCountry = country,
+                language = language,
+                date = date)
                 .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
         } catch (e: Exception) {
             _errorLoadData.emit("Error loading news by text: ${e.message}")

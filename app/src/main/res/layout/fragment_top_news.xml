@@ -83,13 +83,27 @@
         android:layout_height="wrap_content"
         android:text="@string/retry"
         android:textSize="16sp"
-        android:visibility="gone"
         android:textColor="@color/white"
         android:textAllCaps="false"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvErrorAvailableNews"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="@string/no_news_for_criteria"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingStart="34dp"
+        android:paddingEnd="34dp"
+        android:textColor="#7F7F7F"
+        android:textSize="16sp" />
 
     <ProgressBar
         android:id="@+id/pgNews"
@@ -99,6 +113,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:indeterminateTint="@android:color/darker_gray"
         android:visibility="gone" />
 
 

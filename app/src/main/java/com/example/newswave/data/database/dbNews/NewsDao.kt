@@ -1,5 +1,6 @@
 package com.example.newswave.data.database.dbNews
 
+import android.util.Log
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -14,7 +15,11 @@ interface NewsDao {
     fun getNewsList(): Flow<List<NewsDbModel>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertNews(listNews: List<NewsDbModel>)//: Flow<NewsDbModel>
+    suspend fun insertNews(listNews: List<NewsDbModel>)
+
+    @Query("DELETE FROM news")
+    fun deleteAllNews()
+
 
 }
 

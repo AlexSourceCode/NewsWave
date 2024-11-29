@@ -6,7 +6,7 @@ import com.example.newswave.domain.entity.NewsItemEntity
 sealed class AuthorState {
     data class Error(val message: String): AuthorState()
     object Loading: AuthorState()
-    data class Success(val currentList: List<AuthorItemEntity>): AuthorState()
+    data class Success(val currentList: List<AuthorItemEntity>?): AuthorState()
 }
 
 //data class Error(

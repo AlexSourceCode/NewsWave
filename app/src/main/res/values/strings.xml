@@ -19,7 +19,7 @@
 
     <string name="subscribe">Subscribe</string>
     <string name="subscribed">Subscribed</string>
-    
+
     <string name="confirmation">Confirmation</string>
     <string name="positive_answer">Yes</string>
     <string name="negative_answer">No</string>
@@ -29,6 +29,283 @@
     <string name="download_error">Download error</string>
     <string name="repeat">Repeat</string>
     <string name="retry">Retry</string>
+    <string name="sign_in_subscriptions_text">Sign in, and your subscriptions will be here</string>
+    <string name="sign_up_no_account_text">If you don\'t have an account, sign up. Your subscriptions will be here afterward</string>
+    <string name="sign_in_text">Sign in</string>
+    <string name="authorization">Authorization</string>
+    <string name="sign_in_message">Please sign in to use the author subscription feature</string>
+    <string name="registration_text">Registration</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="no_account_yet_text">Do not have an account yet?</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="registration_message">Enter the information in the appropriate fields below:</string>
+    <string name="username">Username</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="sign_up">Sign up</string>
+    <string name="already_registered_text">Already have an account,</string>
+    <string name="reset_password_hint">Enter the email address to which the password reset email will be sent</string>
+    <string name="change_password">Change password</string>
+    <string name="subscription_prompt_message">Want to subscribe to this channel?</string>
+    <string name="sign_in_required_message">Sign in to subscribe to this channel</string>
+    <string name="cancel">Cancel</string>
+    <string name="unsubscribe">Unsubscribe</string>
+    <string name="author_unknown">Author unknown</string>
+    <string name="please_fill_in_all_the_fields">Please fill in all the fields</string>
+    <string name="please_enter_your_email">Please enter your email</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="the_list_of_authors_is_empty_add_new_authors_to_see_them_here">The list of authors is empty. Add new authors to see them here</string>
+    <string name="content_language">Content Language</string>
+    <string name="country_of_news_source">Country of news source</string>
+    <string name="interface_language">Interface language</string>
+
+    <string name="invalid_username_length" translatable="false">Username must be between 3 and 20 characters long</string>
+    <string name="invalid_email_format" translatable="false">Invalid email format</string>
+    <string name="invalid_password_length" translatable="false">The given password is invalid. [ Password should be at least 6 characters ]</string>
+    <string name="invalid_first_name_length" translatable="false">First name must be between 2 and 20 characters long</string>
+    <string name="invalid_last_name_length" translatable="false">Last name must be between 2 and 20 characters long</string>
+
+
+    <string name="system">Match system language</string>
+    <string name="sign_out">Sign out</string>
+    <string name="no_news_for_criteria">No news found for the selected search criteria. Please try adjusting the country or language settings</string>
+
+    <string-array name="languages_interface_array">
+        <item>Match system language</item>
+        <item>Русский</item>
+        <item>English</item>
+    </string-array>
+
+
+    <string-array name="languages_content_array">
+        <item>Afar</item>
+        <item>Amharic</item>
+        <item>Arabic</item>
+        <item>Bengali</item>
+        <item>Bosnian</item>
+        <item>Bulgarian</item>
+        <item>Burmese</item>
+        <item>Chinese</item>
+        <item>Croatian</item>
+        <item>Czech</item>
+        <item>Danish</item>
+        <item>Dutch</item>
+        <item>English</item>
+        <item>Estonian</item>
+        <item>Finnish</item>
+        <item>French</item>
+        <item>German</item>
+        <item>Greek</item>
+        <item>Hebrew</item>
+        <item>Hindi</item>
+        <item>Hungarian</item>
+        <item>Icelandic</item>
+        <item>Indonesian</item>
+        <item>Italian</item>
+        <item>Japanese</item>
+        <item>Korean</item>
+        <item>Lao</item>
+        <item>Latvian</item>
+        <item>Lithuanian</item>
+        <item>Macedonian</item>
+        <item>Malay</item>
+        <item>Maltese</item>
+        <item>Marathi</item>
+        <item>Māori</item>
+        <item>Nepali</item>
+        <item>Norwegian</item>
+        <item>Persian</item>
+        <item>Polish</item>
+        <item>Portuguese</item>
+        <item>Romanian</item>
+        <item>Russian</item>
+        <item>Serbian</item>
+        <item>Sinhalese</item>
+        <item>Slovak</item>
+        <item>Slovene</item>
+        <item>Somali</item>
+        <item>Spanish</item>
+        <item>Swedish</item>
+        <item>Tajik</item>
+        <item>Tamil</item>
+        <item>Telugu</item>
+        <item>Thai</item>
+        <item>Turkish</item>
+        <item>Ukrainian</item>
+        <item>Urdu</item>
+        <item>Uzbek</item>
+        <item>Vietnamese</item>
+
+    </string-array>
+
+    <string-array name="languages_source_country_array">
+        <item>Afghanistan</item>
+        <item>Albania</item>
+        <item>Algeria</item>
+        <item>American Samoa</item>
+        <item>Anguilla</item>
+        <item>Argentina</item>
+        <item>Australia</item>
+        <item>Austria</item>
+        <item>Bahamas</item>
+        <item>Bahrain</item>
+        <item>Bangladesh</item>
+        <item>Barbados</item>
+        <item>Belarus</item>
+        <item>Belgium</item>
+        <item>Belize</item>
+        <item>Benin</item>
+        <item>Bermuda</item>
+        <item>Bhutan</item>
+        <item>Bosnia And Herzegovina</item>
+        <item>Bouvet Island</item>
+        <item>Brazil</item>
+        <item>British Indian Ocean Territory</item>
+        <item>Brunei Darussalam</item>
+        <item>Bulgaria</item>
+        <item>Burkina Faso</item>
+        <item>Burundi</item>
+        <item>Cambodia</item>
+        <item>Cameroon</item>
+        <item>Canada</item>
+        <item>Cape Verde</item>
+        <item>Central African Republic</item>
+        <item>Chile</item>
+        <item>China</item>
+        <item>Colombia</item>
+        <item>Comoros</item>
+        <item>Congo, Democratic Republic Of The</item>
+        <item>Congo, Republic Of The</item>
+        <item>Costa Rica</item>
+        <item>Cote D\'ivoire</item>
+        <item>Croatia</item>
+        <item>Cuba</item>
+        <item>Cyprus</item>
+        <item>Czech Republic</item>
+        <item>Denmark</item>
+        <item>Djibouti</item>
+        <item>Dominican Republic</item>
+        <item>Ecuador</item>
+        <item>Egypt</item>
+        <item>El Salvador</item>
+        <item>Eritrea</item>
+        <item>Ethiopia</item>
+        <item>Fiji</item>
+        <item>Finland</item>
+        <item>France</item>
+        <item>French Guiana</item>
+        <item>French Polynesia</item>
+        <item>Gambia</item>
+        <item>Germany</item>
+        <item>Ghana</item>
+        <item>Greece</item>
+        <item>Guatemala</item>
+        <item>Guinea</item>
+        <item>Guyana</item>
+        <item>Honduras</item>
+        <item>Hong Kong</item>
+        <item>Hungary</item>
+        <item>Iceland</item>
+        <item>India</item>
+        <item>Indonesia</item>
+        <item>Iran</item>
+        <item>Iraq</item>
+        <item>Ireland</item>
+        <item>Israel</item>
+        <item>Italy</item>
+        <item>Japan</item>
+        <item>Jordan</item>
+        <item>Kazakhstan</item>
+        <item>Kenya</item>
+        <item>Kuwait</item>
+        <item>Laos</item>
+        <item>Latvia</item>
+        <item>Lebanon</item>
+        <item>Lesotho</item>
+        <item>Liberia</item>
+        <item>Liechtenstein</item>
+        <item>Lithuania</item>
+        <item>Luxembourg</item>
+        <item>Macedonia</item>
+        <item>Madagascar</item>
+        <item>Malawi</item>
+        <item>Malaysia</item>
+        <item>Maldives</item>
+        <item>Mali</item>
+        <item>Malta</item>
+        <item>Mauritania</item>
+        <item>Mauritius</item>
+        <item>Mexico</item>
+        <item>Micronesia, Federated States Of</item>
+        <item>Moldova</item>
+        <item>Monaco</item>
+        <item>Montenegro</item>
+        <item>Montserrat</item>
+        <item>Morocco</item>
+        <item>Myanmar</item>
+        <item>Namibia</item>
+        <item>Nepal</item>
+        <item>Netherlands</item>
+        <item>New Zealand</item>
+        <item>Niger</item>
+        <item>Nigeria</item>
+        <item>North Korea</item>
+        <item>Norway</item>
+        <item>Oman</item>
+        <item>Pakistan</item>
+        <item>Palestinian Territory</item>
+        <item>Paraguay</item>
+        <item>Peru</item>
+        <item>Philippines</item>
+        <item>Poland</item>
+        <item>Portugal</item>
+        <item>Qatar</item>
+        <item>Romania</item>
+        <item>Russia</item>
+        <item>Rwanda</item>
+        <item>Saint Kitts And Nevis</item>
+        <item>Saint Vincent And The Grenadines</item>
+        <item>San Marino</item>
+        <item>Saudi Arabia</item>
+        <item>Senegal</item>
+        <item>Serbia</item>
+        <item>Seychelles</item>
+        <item>Sierra Leone</item>
+        <item>Singapore</item>
+        <item>Slovakia</item>
+        <item>Slovenia</item>
+        <item>Solomon Islands</item>
+        <item>Somalia</item>
+        <item>South Africa</item>
+        <item>South Korea</item>
+        <item>Spain</item>
+        <item>Sri Lanka</item>
+        <item>Suriname</item>
+        <item>Swaziland</item>
+        <item>Sweden</item>
+        <item>Switzerland</item>
+        <item>Syria</item>
+        <item>Taiwan</item>
+        <item>Tajikistan</item>
+        <item>Thailand</item>
+        <item>Timor-leste</item>
+        <item>Togo</item>
+        <item>Tonga</item>
+        <item>Trinidad And Tobago</item>
+        <item>Turkey</item>
+        <item>Tuvalu</item>
+        <item>Ukraine</item>
+        <item>Uganda</item>
+        <item>United Arab Emirates</item>
+        <item>United Kingdom</item>
+        <item>United States Of America</item>
+        <item>Uruguay</item>
+        <item>Uzbekistan</item>
+        <item>Vanuatu</item>
+        <item>Zambia</item>
+    </string-array>
 
 
 </resources>
+

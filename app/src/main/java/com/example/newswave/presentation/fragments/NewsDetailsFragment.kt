@@ -4,17 +4,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.os.Looper
-import android.text.TextPaint
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -22,19 +19,22 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
-import com.example.newswave.data.database.dbAuthors.AuthorDbModel
-import com.example.newswave.databinding.FragmentNewsDetailsBinding
-import com.example.newswave.presentation.MainActivity
 import com.example.newswave.app.NewsApp
+import com.example.newswave.databinding.FragmentNewsDetailsBinding
+import com.example.newswave.domain.model.AuthState
+import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.CustomArrayAdapter
 import com.example.newswave.utils.DateUtils
 import com.example.newswave.utils.NetworkUtils
-import com.example.newswave.utils.TextUtils
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -76,9 +76,8 @@ class NewsDetailsFragment : Fragment() {
         binding.playerView.player = player
         viewModel = ViewModelProvider(this, viewModelFactory)[NewsDetailsViewModel::class.java]
 
-        observeViewModel()
-        setOnClickListener()
         inflateFragment()
+        observeViewModel()
     }
 
     private fun inflateFragment() {
@@ -86,6 +85,16 @@ class NewsDetailsFragment : Fragment() {
         setupSpinner()
         setupImage()
         setupVideoPlayer()
+        setupDefaultButton()
+    }
+
+    private fun setupDefaultButton() {
+        binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        if ("RU" == currentLanguage()) {
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe_rus)
+        } else {
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
+        }
     }
 
     private fun setupTextViews() {
@@ -96,11 +105,12 @@ class NewsDetailsFragment : Fragment() {
         }
     }
 
-    private fun setupSpinner(){
+    private fun setupSpinner() {
         val list = args.news.author.split(",")
         val spinner = binding.srAuthors
 
-        val customAdapter = CustomArrayAdapter(requireActivity().application, R.layout.spinner_item, list)
+        val customAdapter =
+            CustomArrayAdapter(requireContext(), R.layout.spinner_item, list)
         customAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
         spinner.adapter = customAdapter
 
@@ -116,8 +126,11 @@ class NewsDetailsFragment : Fragment() {
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             @SuppressLint("ResourceAsColor")
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                val selectedItem = p0?.getItemAtPosition(p2).toString()
-                viewModel.checkAuthorInRepository(selectedItem)
+                if (p2 != 0) {
+                    Log.d("onItemSelectedListenerState", "fsfsd")
+                    val selectedItem = p0?.getItemAtPosition(p2).toString()
+                    viewModel.checkAuthorInRepository(selectedItem)
+                }
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -126,18 +139,18 @@ class NewsDetailsFragment : Fragment() {
         }
     }
 
-    private fun setupImage(){
-        if (NetworkUtils.isNetworkAvailable(requireActivity().application)){
+    private fun setupImage() {
+        if (NetworkUtils.isNetworkAvailable(requireActivity().application)) {
             Picasso.get()
                 .load(args.news.image)
                 .resize(800, 600)
                 .into(binding.ivImage)
-        } else{
+        } else {
             binding.ivImage.setImageResource(R.drawable.error_placeholder)
         }
     }
 
-    private fun setupVideoPlayer(){
+    private fun setupVideoPlayer() {
         args.news.video?.let { videoUrl ->
             if (!videoUrl.endsWith("m3u8")) {
                 binding.playerView.visibility = View.VISIBLE
@@ -149,50 +162,94 @@ class NewsDetailsFragment : Fragment() {
         }
     }
 
-    private fun updateSubscriptionButton(isFavorite: Boolean) {
-        if (isFavorite) {
-            binding.btSubscription.text = getString(R.string.subscribed)
-            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
-            binding.btSubscription.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.white
-                )
-            )
-        } else {
-            binding.btSubscription.text = getString(R.string.subscribe)
-            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
-            binding.btSubscription.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.black
-                )
-            )
-        }
+    override fun onDestroy() { // crutch
+        super.onDestroy()
+        viewModel.clearState() // crutch
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){
-                viewModel.stateAuthor.collect { isFavorite ->
-                    updateSubscriptionButton(isFavorite)
+        if (args.news.author == EMPTY_CATEGORY) {
+            updateUIForUnknownAuthor()
+            return
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch { // где надо и не надо collectlatest
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.user.collectLatest { isAuth ->
+                    Log.d("NewsDetailsFragmentState", isAuth.toString())
+                    handleAuthState(isAuth)
+                    if (isAuth is AuthState.LoggedOut) {
+                        if (findNavController().currentDestination?.id == R.id.newsDetailsFragment3) {
+                            findNavController().popBackStack(
+                                R.id.subscribedAuthorsFragment,
+                                false
+                            )
+                        }
+                        binding.btSubscription.visibility = View.VISIBLE
+                        return@collectLatest
+                    }
+                    viewModel.checkAuthorInRepository(args.news.author)
+                    viewModel.stateAuthor.collectLatest { isFavorite -> // возможно нужен запуск в launch
+                        Log.d("NewsDetailsFragmentState", isFavorite.toString())
+                        if (viewModel.isInternetConnection(requireContext())){
+                            if (isFavorite != null) {
+                                updateSubscriptionButton(isFavorite)
+                            }
+                        } else{
+                            updateSubscriptionButton(false)
+                            Log.d("CheckErrorMessage", "execute toast in newsdetails")
+                            showToastErrorInternetConnection()
+                        }
+
+                    }
                 }
             }
         }
     }
 
 
-    private fun setOnClickListener() {
-        binding.btSubscription.setOnClickListener {
-            val checkSubscribed = binding.btSubscription.text.toString()
-            val author = binding.srAuthors.selectedItem.toString()
-            val btSub = requireActivity().getString(R.string.subscribe)
-            if (checkSubscribed == btSub) {
-                viewModel.subscribeOnAuthor(author)
-            } else {
-                showUnsubscribeDialog(author)
+    private fun handleAuthState(isAuth: AuthState) {
+            binding.btSubscription.setOnClickListener {
+                if (!viewModel.isInternetConnection(requireContext())){
+                    showToastErrorInternetConnection()
+                    return@setOnClickListener
+                }
+                    val checkSubscribed = binding.btSubscription.text.toString()
+                val author = binding.srAuthors.selectedItem.toString()
+                val btSub = requireActivity().getString(R.string.subscribe)
+                when (isAuth) {
+                    is AuthState.LoggedIn -> {
+                        if (checkSubscribed == btSub) viewModel.subscribeOnAuthor(author)
+                        else showUnsubscribeDialog(author)
+                    }
+
+                    is AuthState.LoggedOut -> requestLoginForSubscription()
+                }
             }
-        }
+
+    }
+
+    private fun showToastErrorInternetConnection() {
+        Toast.makeText(
+            requireContext(),
+            getString(R.string.no_internet_connection),
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+
+    private fun requestLoginForSubscription() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(getString(R.string.subscription_prompt_message))
+            .setMessage(getString(R.string.sign_in_required_message))
+            .setPositiveButton(getString(R.string.sign_in_text)) { dialog, _ ->
+                launchSignInFragment()
+                dialog.dismiss()
+            }
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+        builder.create().show()
     }
 
     private fun showUnsubscribeDialog(author: String) {
@@ -200,11 +257,11 @@ class NewsDetailsFragment : Fragment() {
         builder.setTitle(getString(R.string.confirmation))
         builder.setMessage(getString(R.string.alert_dialog_question, author))
 
-        builder.setPositiveButton(getString(R.string.positive_answer)) {dialog, _ ->
+        builder.setPositiveButton(getString(R.string.unsubscribe)) { dialog, _ ->
             viewModel.unsubscribeFromAuthor(author)
             dialog.dismiss()
         }
-        builder.setNegativeButton(getString(R.string.negative_answer)){ dialog, _ ->
+        builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
             dialog.dismiss()
         }
 
@@ -212,10 +269,64 @@ class NewsDetailsFragment : Fragment() {
         dialog.show()
     }
 
-        override fun onDestroyView() {
+    private fun updateSubscriptionButton(isFavorite: Boolean) {
+        if (isFavorite) {
+            setSubscribedButton()
+            binding.btSubscription.visibility = View.VISIBLE
+        } else {
+            setUnsubscribedButton()
+            binding.btSubscription.visibility = View.VISIBLE
+        }
+    }
+
+    private fun updateUIForUnknownAuthor() {
+        binding.btSubscription.visibility = View.GONE
+        binding.srAuthors.visibility = View.GONE
+        binding.tvAuthorUnknown.visibility = View.VISIBLE
+    }
+
+
+    private fun setSubscribedButton() {
+        binding.btSubscription.text = getString(R.string.subscribed)
+        binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        if ("RU" == currentLanguage()) {
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed_rus)
+        } else {
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
+        }
+    }
+
+    private fun setUnsubscribedButton() {
+        binding.btSubscription.text = getString(R.string.subscribe)
+        binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        if ("RU" == currentLanguage()) {
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe_rus)
+        } else {
+            binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
+        }
+    }
+
+    private fun currentLanguage(): String {
+        val currentLocale = resources.configuration.locales[0]
+        val currentLanguage = currentLocale.language
+        val currentCountry = currentLocale.country
+        return currentCountry
+    }
+
+    override fun onDestroyView() {
         super.onDestroyView()
         player.release()
         binding.playerView.player = null
     }
 
+    private fun launchSignInFragment() {
+        binding.btSubscription.visibility = View.GONE
+        findNavController().navigate(
+            NewsDetailsFragmentDirections.actionNewsDetailsFragmentToLoginFragment()
+        )
+    }
+
+    companion object {
+        private const val EMPTY_CATEGORY = "unknownAuthor"
+    }
 }

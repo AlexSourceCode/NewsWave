@@ -2,70 +2,63 @@ package com.example.newswave.data.repository
 
 import android.app.Application
 import android.util.Log
-import com.example.newswave.data.database.dbAuthors.AuthorDao
-import com.example.newswave.data.database.dbAuthors.AuthorDbModel
-import com.example.newswave.data.mapper.AuthorMapper
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.domain.entity.AuthorItemEntity
-import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.model.NewsState
 import com.example.newswave.domain.repository.SubscriptionRepository
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.retry
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class SubscriptionRepositoryImpl @Inject constructor(
     private val application: Application,
-    private val authorDao: AuthorDao,
-    private val mapper: AuthorMapper,
     private val mapperNews: NewsMapper,
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val database: FirebaseDatabase,
+    private val auth: FirebaseAuth
 ) : SubscriptionRepository {
 
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val ioScope = CoroutineScope(Dispatchers.IO)
 
     private val _currentAuthor = MutableSharedFlow<String?>()
 
-    private val _authorNews = MutableSharedFlow<NewsState>()//mb stateflow
+    private val _authorNews = MutableSharedFlow<NewsState>()
     private val authorNews: SharedFlow<NewsState> get() = _authorNews.asSharedFlow()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val getAuthorList =
-        authorDao.getAuthorsList()
-            .flatMapConcat { authorsList ->
-                flow {
-                    emit(authorsList.map { mapper.mapDbModelToAuthorEntity(it) })
-                }
-            }.stateIn(
-                scope = coroutineScope,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = emptyList()
-            )
+    private val _authorList = MutableSharedFlow<List<AuthorItemEntity>?>()
+    private val authorList: SharedFlow<List<AuthorItemEntity>?> get() = _authorList.asSharedFlow()
 
-    override suspend fun getAuthorList(): StateFlow<List<AuthorItemEntity>> = getAuthorList
+    private var _isFavoriteAuthorFlow = MutableStateFlow<Boolean?>(null)
+    private val isFavoriteAuthorFlow: StateFlow<Boolean?> get() = _isFavoriteAuthorFlow.asStateFlow()
+
+    private val authorsReference = database.getReference("Authors")
+
+
+    override suspend fun getAuthorList(): SharedFlow<List<AuthorItemEntity>?> = authorList
 
 
     override suspend fun loadAuthorNews(author: String): SharedFlow<NewsState> {
@@ -75,21 +68,134 @@ class SubscriptionRepositoryImpl @Inject constructor(
 
 
     override suspend fun subscribeToAuthor(author: String) {
-        val author = AuthorDbModel(
-            author = author
-        )
-        authorDao.insertAuthor(author)
+        val authorEntity = AuthorItemEntity(author)
+        val userId = auth.currentUser?.uid.toString()
+        val authorQuery = authorsReference.child(userId)
+            .orderByChild("author")
+            .equalTo(author)
+
+        authorQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    return
+                } else {
+                    authorsReference.child(userId).push().setValue(authorEntity)
+                    ioScope.launch {
+                        favoriteAuthorCheck(author)
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("UserRepositoryImpl", "Failed to read value.", error.toException())
+            }
+
+        })
     }
 
     override suspend fun unsubscribeFromAuthor(author: String) {
-        authorDao.deleteAuthor(author)
+        val userId = auth.currentUser?.uid.toString()
+        val authorQuery = authorsReference.child(userId).orderByChild("author")
+
+        authorQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (authorSnapshot in snapshot.children) {
+                    val authorEntity = authorSnapshot.getValue(AuthorItemEntity::class.java)
+                    if (authorEntity?.author == author) {
+                        authorSnapshot.ref.removeValue()
+                        ioScope.launch {
+                            favoriteAuthorCheck(author)
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("UserRepositoryImpl", "Failed to remove value.", error.toException())
+            }
+        })
     }
 
-    override suspend fun favoriteAuthorCheck(author: String): Boolean =
-        authorDao.isAuthorExists(author)
+    override fun favoriteAuthorCheck(author: String) {
+        ioScope.launch {
+            if (auth.currentUser == null) {
+                _authorList.emit(null)
+            } else {
+                authorsReference.child(auth.currentUser?.uid.toString())
+                    .orderByChild("author")
+                    .equalTo(author)
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            ioScope.launch {
+                                Log.d("TimeUpdateValue", "BeforeUpdateFavotireAuthor")
+                                _isFavoriteAuthorFlow.value = snapshot.exists()
+                                Log.d("TimeUpdateValue", "AfterUpdateFavotireAuthor")
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            error.toException()
+                        }
+                    })
+            }
+        }
+    }
+
+    override fun showAuthorsList(){
+        authorsReference.child(auth.currentUser?.uid.toString()).addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val authors = mutableListOf<AuthorItemEntity>()
+                for (authorSnapshot in snapshot.children) {
+                    val author = authorSnapshot.getValue(AuthorItemEntity::class.java)
+                    author?.let { authors.add(author) }
+                }
+                ioScope.launch {
+                    _authorList.emit(authors)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("UserRepositoryImpl", "Failed to read value.", error.toException())
+            }
+
+        })
+    }
+
+    override fun clearState() {
+        _isFavoriteAuthorFlow.value = null
+    }
+
+    override fun isFavoriteAuthor(): StateFlow<Boolean?> = isFavoriteAuthorFlow
+
+    private fun authorization(){
+        auth.addAuthStateListener {
+            authorsReference.child(auth.currentUser?.uid.toString())
+                .addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val authors = mutableListOf<AuthorItemEntity>()
+                        for (authorSnapshot in snapshot.children) {
+                            val author = authorSnapshot.getValue(AuthorItemEntity::class.java)
+                            author?.let { authors.add(author) }
+                        }
+
+                        ioScope.launch {
+                            if (auth.currentUser == null) _authorList.emit(null)
+                            else _authorList.emit(authors)
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.w("UserRepositoryImpl", "Failed to read value.", error.toException())
+                    }
+                })
+        }
+    }
 
     init {
-        coroutineScope.launch {
+        authorization()
+
+
+        ioScope.launch {
             _currentAuthor
                 .filter {
                     delay(10)

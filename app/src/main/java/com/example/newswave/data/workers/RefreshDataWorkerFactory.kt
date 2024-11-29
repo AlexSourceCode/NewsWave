@@ -6,6 +6,7 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.example.newswave.data.database.dbNews.NewsDao
 import com.example.newswave.data.database.dbNews.NewsDb
+import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.network.api.ApiFactory
 import com.example.newswave.data.network.api.ApiService
@@ -14,7 +15,8 @@ import javax.inject.Inject
 class RefreshDataWorkerFactory @Inject constructor(
     private val apiService: ApiService,
     private val newsInfoDao: NewsDao,
-    private val mapper: NewsMapper
+    private val mapper: NewsMapper,
+    private val userPreferences: UserPreferences
 ) : WorkerFactory() {
     override fun createWorker(
         appContext: Context,
@@ -26,7 +28,8 @@ class RefreshDataWorkerFactory @Inject constructor(
             workerParameters,
             apiService,
             newsInfoDao,
-            mapper
+            mapper,
+            userPreferences
         )
     }
 }

@@ -3,7 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-<!--    <color name="selected_color">#E39C49</color> &lt;!&ndash; Белый цвет для выбранного элемента &ndash;&gt;-->
-<!--    <color name="unselected_color">@color/white</color>-->
+    <dimen name="bottom_sheet_min_height">200dp</dimen>
+
 
 </resources>
