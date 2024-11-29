@@ -248,7 +248,7 @@ class TopNewsFragment : Fragment() {
                                 adapter.submitList(uiState.currentList) {
                                     if (viewModel.isFirstLaunch) {
                                         lifecycleScope.launch {
-                                            delay(700)
+                                            delay(1000)
                                             scrollToTop()
                                             viewModel.isFirstLaunch = false
                                         }
