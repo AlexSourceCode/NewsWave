@@ -8,10 +8,14 @@ import com.example.newswave.data.database.dbNews.NewsDb
 import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.data.network.api.ApiFactory
 import com.example.newswave.data.network.api.ApiService
+import com.example.newswave.data.repository.LocalDataSourceImpl
 import com.example.newswave.data.repository.NewsRepositoryImpl
+import com.example.newswave.data.repository.RemoteDataSourceImpl
 import com.example.newswave.data.repository.SubscriptionRepositoryImpl
 import com.example.newswave.data.repository.UserRepositoryImpl
+import com.example.newswave.domain.repository.LocalDataSource
 import com.example.newswave.domain.repository.NewsRepository
+import com.example.newswave.domain.repository.RemoteDataSource
 import com.example.newswave.domain.repository.SubscriptionRepository
 import com.example.newswave.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -37,6 +41,14 @@ interface DataModule {
     @Binds
     @ApplicationScope
     fun bindUserRepository(userRepository: UserRepositoryImpl): UserRepository
+
+    @Binds
+    @ApplicationScope
+    fun bindLocalDataSource(localDataSource: LocalDataSourceImpl): LocalDataSource
+
+    @Binds
+    @ApplicationScope
+    fun bindRemoteDataSource(remoteDataSource: RemoteDataSourceImpl) : RemoteDataSource
 
     companion object{
         @Provides

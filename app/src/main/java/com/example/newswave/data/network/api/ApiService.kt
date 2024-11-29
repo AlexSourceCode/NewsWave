@@ -11,47 +11,43 @@ interface ApiService {
 
     @GET("top-news")
     suspend fun getListTopNews(
-        @Query("source-country") sourceCountry: String = QUERY_PARAM_SOURCE_COUNTRY,
-        @Query("language") language: String = QUERY_PARAM_LANGUAGE,
+        @Query("source-country") sourceCountry: String,
+        @Query("language") language: String,
         @Query("date") date: String,
         @Query("api-key") apiKey: String = QUERY_PARAM_API_KEY
     ): Flow<TopNewsResponseDto>
 
     @GET("search-news")
     suspend fun getNewsByText(
-        @Query("language") language: String = QUERY_PARAM_LANGUAGE,
+        @Query("language") language: String,
         @Query("api-key") apiKey: String = QUERY_PARAM_API_KEY,
         @Query("text") text: String,
         @Query("sort-direction") sortDirection: String = QUERY_PARAM_SORT_DIRECTION,
-        @Query("source-country") sourceCountry: String = QUERY_PARAM_SOURCE_COUNTRY,
+        @Query("source-country") sourceCountry: String,
         @Query("sort") sort: String = QUERY_PARAM_SORT,
         @Query("number") number: Int = QUERY_PARAM_LIMIT
     ): Flow<NewsResponseDto>
 
     @GET("search-news")
     suspend fun getNewsByAuthor(
-//        @Query("language") language: String = QUERY_PARAM_LANGUAGE,
         @Query("api-key") apiKey: String = QUERY_PARAM_API_KEY,
         @Query("authors") author: String,
         @Query("sort-direction") sortDirection: String = QUERY_PARAM_SORT_DIRECTION,
-//        @Query("source-country") sourceCountry: String = QUERY_PARAM_SOURCE_COUNTRY,
         @Query("sort") sort: String = QUERY_PARAM_SORT,
         @Query("number") limit: Int = QUERY_PARAM_LIMIT
     ): Flow<NewsResponseDto>
 
     @GET("top-news")
     suspend fun getNewsByDate(
-        @Query("language") language: String = QUERY_PARAM_LANGUAGE,
+        @Query("language") language: String,
         @Query("api-key") apiKey: String = QUERY_PARAM_API_KEY,
-        @Query("source-country") sourceCountry: String = QUERY_PARAM_SOURCE_COUNTRY,
+        @Query("source-country") sourceCountry: String,
         @Query("date") date: String,
         ): Flow<TopNewsResponseDto>
 
 
     companion object {
         private const val QUERY_PARAM_API_KEY = "b6ef41d59ba74add937bb849af4656b4"
-        private const val QUERY_PARAM_LANGUAGE = "en"
-        private const val QUERY_PARAM_SOURCE_COUNTRY = "us"
         private const val QUERY_PARAM_SORT_DIRECTION = "DESC"
         private const val QUERY_PARAM_SORT = "publish-time"
         private const val QUERY_PARAM_LIMIT = 50

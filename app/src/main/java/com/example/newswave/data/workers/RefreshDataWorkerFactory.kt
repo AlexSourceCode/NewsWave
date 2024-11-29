@@ -10,10 +10,11 @@ import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.network.api.ApiFactory
 import com.example.newswave.data.network.api.ApiService
+import com.example.newswave.domain.repository.RemoteDataSource
 import javax.inject.Inject
 
 class RefreshDataWorkerFactory @Inject constructor(
-    private val apiService: ApiService,
+    private val remoteDataSource: RemoteDataSource,
     private val newsInfoDao: NewsDao,
     private val mapper: NewsMapper,
     private val userPreferences: UserPreferences
@@ -26,7 +27,7 @@ class RefreshDataWorkerFactory @Inject constructor(
         return RefreshDataWorker(
             appContext,
             workerParameters,
-            apiService,
+            remoteDataSource,
             newsInfoDao,
             mapper,
             userPreferences

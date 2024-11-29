@@ -18,6 +18,7 @@ import com.example.newswave.data.network.api.ApiFactory
 import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.network.model.TopNewsResponseDto
 import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.domain.repository.RemoteDataSource
 import com.example.newswave.utils.DateUtils
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +39,7 @@ import kotlinx.coroutines.launch
 class RefreshDataWorker(
     private val context: Context,
     private var workerParameters: WorkerParameters,
-    private val apiService: ApiService,
+    private val remoteDataSource: RemoteDataSource,
     private val newsInfoDao: NewsDao,
     private val mapper: NewsMapper,
     private val userPreferences: UserPreferences
@@ -68,7 +69,7 @@ class RefreshDataWorker(
 
         val jsonContainer: Flow<TopNewsResponseDto> = flow {
             for (attempt in 1..2) {
-                val response = apiService.getListTopNews(
+                val response = remoteDataSource.fetchTopNews(
                     sourceCountry = country,
                     language = language,
                     date = date

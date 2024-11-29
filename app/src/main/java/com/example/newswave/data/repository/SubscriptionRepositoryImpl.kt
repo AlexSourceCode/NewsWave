@@ -6,6 +6,7 @@ import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.domain.entity.AuthorItemEntity
 import com.example.newswave.domain.model.NewsState
+import com.example.newswave.domain.repository.RemoteDataSource
 import com.example.newswave.domain.repository.SubscriptionRepository
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import com.google.firebase.auth.FirebaseAuth
@@ -37,7 +38,7 @@ import kotlin.coroutines.suspendCoroutine
 class SubscriptionRepositoryImpl @Inject constructor(
     private val application: Application,
     private val mapperNews: NewsMapper,
-    private val apiService: ApiService,
+    private val remoteDataSource: RemoteDataSource,
     private val database: FirebaseDatabase,
     private val auth: FirebaseAuth
 ) : SubscriptionRepository {
@@ -207,7 +208,7 @@ class SubscriptionRepositoryImpl @Inject constructor(
                 }
                 .filterNotNull()
                 .flatMapLatest { author ->
-                    apiService.getNewsByAuthor(author = author)
+                    remoteDataSource.fetchNewsByAuthor(author = author)
                         .map { newsResponse ->
                             newsResponse.news.map { mapperNews.mapDtoToEntity(it) }
                                 .distinctBy { it.title }

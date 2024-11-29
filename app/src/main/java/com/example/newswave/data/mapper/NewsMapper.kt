@@ -35,7 +35,6 @@ class NewsMapper @Inject constructor() {
             publishDate = dto.publishDate,
             author = author,
             language = dto.language,
-//            category = category,
             sourceCountry = dto.sourceCountry
         )
     }
@@ -50,18 +49,9 @@ class NewsMapper @Inject constructor() {
         publishDate = dbModel.publishDate,
         author = dbModel.author,
         language = dbModel.language,
-//        category = dbModel.category,
         sourceCountry = dbModel.sourceCountry
     )
 
-
-
-
-
-//    suspend fun mapJsonContainerNewsToListNews(newsResponseDto: NewsResponseDto): List<NewsItemDto>{
-//        val result = mutableListOf<NewsItemDto>()
-//        val news = newsResponseDto.news
-//    }
 
     fun mapDtoToEntity(dto: NewsItemDto): NewsItemEntity {
         val author = dto.author ?: EMPTY_CATEGORY
@@ -76,7 +66,6 @@ class NewsMapper @Inject constructor() {
             publishDate = dto.publishDate,
             author = author,
             language = dto.language,
-//        category = dto.category,
             sourceCountry = dto.sourceCountry
         )
     }

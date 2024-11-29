@@ -16,7 +16,9 @@ import com.example.newswave.data.network.model.NewsItemDto
 import com.example.newswave.data.network.model.TopNewsResponseDto
 import com.example.newswave.data.workers.RefreshDataWorker
 import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.domain.repository.LocalDataSource
 import com.example.newswave.domain.repository.NewsRepository
+import com.example.newswave.domain.repository.RemoteDataSource
 import com.example.newswave.utils.Filter
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import com.google.firebase.auth.FirebaseAuth
@@ -52,9 +54,9 @@ import javax.inject.Inject
 
 class NewsRepositoryImpl @Inject constructor(
     private val application: Application,
-    private val newsDao: NewsDao,
+    private val localDataSource: LocalDataSource,
     private val mapper: NewsMapper,
-    private val apiService: ApiService,
+    private val remoteDataSource: RemoteDataSource,
     private val userPreferences: UserPreferences
 ) : NewsRepository {
 
@@ -74,7 +76,7 @@ class NewsRepositoryImpl @Inject constructor(
     private val errorLoadData: SharedFlow<String> get() = _errorLoadData.asSharedFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val fetchTopNewsListFlow = newsDao.getNewsList()
+    private val fetchTopNewsListFlow = localDataSource.getNewsList()
         .flatMapConcat { newsList ->
             flow {
                 emit(newsList.map { mapper.mapDbModelToEntity(it) })
@@ -120,7 +122,10 @@ class NewsRepositoryImpl @Inject constructor(
 
                                 WorkInfo.State.FAILED -> {
                                     val error = workInfo.outputData.getString("error")
-                                    Log.d("CheckErrorMessage", "execute loadata State = FAILED: $error ")
+                                    Log.d(
+                                        "CheckErrorMessage",
+                                        "execute loadata State = FAILED: $error "
+                                    )
                                     if (error != null) {
                                         _errorLoadData.emit(error)
                                     }
@@ -159,7 +164,7 @@ class NewsRepositoryImpl @Inject constructor(
                 return@launch
             }
             try {
-                apiService.getListTopNews(
+                remoteDataSource.fetchTopNews(
                     sourceCountry = country,
                     language = language,
                     date = previousDate
@@ -171,8 +176,8 @@ class NewsRepositoryImpl @Inject constructor(
                         }
                     }
                     .map { it.distinctBy { news -> news.title } }
-                    .collect {
-                        newsDao.insertNews(it)
+                    .collect { newsList ->
+                        localDataSource.insertNews(newsList)
                     }
             } catch (e: Exception) {
                 _errorLoadData.emit("Error loading news ${e.message}")
@@ -198,10 +203,11 @@ class NewsRepositoryImpl @Inject constructor(
             val country = userPreferences.getSourceCountry()
             val language = userPreferences.getContentLanguage()
 
-            return apiService.getNewsByText(
+            return remoteDataSource.fetchNewsByText(
                 sourceCountry = country,
                 language = language,
-                text = text).map { it.news }
+                text = text
+            )
         } catch (e: Exception) {
             _errorLoadData.emit("Error loading news by text: ${e.message}")
             return flow { emptyList<NewsItemDto>() }
@@ -213,11 +219,9 @@ class NewsRepositoryImpl @Inject constructor(
             val country = userPreferences.getSourceCountry()
             val language = userPreferences.getContentLanguage()
 
-            return apiService.getNewsByAuthor(
-//                sourceCountry = country,
-//                language = language,
-                author = author)
-                .map { it.news }
+            return remoteDataSource.fetchNewsByAuthor(
+                author = author
+            )
         } catch (e: Exception) {
             _errorLoadData.emit("Error loading news by text: ${e.message}")
             return flow { emptyList<NewsItemDto>() }
@@ -229,11 +233,11 @@ class NewsRepositoryImpl @Inject constructor(
             val country = userPreferences.getSourceCountry()
             val language = userPreferences.getContentLanguage()
 
-            return apiService.getNewsByDate(
+            return remoteDataSource.fetchNewsByDate(
                 sourceCountry = country,
                 language = language,
-                date = date)
-                .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
+                date = date
+            )
         } catch (e: Exception) {
             _errorLoadData.emit("Error loading news by text: ${e.message}")
             return flow { emptyList<NewsItemDto>() }
@@ -265,12 +269,12 @@ class NewsRepositoryImpl @Inject constructor(
                             throw Exception("Invalid filter: $filter")
                         }
                     }
-//                        .retry { cause ->
-//                            if (cause is HttpException && cause.code() == 429) {
-//                                delay(2000)
-//                                true
-//                            } else false
-//                        }
+                        .retry { cause -> // временно верну
+                            if (cause is HttpException && cause.code() == 429) {
+                                delay(2000)
+                                true
+                            } else false
+                        }
                         .flatMapConcat { newsList ->
                             flow { emit(newsList.map { mapper.mapDtoToEntity(it) }) }
                         }
