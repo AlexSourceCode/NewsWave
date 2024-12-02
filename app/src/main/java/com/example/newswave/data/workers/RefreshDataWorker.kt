@@ -9,8 +9,10 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.example.newswave.R
 import com.example.newswave.data.database.dbNews.NewsDao
 import com.example.newswave.data.database.dbNews.NewsDb
+import com.example.newswave.data.database.dbNews.NewsDbModel
 import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.mapper.flattenToList
@@ -18,6 +20,8 @@ import com.example.newswave.data.network.api.ApiFactory
 import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.network.model.TopNewsResponseDto
 import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.domain.model.NewsState
+import com.example.newswave.domain.repository.LocalDataSource
 import com.example.newswave.domain.repository.RemoteDataSource
 import com.example.newswave.utils.DateUtils
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
@@ -38,11 +42,9 @@ import kotlinx.coroutines.launch
 
 class RefreshDataWorker(
     private val context: Context,
-    private var workerParameters: WorkerParameters,
+    workerParameters: WorkerParameters,
     private val remoteDataSource: RemoteDataSource,
-    private val newsInfoDao: NewsDao,
-    private val mapper: NewsMapper,
-    private val userPreferences: UserPreferences
+    private val localDataSource: LocalDataSource,
 ) : CoroutineWorker(context, workerParameters) {
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
@@ -61,49 +63,31 @@ class RefreshDataWorker(
     private suspend fun loadData() {
         Log.d("CheckErrorMessage", "execute loadData from dowork")
         var date = DateUtils.formatCurrentDate()
-        val country = userPreferences.getSourceCountry()
-        val language = userPreferences.getContentLanguage()
-        Log.d("loadDataStateArgs", country)
-        Log.d("loadDataStateArgs", language)
 
 
-        val jsonContainer: Flow<TopNewsResponseDto> = flow {
+        val newsList = try {
+            var result: List<NewsDbModel> = emptyList()
             for (attempt in 1..2) {
-                val response = remoteDataSource.fetchTopNews(
-                    sourceCountry = country,
-                    language = language,
-                    date = date
-                ).first()
-
-                if (response.news.isNotEmpty()) {
-                    emit(response)
+                val news = remoteDataSource.fetchTopNews(date)
+                if (news.isNotEmpty()) {
+                    result = news
                     break
                 }
                 date = DateUtils.formatDateToYesterday()
             }
-        }
-
-        val newsList = jsonContainer
-            .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
-            .flatMapConcat { newsList -> flow { emit(newsList.map { mapper.mapDtoToDbModel(it) }) } }
-            .map { it.distinctBy { it.title } }
-            .firstOrNull()
-
-        if (newsList.isNullOrEmpty()) {
-            throw Exception("News list is empty or invalid parameters!") // Генерируем ошибку
-        }
-
-//        val currentNews = newsInfoDao.getNewsList().firstOrNull()?.map { mapper.mapDbModelToEntity(it) }
-//        if (newsList != currentNews) {
-//            Log.d("checkloaddata","Execute if")
-//            newsInfoDao.insertNews(newsList)
-//        } else {
-            ioScope.launch {
-                newsInfoDao.deleteAllNews()
-                newsInfoDao.insertNews(newsList)
+            if (result.isEmpty()) {
+                throw Exception(context.getString(R.string.news_list_is_empty_or_invalid_parameters))
             }
-//        }
+            result
+        } catch (e: Exception) {
+            throw Exception(e.message.toString())
+        }
 
+
+        ioScope.launch {
+            localDataSource.deleteAllNews()
+            localDataSource.insertNews(newsList)
+        }
     }
 
 

@@ -41,28 +41,28 @@ class UserRepositoryImpl @Inject constructor(
     val user: StateFlow<FirebaseUser?> get() = _user.asStateFlow()
 
     private val _signInError = MutableSharedFlow<String>()
-    val signInError: SharedFlow<String> get() = _signInError
+    private val signInError: SharedFlow<String> get() = _signInError
 
     private val _forgotPasswordError = MutableSharedFlow<String>()
-    val forgotPasswordError: SharedFlow<String> get() = _forgotPasswordError
+    private val forgotPasswordError: SharedFlow<String> get() = _forgotPasswordError
 
     private val _signUpError = MutableSharedFlow<String>()
-    val signUpError: SharedFlow<String> get() = _signUpError
+    private val signUpError: SharedFlow<String> get() = _signUpError
 
     private var _userData = MutableStateFlow<UserEntity?>(null)
-    val userData: StateFlow<UserEntity?> get() = _userData.asStateFlow()
+    private val userData: StateFlow<UserEntity?> get() = _userData.asStateFlow()
 
     private var _isSuccess = MutableSharedFlow<Boolean>()
-    val isSuccess: SharedFlow<Boolean> get() = _isSuccess.asSharedFlow()
+    private val isSuccess: SharedFlow<Boolean> get() = _isSuccess.asSharedFlow()
 
     private val _contentLanguage = MutableStateFlow<String>(getContentLanguage())
-    val contentLanguage: StateFlow<String> = _contentLanguage
+    private val contentLanguage: StateFlow<String> = _contentLanguage
 
     private val _sourceCountry = MutableStateFlow<String>(getSourceCountry())
-    val sourceCountry: StateFlow<String> = _sourceCountry
+    private val sourceCountry: StateFlow<String> = _sourceCountry
 
     private val _isUserDataUpdatedFlow = MutableSharedFlow<Unit>()
-    val isUserDataUpdatedFlow: SharedFlow<Unit> = _isUserDataUpdatedFlow
+    private val isUserDataUpdatedFlow: SharedFlow<Unit> = _isUserDataUpdatedFlow
 
     private var isFirstAuth = true
 

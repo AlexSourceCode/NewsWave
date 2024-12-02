@@ -47,7 +47,7 @@ interface ApiService {
 
 
     companion object {
-        private const val QUERY_PARAM_API_KEY = "b6ef41d59ba74add937bb849af4656b4"
+        private const val QUERY_PARAM_API_KEY = "dd1c0076447947fc921616b08d0af87d"
         private const val QUERY_PARAM_SORT_DIRECTION = "DESC"
         private const val QUERY_PARAM_SORT = "publish-time"
         private const val QUERY_PARAM_LIMIT = 50

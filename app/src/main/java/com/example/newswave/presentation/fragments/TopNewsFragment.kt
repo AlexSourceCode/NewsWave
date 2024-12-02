@@ -184,8 +184,12 @@ class TopNewsFragment : Fragment() {
                     when (uiState) {
                         is NewsState.Error -> {
                             binding.pgNews.visibility = View.GONE
-                            when (uiState.message) {
-                                "No Internet connection" -> {
+                            Log.d(
+                                "TopNewsFragmentState",
+                                "Error: ${uiState.message}"
+                            )
+                            when (uiState.message.toString().trim()) {
+                                requireContext().getString(R.string.no_internet_connection) -> {
                                     if (adapter.currentList.isEmpty()) {
                                         binding.tvRetry.visibility = View.VISIBLE
                                     }
@@ -199,7 +203,7 @@ class TopNewsFragment : Fragment() {
                                     showToast()
                                 }
 
-                                "News list is empty or invalid parameters!" -> {
+                                requireContext().getString(R.string.news_list_is_empty_or_invalid_parameters).trim() -> {
                                     Log.d(
                                         "TopNewsFragmentState",
                                         "TopNewsFragment Error: News list is empty or invalid parameters! ${uiState.message}"
@@ -216,7 +220,7 @@ class TopNewsFragment : Fragment() {
                                     showToast()
                                     binding.tvRetry.visibility = View.VISIBLE
                                     binding.tvRetry.setOnClickListener {
-                                        viewModel.refreshData()
+                                        viewModel.searchNewsByFilter()
                                     }
                                 }
                             }

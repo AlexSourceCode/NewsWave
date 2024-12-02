@@ -6,14 +6,8 @@ import android.util.Log
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import retrofit2.HttpException
-import com.example.newswave.data.database.dbNews.NewsDao
-import com.example.newswave.data.database.dbNews.UserPreferences
-import com.example.newswave.data.mapper.NewsMapper
-import com.example.newswave.data.mapper.flattenToList
-import com.example.newswave.data.network.api.ApiService
+import com.example.newswave.R
 import com.example.newswave.data.network.model.NewsItemDto
-import com.example.newswave.data.network.model.TopNewsResponseDto
 import com.example.newswave.data.workers.RefreshDataWorker
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.LocalDataSource
@@ -21,271 +15,207 @@ import com.example.newswave.domain.repository.NewsRepository
 import com.example.newswave.domain.repository.RemoteDataSource
 import com.example.newswave.utils.Filter
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.retry
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
+/**
+ Реализация репозитория для управления данными новостей
+ Позволяет загружать, фильтровать и обновлять данные
+ */
 class NewsRepositoryImpl @Inject constructor(
     private val application: Application,
-    private val localDataSource: LocalDataSource,
-    private val mapper: NewsMapper,
-    private val remoteDataSource: RemoteDataSource,
-    private val userPreferences: UserPreferences
+    private val localDataSource: LocalDataSource, // Локальный источник данных (БД)
+    private val remoteDataSource: RemoteDataSource, // Удалённый источник данных (API)
 ) : NewsRepository {
 
-
+    // Текущая дата для фильтрации новостей по дням
     @SuppressLint("NewApi")
     private var currentEndDate: LocalDate = LocalDate.now()
 
-    private val ioScope = CoroutineScope(Dispatchers.IO)
+    private val job = SupervisorJob()
+    private val ioScope = CoroutineScope(job + Dispatchers.IO)
 
-    private val _filterFlow = MutableSharedFlow<String>()
-    private var _valueFilter: String? = null
+    // Поток для передачи фильтров и значений
+    private val _filterFlow =
+        MutableSharedFlow<Pair<String, String>>()
 
-    private val _filteredNewsFlow = MutableSharedFlow<List<NewsItemEntity>>()
-    private val filteredNewsFlow: SharedFlow<List<NewsItemEntity>> get() = _filteredNewsFlow.asSharedFlow()
+    // Поток отфильтрованных новостей
+    private val _filteredNewsSharedFlow = MutableSharedFlow<List<NewsItemEntity>>()
+    private val filteredNewsSharedFlow: SharedFlow<List<NewsItemEntity>> get() = _filteredNewsSharedFlow.asSharedFlow()
 
-    private val _errorLoadData = MutableSharedFlow<String>()
-    private val errorLoadData: SharedFlow<String> get() = _errorLoadData.asSharedFlow()
+    // Поток для передачи ошибок
+    private val _observeErrorLoadData = MutableSharedFlow<String>()
+    private val observeErrorLoadData: SharedFlow<String> get() = _observeErrorLoadData.asSharedFlow()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val fetchTopNewsListFlow = localDataSource.getNewsList()
-        .flatMapConcat { newsList ->
-            flow {
-                emit(newsList.map { mapper.mapDbModelToEntity(it) })
-            }
-        }.stateIn(
-            scope = ioScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList(),
+    // Поток для получения списка новостей из БД
+    private val topNewsStateFlow = localDataSource.getNewsList()
+
+    init {
+        observeFilterFlow()
+    }
+
+    // Получение топ новостей из БД
+    override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> = topNewsStateFlow
+
+
+    // Запуск фоновой задачи для обновления данных через WorkManager
+    override suspend fun loadData() {
+        val workManager = WorkManager.getInstance(application.applicationContext)
+        val workRequest = RefreshDataWorker.makeRequest()
+
+        workManager.enqueueUniqueWork(
+            RefreshDataWorker.WORK_NAME,
+            ExistingWorkPolicy.REPLACE,
+            workRequest
         )
 
-
-    override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> = fetchTopNewsListFlow
-
-
-    override suspend fun loadData() {
-        Log.d("CheckErrorMessage", "start fun loaddata")
-
-        val workManager =
-            WorkManager.getInstance(application.applicationContext)     // Получаем экземпляр WorkManager для управления задачами
-        val workRequest =
-            RefreshDataWorker.makeRequest()     // Создаем запрос на выполнение работы
-
-        if (workRequest != null) {
-            workManager.enqueueUniqueWork(
-                RefreshDataWorker.WORK_NAME,
-                ExistingWorkPolicy.REPLACE,
-                workRequest
-            )
-
-            ioScope.launch {
-                workManager.getWorkInfosForUniqueWorkFlow(RefreshDataWorker.WORK_NAME)
-                    .collect { workInfos ->
-                        val workInfo = workInfos.firstOrNull()
-                        if (workInfo != null) {
-                            when (workInfo.state) {
-                                WorkInfo.State.ENQUEUED -> {
-                                    Log.d("CheckErrorMessage", "execute loadata State = ENQUEUED ")
-                                    if (!isNetworkAvailable(application)) {
-                                        _errorLoadData.emit("No Internet connection")
-                                        cancel()
-                                    }
-                                }
-
-                                WorkInfo.State.FAILED -> {
-                                    val error = workInfo.outputData.getString("error")
-                                    Log.d(
-                                        "CheckErrorMessage",
-                                        "execute loadata State = FAILED: $error "
-                                    )
-                                    if (error != null) {
-                                        _errorLoadData.emit(error)
-                                    }
-                                    cancel()
-                                }
-
-                                WorkInfo.State.SUCCEEDED -> {
-                                    Log.d("CheckErrorMessage", "Success")
-                                    cancel() // Прекращаем слежение при успешном завершении работы
-                                }
-
-                                else -> {}
-                            }
-                        }
-                    }
-            }
+        ioScope.launch {
+            observeWorkState(workManager)
         }
     }
 
+    // Отслеживание состояния задачи WorkManager
+    private suspend fun observeWorkState(workManager: WorkManager) {
+        workManager.getWorkInfosForUniqueWorkFlow(RefreshDataWorker.WORK_NAME)
+            .collect { workInfos ->
+                workInfos.firstOrNull()?.let { handleWorkState(it) }
+            }
+    }
 
-    override suspend fun fetchErrorLoadData(): SharedFlow<String> = errorLoadData
+    // Обработка состояний задачи WorkManager
+    private suspend fun handleWorkState(workInfo: WorkInfo) {
+        when (workInfo.state) {
+            WorkInfo.State.ENQUEUED -> {
+                if (!isNetworkAvailableWithError()) throw CancellationException("No network available")
+            }
 
+            WorkInfo.State.FAILED -> {
+                val error = workInfo.outputData.getString("error")
+                _observeErrorLoadData.emit(error.toString())
+                throw CancellationException("Work failed")
+            }
 
+            WorkInfo.State.SUCCEEDED -> {
+                Log.d("CheckErrorMessage", "Work succeeded")
+            }
+
+            else -> Unit
+        }
+    }
+
+    // Поток для ошибок при загрузке данных
+    override suspend fun fetchErrorLoadData(): SharedFlow<String> = observeErrorLoadData
+
+    // Загрузка новостей за предыдущий день.
     @SuppressLint("NewApi")
     override suspend fun loadNewsForPreviousDay() {
-
         ioScope.launch {
-            val country = userPreferences.getSourceCountry()
-            val language = userPreferences.getContentLanguage()
-
             currentEndDate = currentEndDate.minusDays(1)
-            val previousDate = currentEndDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-
-            if (!isNetworkAvailable(application)) {
-                _errorLoadData.emit("No Internet connection")
-                return@launch
-            }
-            try {
-                remoteDataSource.fetchTopNews(
-                    sourceCountry = country,
-                    language = language,
-                    date = previousDate
-                )
-                    .map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }//преобразование в List<NewsItemDto>
-                    .flatMapConcat { newList ->
-                        flow {
-                            emit(newList.map { mapper.mapDtoToDbModel(it) }) //преобразование в List<NewsDbModel>
-                        }
-                    }
-                    .map { it.distinctBy { news -> news.title } }
-                    .collect { newsList ->
-                        localDataSource.insertNews(newsList)
-                    }
-            } catch (e: Exception) {
-                _errorLoadData.emit("Error loading news ${e.message}")
+            val previousDate = currentEndDate.format(
+                DateTimeFormatter.ofPattern(application.getString(R.string.yyyy_mm_dd))
+            )
+            fetchDataWithNetworkCheck {
+                val newsList = remoteDataSource.fetchTopNews(previousDate)
+                localDataSource.insertNews(newsList)
             }
         }
     }
 
-    private suspend fun updateFilterParameters(filterParameter: String, valueParameter: String) {
-        _valueFilter = valueParameter
-        _filterFlow.emit(filterParameter)
+    // Универсальная функция для проверки сети перед выполнением операции
+    private suspend fun fetchDataWithNetworkCheck(onFetch: suspend () -> Unit) {
+        if (isNetworkAvailableWithError()) {
+            try {
+                onFetch()
+            } catch (e: Exception) {
+                _observeErrorLoadData.emit(e.message.toString())
+            }
+        }
     }
 
+    // Поиск новостей по заданному фильтру
     override suspend fun searchNewsByFilter(
         filterParameter: String,
         valueParameter: String
     ): SharedFlow<List<NewsItemEntity>> {
-        updateFilterParameters(filterParameter, valueParameter)
-        return filteredNewsFlow
+        _filterFlow.emit(filterParameter to valueParameter)
+        return filteredNewsSharedFlow
     }
 
-    private suspend fun getNewsByText(text: String): Flow<List<NewsItemDto>> {
-        try {
-            val country = userPreferences.getSourceCountry()
-            val language = userPreferences.getContentLanguage()
-
-            return remoteDataSource.fetchNewsByText(
-                sourceCountry = country,
-                language = language,
-                text = text
-            )
-        } catch (e: Exception) {
-            _errorLoadData.emit("Error loading news by text: ${e.message}")
-            return flow { emptyList<NewsItemDto>() }
+    // Проверка доступности сети с отправкой ошибок при отсутствии соединения
+    private suspend fun isNetworkAvailableWithError(): Boolean {
+        return if (!isNetworkAvailable(application)) {
+            _observeErrorLoadData.emit(application.getString(R.string.no_internet_connection))
+            false
+        } else {
+            true
         }
     }
 
-    private suspend fun getNewsByAuthor(author: String): Flow<List<NewsItemDto>> {
-        try {
-            val country = userPreferences.getSourceCountry()
-            val language = userPreferences.getContentLanguage()
-
-            return remoteDataSource.fetchNewsByAuthor(
-                author = author
-            )
-        } catch (e: Exception) {
-            _errorLoadData.emit("Error loading news by text: ${e.message}")
-            return flow { emptyList<NewsItemDto>() }
-        }
+    // Применение фильтра для получения новостей
+    private suspend fun applyFilter(filter: Filter, value: String): Flow<List<NewsItemEntity>> {
+        return remoteDataSource.fetchFilteredNews(filter, value)
     }
 
-    private suspend fun getNewsByDate(date: String): Flow<List<NewsItemDto>> {
-        try {
-            val country = userPreferences.getSourceCountry()
-            val language = userPreferences.getContentLanguage()
-
-            return remoteDataSource.fetchNewsByDate(
-                sourceCountry = country,
-                language = language,
-                date = date
+    // Получение типа фильтра
+    private fun getFilterType(filter: String): Filter {
+        val map = mapOf(
+            application.getString(Filter.TEXT.descriptionResId) to Filter.TEXT,
+            application.getString(Filter.AUTHOR.descriptionResId) to Filter.AUTHOR,
+            application.getString(Filter.DATE.descriptionResId) to Filter.DATE
+        )
+        return map[filter] ?: throw IllegalArgumentException(
+            application.getString(
+                R.string.invalid_filter,
+                filter
             )
-        } catch (e: Exception) {
-            _errorLoadData.emit("Error loading news by text: ${e.message}")
-            return flow { emptyList<NewsItemDto>() }
-        }
+        )
     }
 
-    init {
+    // Наблюдение за потоком фильтров и выполнение поиска
+    private fun observeFilterFlow() {
         ioScope.launch {
             _filterFlow
-                .filter {
-                    val isConnected = isNetworkAvailable(application)
-                    if (!isConnected) {
-                        _errorLoadData.emit("No Internet connection")
+                .filter { isNetworkAvailableWithError() }
+                .flatMapLatest { (filterParameter, filterValue) ->
+                    try {
+                        val filterType = getFilterType(filterParameter)
+                        applyFilter(filterType, filterValue)
+                            .catch { e ->
+                                _observeErrorLoadData.emit(
+                                    application.getString(
+                                        R.string.error_loading_news_by_filter,
+                                        e.message
+                                    )
+                                )
+                                emit(emptyList())
+                            }
+                    } catch (e: Exception) {
+                        _observeErrorLoadData.emit(
+                            application.getString(
+                                R.string.error_loading_news_by_filter,
+                                e.message
+                            )
+                        )
+                        flow { emptyList<NewsItemDto>() }
                     }
-                    isConnected
                 }
-                .flatMapLatest { filter ->
-                    when (filter) {
-                        application.getString(Filter.TEXT.descriptionResId) ->
-                            getNewsByText(_valueFilter.toString())
-
-                        application.getString(Filter.AUTHOR.descriptionResId) ->
-                            getNewsByAuthor(_valueFilter.toString())
-
-                        application.getString(Filter.DATE.descriptionResId) ->
-                            getNewsByDate(_valueFilter.toString())
-
-                        else -> {
-                            throw Exception("Invalid filter: $filter")
-                        }
-                    }
-                        .retry { cause -> // временно верну
-                            if (cause is HttpException && cause.code() == 429) {
-                                delay(2000)
-                                true
-                            } else false
-                        }
-                        .flatMapConcat { newsList ->
-                            flow { emit(newsList.map { mapper.mapDtoToEntity(it) }) }
-                        }
-                        .map { it.distinctBy { news -> news.title } }
-                        .map {
-                            if (filter == application.getString(Filter.DATE.descriptionResId)) {
-                                it.sortedBy { it.publishDate }
-                            } else it
-                        }
-                }
-                .collect { news -> _filteredNewsFlow.emit(news) }
+                .filter { it.isNotEmpty() }
+                .collect { news -> _filteredNewsSharedFlow.emit(news) }
         }
     }
 }

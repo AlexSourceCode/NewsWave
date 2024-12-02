@@ -115,10 +115,13 @@ class TopNewsViewModel @Inject constructor(
         viewModelScope.launch {
             fetchErrorLoadDataUseCase()
                 .collect { errorMessage ->
-                    Log.d("CheckErrorMessage", "execute fetchErrorLoadData")
-                    _uiState.value = NewsState.Error(errorMessage) // дважды одно и тоже значение
+                    val trimmedErrorMessage = errorMessage.toString().trim()
+                    Log.d("CheckErrorMessage", "get error: $errorMessage")
+                    Log.d("CheckErrorMessage", errorMessage)
+                    _uiState.value = NewsState.Error(errorMessage)
                     val savedNews = getTopNews()
-                    if (!savedNews.isNullOrEmpty() && errorMessage!= "News list is empty or invalid parameters!"){
+                    if ((!savedNews.isNullOrEmpty()) && (trimmedErrorMessage != "Error loading news by filter: HTTP 402") && (trimmedErrorMessage != "News list is empty or invalid parameters!")) {
+                        Log.d("CheckErrorMessage", "execute gettopnews")
                         _uiState.value = NewsState.Success(savedNews)
                     }
                 }
@@ -130,7 +133,7 @@ class TopNewsViewModel @Inject constructor(
             try {
                 fetchTopNewsListUseCase()
                     .collect { news ->
-                        Log.d("fetchTopNewsListUseCase",  "execute collect")
+                        Log.d("fetchTopNewsListUseCase", "execute collect")
                         if (news.isEmpty()) _uiState.value = NewsState.Loading
                         else {
                             _uiState.value = NewsState.Success(news)
@@ -140,7 +143,7 @@ class TopNewsViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = NewsState.Error(e.toString())
                 val savedNews = getTopNews()
-                if (!savedNews.isNullOrEmpty()){
+                if (!savedNews.isNullOrEmpty()) {
                     _uiState.value = NewsState.Success(savedNews)
                 }
             }

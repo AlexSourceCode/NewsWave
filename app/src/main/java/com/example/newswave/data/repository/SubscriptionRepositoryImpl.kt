@@ -207,16 +207,8 @@ class SubscriptionRepositoryImpl @Inject constructor(
                     isConnected
                 }
                 .filterNotNull()
-                .flatMapLatest { author ->
-                    remoteDataSource.fetchNewsByAuthor(author = author)
-                        .map { newsResponse ->
-                            newsResponse.news.map { mapperNews.mapDtoToEntity(it) }
-                                .distinctBy { it.title }
-                        }
-                }
-                .catch {
-                    _authorNews.emit(NewsState.Error(it.toString()))
-                }
+                .flatMapLatest { author -> remoteDataSource.fetchNewsByAuthorFlow(author) }
+                .catch { _authorNews.emit(NewsState.Error(it.toString())) }
                 .collect { news ->
                     _authorNews.emit(NewsState.Success(news))
                 }

@@ -1,20 +1,19 @@
 package com.example.newswave.domain.repository
 
+import com.example.newswave.data.database.dbNews.NewsDbModel
 import com.example.newswave.data.network.model.NewsItemDto
 import com.example.newswave.data.network.model.NewsResponseDto
 import com.example.newswave.data.network.model.TopNewsResponseDto
+import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.utils.Filter
 import kotlinx.coroutines.flow.Flow
 
 interface RemoteDataSource {
     suspend fun fetchTopNews(
         date: String,
-        sourceCountry: String,
-        language: String
-    ): Flow<TopNewsResponseDto>
+    ): List<NewsDbModel>
 
     suspend fun fetchNewsByText(
-        sourceCountry: String,
-        language: String,
         text: String,
     ): Flow<List<NewsItemDto>>
 
@@ -24,8 +23,12 @@ interface RemoteDataSource {
 
     suspend fun fetchNewsByDate(
         date: String,
-        sourceCountry: String,
-        language: String
     ): Flow<List<NewsItemDto>>
 
+    suspend fun fetchFilteredNews(
+        filterType: Filter,
+        filterValue: String
+    ): Flow<List<NewsItemEntity>>
+
+    suspend fun fetchNewsByAuthorFlow(author: String): Flow<List<NewsItemEntity>>
 }
