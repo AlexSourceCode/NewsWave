@@ -1,5 +1,6 @@
 package com.example.newswave.data.repository
 
+import android.util.Log
 import com.example.newswave.data.database.dbNews.NewsDbModel
 import com.example.newswave.data.database.dbNews.UserPreferences
 import com.example.newswave.data.mapper.NewsMapper
@@ -32,6 +33,8 @@ class RemoteDataSourceImpl @Inject constructor(
     ): List<NewsDbModel> {
         val sourceCountry = userPreferences.getSourceCountry()
         val language = userPreferences.getContentLanguage()
+        Log.d("CheckArgs", sourceCountry)
+        Log.d("CheckArgs", language)
 
         return apiService.getListTopNews(
             sourceCountry = sourceCountry,

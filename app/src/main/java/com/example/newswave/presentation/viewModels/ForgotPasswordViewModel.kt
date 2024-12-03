@@ -2,7 +2,8 @@ package com.example.newswave.presentation.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.domain.usecases.FetchErrorForgotPasswordUseCase
+import com.example.newswave.data.network.model.ErrorType
+import com.example.newswave.domain.usecases.FetchAuthErrorUseCase
 import com.example.newswave.domain.usecases.FetchIsSuccessAuthUseCase
 import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
 import com.example.newswave.domain.usecases.ResetPasswordUseCase
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ForgotPasswordViewModel @Inject constructor(
-    private val fetchErrorForgotPasswordUseCase: FetchErrorForgotPasswordUseCase,
+    private val fetchAuthErrorUseCase: FetchAuthErrorUseCase,
     private val fetchIsSuccessAuthUseCase: FetchIsSuccessAuthUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
 ) : ViewModel() {
@@ -36,7 +37,7 @@ class ForgotPasswordViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            fetchErrorForgotPasswordUseCase().collect{
+            fetchAuthErrorUseCase(ErrorType.FORGOT_PASSWORD).collect{
                 _error.emit(it)
             }
         }

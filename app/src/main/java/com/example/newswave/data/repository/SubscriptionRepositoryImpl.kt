@@ -37,7 +37,6 @@ import kotlin.coroutines.suspendCoroutine
 
 class SubscriptionRepositoryImpl @Inject constructor(
     private val application: Application,
-    private val mapperNews: NewsMapper,
     private val remoteDataSource: RemoteDataSource,
     private val database: FirebaseDatabase,
     private val auth: FirebaseAuth

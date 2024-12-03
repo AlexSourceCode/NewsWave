@@ -1,5 +1,6 @@
 package com.example.newswave.domain.repository
 
+import com.example.newswave.data.network.model.ErrorType
 import com.example.newswave.domain.entity.UserEntity
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +21,8 @@ interface UserRepository {
         lastName: String
     )
 
+    fun fetchError(type: ErrorType): SharedFlow<String>
+
     fun signOut()
 
     fun syncUserSettings()
@@ -37,12 +40,6 @@ interface UserRepository {
     fun fetchIsSuccessAuth(): SharedFlow<Boolean>
 
     fun observeAuthState(): StateFlow<FirebaseUser?>
-
-    fun fetchErrorSignIn(): SharedFlow<String>
-
-    fun fetchErrorSignUp(): SharedFlow<String>
-
-    fun fetchErrorForgotPassword(): SharedFlow<String>
 
     fun fetchUserData(): StateFlow<UserEntity?>
 
