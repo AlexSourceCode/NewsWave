@@ -1,14 +1,29 @@
 package com.example.newswave.data.datasource.remote
 
+import android.util.Log
+import com.example.newswave.domain.entity.AuthorItemEntity
 import com.example.newswave.domain.entity.UserEntity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Класс для работы с Firebase
@@ -18,19 +33,110 @@ class FirebaseDataSource @Inject constructor(
     private val auth: FirebaseAuth, // Firebase API для управления авторизацией
     private val database: FirebaseDatabase // Firebase API для работы с базой данных Realtime Database.
 ) {
+    private var authorsJob: Job? = null
+    private val ioScope = CoroutineScope(Dispatchers.IO) // Определяет контекст для корутин на IO-потоке
 
     // Ссылка на узел Users в Firebase Realtime Database
     private val usersReference = database.getReference("Users")
+
+    // Получает поток авторов для текущего пользователя
+    fun getAuthorsReference(userId: String) = database.getReference("Authors").child(userId)
 
     // Поток состояния авторизации, содержащий текущего авторизованного пользователя
     private val _authStateFlow = MutableStateFlow<FirebaseUser?>(auth.currentUser)
     val authStateFlow: StateFlow<FirebaseUser?> get() = _authStateFlow.asStateFlow()
 
+    // Поток, содержащий список авторов для текущего пользователя
+    private val _authorsFlow = MutableSharedFlow<List<AuthorItemEntity>?>()
+    private val authorsFlow: SharedFlow<List<AuthorItemEntity>?> get() = _authorsFlow.asSharedFlow()
+
     init {
-        auth.addAuthStateListener { firebaseAuth ->
-            _authStateFlow.value = firebaseAuth.currentUser
+        observeAuthState()
+    }
+
+    // Возвращает поток списка авторов текущего пользователя
+    fun getAuthorListFlow(): SharedFlow<List<AuthorItemEntity>?> = authorsFlow
+
+    // Эмитирует список авторов текущего пользователя.
+    // Отменяет предыдущую задачу, если она запущена, чтобы избежать накопления задач.
+    fun showAuthorsList(){
+        authorsJob?.cancel()
+        authorsJob = ioScope.launch {
+            val currentUser = authStateFlow.value
+            val userId = currentUser?.uid
+            val authors = if (userId != null) fetchAuthors(userId) else null
+            _authorsFlow.emit(authors)
         }
     }
+
+    // Наблюдает за изменениями состояния аутентификации пользователя.
+    private fun observeAuthState() {
+        auth.addAuthStateListener { auth ->
+            _authStateFlow.value = auth.currentUser
+            if (auth.currentUser != null) {
+                observeAuthors(auth.currentUser!!.uid)
+            } else {
+                CoroutineScope(Dispatchers.IO).launch { _authorsFlow.emit(null) }
+            }
+        }
+    }
+
+    // Наблюдает за изменениями списка авторов в Firebase.
+    private fun observeAuthors(userId: String) {
+        val authorsReference = getAuthorsReference(userId)
+        authorsReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val authors = snapshot.children.mapNotNull { it.getValue(AuthorItemEntity::class.java) }
+                CoroutineScope(Dispatchers.IO).launch {
+                    _authorsFlow.emit(authors)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("FirebaseDataSource", "Failed to listen for authors: ", error.toException())
+            }
+        })
+    }
+
+    // Добавляет автора в список любимых авторов для текущего пользователя в Firebase
+    suspend fun addAuthor(userId: String, author: AuthorItemEntity){
+        try {
+            getAuthorsReference(userId).push().setValue(author).await()
+        } catch (e: Exception){
+            Log.d("FirebaseDataSource", "Failed to add author: ${e.message}", )
+        }
+    }
+
+    // Удаляет автора из списка любимых авторов для текущего пользователя из Firebase
+    suspend fun deleteAuthor(userId: String, author: String) {
+        val query = getAuthorsReference(userId).orderByChild("author").equalTo(author)
+        suspendCoroutine<Unit> { continuation ->
+            query.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    snapshot.children.forEach { it.ref.removeValue() }
+                    continuation.resume(Unit)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d("FirebaseDataSource", "Failed to delete on the author: ${error.message.toString()}", )
+                }
+            })
+        }
+    }
+
+    // Получает список авторов для текущего пользователя из Firebase
+    suspend fun fetchAuthors(userId: String): List<AuthorItemEntity> {
+        val snapshot = getAuthorsReference(userId).get().await()
+        return snapshot.children.mapNotNull { it.getValue(AuthorItemEntity::class.java) }
+    }
+
+    // Проверяет, является ли указанный автор избранным для текущего пользователя.
+    suspend fun isFavoriteAuthor(userId: String, author: String): Boolean {
+        val authors = fetchAuthors(userId)
+        return authors.any { it.author == author }
+    }
+
+
 
     // Авторизация по почте
     suspend fun signIn(email: String, password: String): Result<FirebaseUser?> {
