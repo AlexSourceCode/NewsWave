@@ -2,32 +2,19 @@ package com.example.newswave.presentation
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
-import android.view.MenuItem
-import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
-import com.example.newswave.data.database.dbNews.UserPreferences
+import com.example.newswave.data.dataSource.local.UserPreferences
 import com.example.newswave.databinding.ActivityMainBinding
 import com.example.newswave.presentation.fragments.TopNewsFragment
 import com.example.newswave.presentation.viewModels.SessionViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.LocaleHelper
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.navigation.NavigationBarMenuView
 import com.jakewharton.threetenabp.AndroidThreeTen
 import javax.inject.Inject
 

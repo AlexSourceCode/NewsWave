@@ -1,7 +1,7 @@
 package com.example.newswave.data.repository
 
 import android.app.Application
-import com.example.newswave.data.datasource.remote.FirebaseDataSource
+import com.example.newswave.data.dataSource.remote.FirebaseDataSource
 import com.example.newswave.domain.entity.AuthorItemEntity
 import com.example.newswave.domain.model.NewsState
 import com.example.newswave.domain.repository.RemoteDataSource

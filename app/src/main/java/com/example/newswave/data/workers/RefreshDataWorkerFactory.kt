@@ -4,12 +4,6 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import com.example.newswave.data.database.dbNews.NewsDao
-import com.example.newswave.data.database.dbNews.NewsDb
-import com.example.newswave.data.database.dbNews.UserPreferences
-import com.example.newswave.data.mapper.NewsMapper
-import com.example.newswave.data.network.api.ApiFactory
-import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.domain.repository.LocalDataSource
 import com.example.newswave.domain.repository.RemoteDataSource
 import javax.inject.Inject

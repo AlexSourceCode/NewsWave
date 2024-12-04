@@ -1,13 +1,17 @@
-package com.example.newswave.data.database.dbNews
+package com.example.newswave.data.dataSource.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [NewsDbModel :: class], version = 3, exportSchema = false)
+/**
+ *  NewsDb: Класс базы данных Room
+ */
+@Database(entities = [NewsDbModel::class], version = 3, exportSchema = false)
 abstract class NewsDb : RoomDatabase() {
 
+    // Возвращает DAO для взаимодействия с таблицей новостей
     abstract fun newsDao(): NewsDao
 
     companion object {
@@ -16,13 +20,13 @@ abstract class NewsDb : RoomDatabase() {
         private var db: NewsDb? = null
         private const val DB_NAME = "news.db"
 
-
+        // Получение экземпляра базы данных.
         fun getInstance(context: Context): NewsDb {
             synchronized(LOCK) {
                 db?.let { return it }
                 val instance = Room.databaseBuilder(
                     context,
-                    NewsDb :: class.java,
+                    NewsDb::class.java,
                     DB_NAME
                 ).fallbackToDestructiveMigration().build()
 

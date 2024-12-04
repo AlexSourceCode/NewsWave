@@ -1,8 +1,7 @@
 package com.example.newswave.domain.repository
 
-import com.example.newswave.data.database.dbNews.NewsDbModel
+import com.example.newswave.data.dataSource.local.NewsDbModel
 import com.example.newswave.domain.entity.NewsItemEntity
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface LocalDataSource {

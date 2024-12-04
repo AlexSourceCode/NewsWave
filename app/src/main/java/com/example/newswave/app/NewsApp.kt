@@ -3,13 +3,10 @@ package com.example.newswave.app
 import android.app.Application
 import android.content.Context
 import androidx.work.Configuration
-import com.example.newswave.data.database.dbNews.UserPreferences
+import com.example.newswave.data.dataSource.local.UserPreferences
 import com.example.newswave.data.workers.RefreshDataWorkerFactory
 import com.example.newswave.di.DaggerApplicationComponent
 import com.example.newswave.domain.repository.UserRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class NewsApp: Application(), Configuration.Provider {

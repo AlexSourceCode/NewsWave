@@ -1,13 +1,11 @@
 package com.example.newswave.data.repository
 
 import android.util.Log
-import com.example.newswave.data.database.dbNews.NewsDbModel
-import com.example.newswave.data.database.dbNews.UserPreferences
+import com.example.newswave.data.dataSource.local.NewsDbModel
+import com.example.newswave.data.dataSource.local.UserPreferences
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.network.model.NewsItemDto
-import com.example.newswave.data.network.model.NewsResponseDto
-import com.example.newswave.data.network.model.TopNewsResponseDto
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.RemoteDataSource
 import com.example.newswave.utils.Filter

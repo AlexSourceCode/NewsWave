@@ -1,4 +1,4 @@
-package com.example.newswave.data.datasource.remote
+package com.example.newswave.data.dataSource.remote
 
 import android.util.Log
 import com.example.newswave.domain.entity.AuthorItemEntity
@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 /**

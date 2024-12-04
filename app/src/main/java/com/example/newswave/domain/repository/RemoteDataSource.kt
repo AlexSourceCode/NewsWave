@@ -1,9 +1,7 @@
 package com.example.newswave.domain.repository
 
-import com.example.newswave.data.database.dbNews.NewsDbModel
+import com.example.newswave.data.dataSource.local.NewsDbModel
 import com.example.newswave.data.network.model.NewsItemDto
-import com.example.newswave.data.network.model.NewsResponseDto
-import com.example.newswave.data.network.model.TopNewsResponseDto
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.utils.Filter
 import kotlinx.coroutines.flow.Flow

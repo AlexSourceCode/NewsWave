@@ -3,9 +3,9 @@ package com.example.newswave.di
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
-import com.example.newswave.data.database.dbNews.NewsDao
-import com.example.newswave.data.database.dbNews.NewsDb
-import com.example.newswave.data.database.dbNews.UserPreferences
+import com.example.newswave.data.dataSource.local.NewsDao
+import com.example.newswave.data.dataSource.local.NewsDb
+import com.example.newswave.data.dataSource.local.UserPreferences
 import com.example.newswave.data.network.api.ApiFactory
 import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.repository.LocalDataSourceImpl
@@ -53,7 +53,7 @@ interface DataModule {
     companion object{
         @Provides
         @ApplicationScope
-        fun provideNewsDao(application: Application): NewsDao{
+        fun provideNewsDao(application: Application): NewsDao {
             return NewsDb.getInstance(application).newsDao()
         }
 

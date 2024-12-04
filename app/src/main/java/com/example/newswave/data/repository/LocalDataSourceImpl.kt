@@ -1,13 +1,12 @@
 package com.example.newswave.data.repository
 
-import com.example.newswave.data.database.dbNews.NewsDao
-import com.example.newswave.data.database.dbNews.NewsDbModel
+import com.example.newswave.data.dataSource.local.NewsDao
+import com.example.newswave.data.dataSource.local.NewsDbModel
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.LocalDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
