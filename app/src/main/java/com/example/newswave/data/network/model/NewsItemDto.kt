@@ -4,7 +4,9 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 
-
+/**
+ * DTO для описания одной новости
+ */
 data class NewsItemDto(
     @Expose
     @SerializedName("id")
@@ -41,10 +43,6 @@ data class NewsItemDto(
     @Expose
     @SerializedName("language")
     val language: String,
-
-//    @Expose
-//    @SerializedName("category")
-//    val category: String? = null,
 
     @Expose
     @SerializedName("source_country")

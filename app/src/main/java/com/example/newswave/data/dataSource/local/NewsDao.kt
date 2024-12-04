@@ -21,7 +21,7 @@ interface NewsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNews(listNews: List<NewsDbModel>)
 
-    // Удаление всех записей из таблицы новостей.
+    // Удаление всех записей из таблицы новостей
     @Query("DELETE FROM news")
     fun deleteAllNews()
 

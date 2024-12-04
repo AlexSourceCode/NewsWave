@@ -27,6 +27,9 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 
+/**
+ * Dagger модуль для предоставления зависимостей, связанных с данными.
+ */
 @Module
 interface DataModule {
 
@@ -48,9 +51,9 @@ interface DataModule {
 
     @Binds
     @ApplicationScope
-    fun bindRemoteDataSource(remoteDataSource: RemoteDataSourceImpl) : RemoteDataSource
+    fun bindRemoteDataSource(remoteDataSource: RemoteDataSourceImpl): RemoteDataSource
 
-    companion object{
+    companion object {
         @Provides
         @ApplicationScope
         fun provideNewsDao(application: Application): NewsDao {
@@ -64,12 +67,12 @@ interface DataModule {
 
         @Provides
         @ApplicationScope
-        fun provideApiService(): ApiService{
+        fun provideApiService(): ApiService {
             return ApiFactory.apiService
         }
 
         @Provides
-        fun provideFirebaseAuth(): FirebaseAuth{
+        fun provideFirebaseAuth(): FirebaseAuth {
             return Firebase.auth
         }
 

@@ -16,7 +16,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 
-//Модуль со всеми вьюмоделями, для того чтобы все они инжектились в вьюмодель фектори
+/**
+ * Модуль Dagger для предоставления зависимостей для ViewModel в проекте
+ * Использует аннотации @IntoMap и @ViewModelKey для привязки каждой ViewModel к ключу в Map
+ */
 @Module
 interface ViewModelModule {
 
@@ -48,24 +51,26 @@ interface ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(RegistrationViewModel::class)
-    fun bindRegistrationViewModel(viewModel: RegistrationViewModel):ViewModel
+    fun bindRegistrationViewModel(viewModel: RegistrationViewModel): ViewModel
 
     @Binds
     @IntoMap
     @ViewModelKey(ForgotPasswordViewModel::class)
-    fun bindForgotPasswordViewModel(viewModel: ForgotPasswordViewModel):ViewModel
+    fun bindForgotPasswordViewModel(viewModel: ForgotPasswordViewModel): ViewModel
 
     @Binds
     @IntoMap
     @ViewModelKey(SettingsViewModel::class)
-    fun bindSettingsViewModel(viewModel: SettingsViewModel):ViewModel
+    fun bindSettingsViewModel(viewModel: SettingsViewModel): ViewModel
 
     @Binds
     @IntoMap
     @ViewModelKey(SessionViewModel::class)
-    fun bindSessionViewModel(viewModel: SessionViewModel):ViewModel
+    fun bindSessionViewModel(viewModel: SessionViewModel): ViewModel
 
-
+    /**
+     * Фабрика для создания ViewModel
+     */
     @Binds
     abstract fun bindViewModelFactory(factory: SavedStateViewModelFactory): ViewModelProvider.Factory
 

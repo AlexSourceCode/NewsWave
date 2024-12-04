@@ -1,7 +1,6 @@
 package com.example.newswave.data.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequest
@@ -17,6 +16,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**
+ * Использует WorkManager для выполнения задач в фоновом режиме
+ * Выполняет:
+ * - Загрузку новостей с удаленного API через RemoteDataSource
+ * - Обновление локальной базы данных через LocalDataSource
+ */
 class RefreshDataWorker(
     private val context: Context,
     workerParameters: WorkerParameters,
@@ -24,8 +29,10 @@ class RefreshDataWorker(
     private val localDataSource: LocalDataSource,
 ) : CoroutineWorker(context, workerParameters) {
 
-    private val ioScope = CoroutineScope(Dispatchers.IO)
-
+    /**
+     * Основной метод WorkManager, который выполняется при запуске Worker
+     * Если операция успешна — возвращает Result.success(), иначе — Result.failure()
+     */
     override suspend fun doWork(): Result {
         return try {
             loadData()
@@ -36,11 +43,9 @@ class RefreshDataWorker(
         }
     }
 
-
+    // Загружает данные из удаленного источника и обновляет локальную базу данных
     private suspend fun loadData() {
-        Log.d("CheckErrorMessage", "execute loadData from dowork")
         var date = DateUtils.formatCurrentDate()
-
 
         val newsList = try {
             var result: List<NewsDbModel> = emptyList()
@@ -61,25 +66,25 @@ class RefreshDataWorker(
         }
 
 
-        ioScope.launch {
-            localDataSource.deleteAllNews()
-            localDataSource.insertNews(newsList)
-        }
+        // Обновление локальной базы данных
+        localDataSource.deleteAllNews()
+        localDataSource.insertNews(newsList)
     }
 
 
     companion object {
         const val WORK_NAME = "refresh news"
 
+        // Создает запрос для одноразового выполнения `WorkManager`.
         fun makeRequest(): OneTimeWorkRequest {
             return OneTimeWorkRequestBuilder<RefreshDataWorker>().apply {
                 setConstraints(makeConstraints())
             }.build()
         }
 
+        // Настраивает ограничения для Worker.
         private fun makeConstraints(): Constraints {
             return Constraints.Builder()
-//                .setRequiredNetworkType(NetworkType.CONNECTED) // как сделать так, чтобы запросы шли только если есть интернет
                 .build()
         }
     }

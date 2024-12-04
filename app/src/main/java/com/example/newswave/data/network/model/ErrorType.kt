@@ -1,5 +1,11 @@
 package com.example.newswave.data.network.model
 
+/**
+ * Перечисление типов ошибок, связанных с сетью
+ * Используется для указания вида ошибки при выполнении сетевых запросов.
+ */
 enum class ErrorType {
-    SIGN_IN, SIGN_UP, FORGOT_PASSWORD
+    SIGN_IN, // Ошибка при выполнении входа в систему
+    SIGN_UP, // Ошибка при регистрации пользователя
+    FORGOT_PASSWORD // Ошибка при восстановлении пароля
 }

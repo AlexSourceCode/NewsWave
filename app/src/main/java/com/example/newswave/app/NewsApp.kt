@@ -9,49 +9,42 @@ import com.example.newswave.di.DaggerApplicationComponent
 import com.example.newswave.domain.repository.UserRepository
 import javax.inject.Inject
 
-class NewsApp: Application(), Configuration.Provider {
+/**
+ * Главный класс приложения.
+ * Управляет внедрением зависимостей и настройкой WorkManager.
+ */
+class NewsApp : Application(), Configuration.Provider {
 
-    @Inject lateinit var workerFactory: RefreshDataWorkerFactory
+    // Фабрика для создания рабочих задач (WorkManager).
+    @Inject
+    lateinit var workerFactory: RefreshDataWorkerFactory
+
+    // Репозиторий пользователя.
     @Inject
     lateinit var userRepository: UserRepository
 
+    // Ленивая инициализация компонента Dagger для внедрения зависимостей.
     val component by lazy {
         DaggerApplicationComponent.factory()
             .create(
                 applicationContext,
                 getSharedPreferences("news_by_search", Context.MODE_PRIVATE)
-                )
+            )
     }
 
+    // Инициализация приложения, включая настройки пользователя.
     override fun onCreate() {
         component.inject(this)
         super.onCreate()
 
         val userPreferences = UserPreferences(this)
         userPreferences.initializeDefaultSettings()
-//        syncUserDataIfNeeded()
-
-
     }
 
-//    private fun syncUserDataIfNeeded() { //под вопросом
-//        val currentUser = userRepository.observeAuthState().value
-//
-//        if (currentUser != null) {
-//            CoroutineScope(Dispatchers.IO).launch {
-//                try {
-//                    userRepository.syncUserSettings()
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                }
-//            }
-//        }
-//    }
-
+    // Конфигурация WorkManager с кастомной фабрикой задач.
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
             .build()
-
 
 }

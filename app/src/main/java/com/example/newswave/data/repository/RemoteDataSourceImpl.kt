@@ -1,6 +1,5 @@
 package com.example.newswave.data.repository
 
-import android.util.Log
 import com.example.newswave.data.dataSource.local.NewsDbModel
 import com.example.newswave.data.dataSource.local.UserPreferences
 import com.example.newswave.data.mapper.NewsMapper
@@ -20,20 +19,22 @@ import kotlinx.coroutines.flow.retry
 import retrofit2.HttpException
 import javax.inject.Inject
 
+/**
+ * Реализация интерфейса RemoteDataSource, обеспечивающая работу с удаленным API для получения новостей
+ * Использует ApiService для выполнения запросов и NewsMapper для преобразования данных
+ */
 class RemoteDataSourceImpl @Inject constructor(
     private val apiService: ApiService,
     private val mapper: NewsMapper,
     private val userPreferences: UserPreferences
 ) : RemoteDataSource {
 
+    // Получает список топ-новостей с удаленного API
     override suspend fun fetchTopNews(
         date: String,
     ): List<NewsDbModel> {
         val sourceCountry = userPreferences.getSourceCountry()
         val language = userPreferences.getContentLanguage()
-        Log.d("CheckArgs", sourceCountry)
-        Log.d("CheckArgs", language)
-
         return apiService.getListTopNews(
             sourceCountry = sourceCountry,
             language = language,
@@ -44,6 +45,7 @@ class RemoteDataSourceImpl @Inject constructor(
             .firstOrNull() ?: emptyList()
     }
 
+    // Получает новости по текстовому запросу
     override suspend fun fetchNewsByText(
         text: String,
     ): Flow<List<NewsItemDto>> {
@@ -56,6 +58,7 @@ class RemoteDataSourceImpl @Inject constructor(
         ).map { it.news }
     }
 
+    // Получает новости по автору
     override suspend fun fetchNewsByAuthor(
         author: String,
     ): Flow<List<NewsItemDto>> {
@@ -64,6 +67,7 @@ class RemoteDataSourceImpl @Inject constructor(
         ).map { it.news }
     }
 
+    // Получает новости по дате публикации
     override suspend fun fetchNewsByDate(
         date: String,
     ): Flow<List<NewsItemDto>> {
@@ -76,6 +80,7 @@ class RemoteDataSourceImpl @Inject constructor(
         ).map { mapper.mapJsonContainerTopNewsToListNews(flow { emit(it) }) }
     }
 
+    // Получает новости с учетом фильтрации
     override suspend fun fetchFilteredNews(
         filterType: Filter,
         filterValue: String
@@ -93,10 +98,10 @@ class RemoteDataSourceImpl @Inject constructor(
                 newsEntities.distinctBy { it.title }
             }
             .collect { distinctNews ->
-                emit(distinctNews) // Отправляем результат
+                emit(distinctNews)
             }
     }
-        .retry { cause -> // временно верну
+        .retry { cause ->
             if (cause is HttpException && cause.code() == 429) {
                 delay(2000)
                 true
@@ -108,6 +113,7 @@ class RemoteDataSourceImpl @Inject constructor(
             } else newsList
         }
 
+    // Получает новости по автору и преобразует их в формат NewsItemEntity
     override suspend fun fetchNewsByAuthorFlow(author: String): Flow<List<NewsItemEntity>> =
         fetchNewsByAuthor(author).map { newsList ->
             newsList.map { mapper.mapDtoToEntity(it) }
@@ -116,6 +122,5 @@ class RemoteDataSourceImpl @Inject constructor(
                 newsEntities.distinctBy { it.title }
             }
             .catch { throw Exception("Error fetching news by author: $author. Cause: ${it.message}") }
-
 
 }

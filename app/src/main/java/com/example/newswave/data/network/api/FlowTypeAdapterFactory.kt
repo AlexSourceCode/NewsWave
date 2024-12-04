@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import java.lang.reflect.ParameterizedType
 
+/**
+ * Фабрика для адаптера TypeAdapter, обрабатывающего Flow
+ */
 class FlowTypeAdapterFactory : TypeAdapterFactory {
     override fun <T> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
         val rawType = type.rawType
@@ -23,6 +26,7 @@ class FlowTypeAdapterFactory : TypeAdapterFactory {
     }
 }
 
+// Адаптер для сериализации/десериализации Flow
 class FlowTypeAdapter<T>(private val elementAdapter: TypeAdapter<T>) : TypeAdapter<Flow<T>>() {
     override fun write(out: JsonWriter, value: Flow<T>?) {
         if (value == null) {

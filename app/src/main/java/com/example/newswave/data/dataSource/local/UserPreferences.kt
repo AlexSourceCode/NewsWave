@@ -27,7 +27,7 @@ class UserPreferences(context: Context) {
 
     }
 
-    // Сохранение данных пользователя.
+    // Сохранение данных пользователя
     fun saveUserData(user: UserEntity) {
         val json = Gson().toJson(user)
         Log.d(TAG, "saveUser ${json.toString()}")
@@ -35,71 +35,72 @@ class UserPreferences(context: Context) {
         editor.apply()
     }
 
-    // Получение данных пользователя.
+    // Получение данных пользователя
     fun getUserData(): UserEntity? {
         val json = sharedPreferences.getString(KEY_USER_DATA, null)
         Log.d(TAG, "getUser ${json.toString()}")
         return if (json != null) Gson().fromJson(json, UserEntity::class.java) else null
     }
 
-    // Проверка, является ли запуск приложения первым.
-    private fun isFirstLaunch(): Boolean { // проверка флага, является ли запуск приложения первым
+    // Проверка, является ли запуск приложения первым
+    private fun isFirstLaunch(): Boolean {
         return sharedPreferences.getBoolean(KEY_FIRST_LAUNCH, true)
     }
 
-    private fun setFirstLaunchCompleted() { // меняет флаг после первого запуска
+    // Меняет флаг после первого запуска
+    private fun setFirstLaunchCompleted() {
         editor.putBoolean(KEY_FIRST_LAUNCH, false)
         editor.apply()
     }
 
-    // Инициализация настроек по умолчанию при первом запуске приложения.
-    fun initializeDefaultSettings() { // Если это первый запуск, то устанавливается язык устройства системы
+    // Инициализация настроек по умолчанию при первом запуске приложения
+    fun initializeDefaultSettings() {
         if (isFirstLaunch()) {
             saveInterfaceLanguage(LocaleHelper.SYSTEM_DEFAULT) // Устанавливаем "Как в системе" по умолчанию
-            saveContentLanguage("ru") // По умолчанию язык контента — "ru"
-            saveSourceCountry("ru") // По умолчанию страна источника — "ru"
-            setFirstLaunchCompleted() // Фиксируем, что первый запуск завершен
+            saveContentLanguage(DEFAULT_LANGUAGE)
+            saveSourceCountry(DEFAULT_LANGUAGE)
+            setFirstLaunchCompleted()
         }
     }
 
 
-    // Сохранение выбранного языка интерфейса.
-    fun saveInterfaceLanguage(language: String) { // Изменяет текущий язык
+    // Сохранение выбранного языка интерфейса
+    fun saveInterfaceLanguage(language: String) {
         editor.putString(KEY_INTERFACE_LANGUAGE, language)
         editor.apply()
     }
 
-    // Получение текущего языка интерфейса.
-    fun getInterfaceLanguage(): String { //Получение текущего языка приложение, если оно не установленно, то по умолчанию берется язык устройства системы
+    // Получение текущего языка интерфейса
+    fun getInterfaceLanguage(): String {
         val savedLanguage = sharedPreferences.getString(KEY_INTERFACE_LANGUAGE, LocaleHelper.SYSTEM_DEFAULT)
         return if (savedLanguage == LocaleHelper.SYSTEM_DEFAULT) {
             LocaleHelper.SYSTEM_DEFAULT
         } else savedLanguage!!
     }
 
-    // Сохранение языка контента.
-    fun saveContentLanguage(language: String) { // Изменяет текущий язык
+    // Сохранение языка контента
+    fun saveContentLanguage(language: String) {
         editor.putString(KEY_CONTENT_LANGUAGE, language)
         editor.apply()
     }
 
-    // Получение текущего языка контента.
+    // Получение текущего языка контента
     fun getContentLanguage(): String {
         return sharedPreferences.getString(KEY_CONTENT_LANGUAGE, DEFAULT_LANGUAGE) ?: DEFAULT_LANGUAGE
     }
 
-    // Сохранение страны источника.
+    // Сохранение страны источника
     fun saveSourceCountry(country: String) {
         editor.putString(KEY_SOURCE_COUNTRY, country)
         editor.apply()
     }
 
-    // Получение текущей страны источника.
+    // Получение текущей страны источника
     fun getSourceCountry(): String {
         return sharedPreferences.getString(KEY_SOURCE_COUNTRY, DEFAULT_LANGUAGE) ?: DEFAULT_LANGUAGE
     }
 
-    // Очистка всех данных пользователя из SharedPreferences.
+    // Очистка всех данных пользователя из SharedPreferences
     fun clearUserData() {
         editor.remove(KEY_USER_DATA)
         editor.apply()

@@ -20,7 +20,7 @@ abstract class NewsDb : RoomDatabase() {
         private var db: NewsDb? = null
         private const val DB_NAME = "news.db"
 
-        // Получение экземпляра базы данных.
+        // Получение экземпляра базы данных
         fun getInstance(context: Context): NewsDb {
             synchronized(LOCK) {
                 db?.let { return it }

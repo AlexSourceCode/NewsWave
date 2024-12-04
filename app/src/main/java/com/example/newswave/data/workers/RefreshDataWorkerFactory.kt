@@ -8,10 +8,16 @@ import com.example.newswave.domain.repository.LocalDataSource
 import com.example.newswave.domain.repository.RemoteDataSource
 import javax.inject.Inject
 
+/**
+ * Фабрика для создания экземпляров RefreshDataWorker
+ * Используется для внедрения зависимостей через Dagger
+ */
 class RefreshDataWorkerFactory @Inject constructor(
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource
 ) : WorkerFactory() {
+
+    // Создает экземпляр RefreshDataWorker с параметрами
     override fun createWorker(
         appContext: Context,
         workerClassName: String,
@@ -22,7 +28,7 @@ class RefreshDataWorkerFactory @Inject constructor(
             workerParameters,
             remoteDataSource,
             localDataSource,
-
         )
     }
+
 }
