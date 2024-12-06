@@ -209,6 +209,12 @@ class TopNewsFragment : Fragment() {
                                         "TopNewsFragment Error: News list is empty or invalid parameters! ${uiState.message}"
                                     )
                                     binding.tvRetry.visibility = View.GONE
+                                    binding.tvErrorAvailableNews.text = requireContext().getString(R.string.no_news_for_criteria)
+                                    binding.tvErrorAvailableNews.visibility = View.VISIBLE
+                                }
+                                "No results found for the query".trim() -> {
+                                    binding.tvRetry.visibility = View.GONE
+                                    binding.tvErrorAvailableNews.text = requireContext().getString(R.string.errorMessageNoResultsFound)
                                     binding.tvErrorAvailableNews.visibility = View.VISIBLE
                                 }
 
@@ -225,11 +231,11 @@ class TopNewsFragment : Fragment() {
                                 }
                             }
 
-                            if (isSearchNews == true) {
-                                Log.d("TopNewsFragmentState", "isSearchNews")
-                                binding.tvRetry.visibility = View.VISIBLE
-                                adapter.submitList(emptyList())
-                            }
+//                            if (isSearchNews == true) {
+//                                Log.d("TopNewsFragmentState", "isSearchNews")
+//                                binding.tvRetry.visibility = View.VISIBLE
+//                                adapter.submitList(emptyList())
+//                            }
                         }
 
                         is NewsState.Loading -> {

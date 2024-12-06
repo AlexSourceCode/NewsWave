@@ -120,7 +120,7 @@ class TopNewsViewModel @Inject constructor(
                     Log.d("CheckErrorMessage", errorMessage)
                     _uiState.value = NewsState.Error(errorMessage)
                     val savedNews = getTopNews()
-                    if ((!savedNews.isNullOrEmpty()) && (trimmedErrorMessage != "Error loading news by filter: HTTP 402") && (trimmedErrorMessage != "News list is empty or invalid parameters!")) {
+                    if ((!savedNews.isNullOrEmpty()) && (trimmedErrorMessage != "Error loading news by filter: HTTP 402") && (trimmedErrorMessage != "News list is empty or invalid parameters!") && (trimmedErrorMessage != "No results found for the query")) {
                         Log.d("CheckErrorMessage", "execute gettopnews")
                         _uiState.value = NewsState.Success(savedNews)
                     }

@@ -67,4 +67,5 @@
         <item>Русский</item>
         <item>English</item>
     </string-array>
+    <string name="errorMessageNoResultsFound">По запросу ничего не найдено</string>
 </resources>

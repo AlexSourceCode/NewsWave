@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -214,8 +215,19 @@ class NewsRepositoryImpl @Inject constructor(
                         flow { emptyList<NewsItemDto>() }
                     }
                 }
-                .filter { it.isNotEmpty() }
-                .collect { news -> _filteredNewsSharedFlow.emit(news) }
+//                .filter { it.isNotEmpty() }
+                .collect { news ->
+                    Log.d("NewsRepositoryImpl", "execute collect")
+                    Log.d("NewsRepositoryImpl", news.toString())
+                    if (news.isEmpty()) {
+                        Log.d("NewsRepositoryImpl", "execute condition")
+                        _observeErrorLoadData.emit(
+                            "No results found for the query"
+                        )
+                        return@collect
+                    }
+                    _filteredNewsSharedFlow.emit(news)
+                }
         }
     }
 }
