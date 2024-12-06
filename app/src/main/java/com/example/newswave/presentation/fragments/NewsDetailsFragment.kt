@@ -30,6 +30,7 @@ import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.CustomArrayAdapter
 import com.example.newswave.utils.DateUtils
+import com.example.newswave.utils.LocaleHelper
 import com.example.newswave.utils.NetworkUtils
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.delay
@@ -90,7 +91,7 @@ class NewsDetailsFragment : Fragment() {
 
     private fun setupDefaultButton() {
         binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        if ("RU" == currentLanguage()) {
+        if ("RU" == LocaleHelper.getSystemLanguage()) {
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe_rus)
         } else {
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
@@ -287,11 +288,14 @@ class NewsDetailsFragment : Fragment() {
 
 
     private fun setSubscribedButton() {
+        Log.d("setSubscribedButton", currentLanguage())
         binding.btSubscription.text = getString(R.string.subscribed)
         binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        if ("RU" == currentLanguage()) {
+        if ("ru" == LocaleHelper.getSystemLanguage()) {
+            Log.d("setSubscribedButton", "execute ed ru")
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed_rus)
         } else {
+            Log.d("setSubscribedButton", "execute ed en")
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribed)
         }
     }
@@ -299,9 +303,11 @@ class NewsDetailsFragment : Fragment() {
     private fun setUnsubscribedButton() {
         binding.btSubscription.text = getString(R.string.subscribe)
         binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        if ("RU" == currentLanguage()) {
+        if ("ru" == LocaleHelper.getSystemLanguage()) {
+            Log.d("setSubscribedButton", "execute e ru")
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe_rus)
         } else {
+            Log.d("setSubscribedButton", "execute e ru")
             binding.btSubscription.setBackgroundResource(R.drawable.button_subscribe)
         }
     }
