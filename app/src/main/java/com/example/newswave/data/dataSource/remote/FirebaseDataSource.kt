@@ -30,7 +30,7 @@ import kotlin.coroutines.suspendCoroutine
  */
 class FirebaseDataSource @Inject constructor(
     private val auth: FirebaseAuth, // Firebase API для управления авторизацией
-    private val database: FirebaseDatabase // Firebase API для работы с базой данных Realtime Database.
+    private val database: FirebaseDatabase, // Firebase API для работы с базой данных Realtime Database
 ) {
     private var authorsJob: Job? = null
     private val ioScope = CoroutineScope(Dispatchers.IO) // Определяет контекст для корутин на IO-потоке
@@ -39,7 +39,7 @@ class FirebaseDataSource @Inject constructor(
     private val usersReference = database.getReference("Users")
 
     // Получает поток авторов для текущего пользователя
-    fun getAuthorsReference(userId: String) = database.getReference("Authors").child(userId)
+    private fun getAuthorsReference(userId: String) = database.getReference("Authors").child(userId)
 
     // Поток состояния авторизации, содержащий текущего авторизованного пользователя
     private val _authStateFlow = MutableStateFlow<FirebaseUser?>(auth.currentUser)
@@ -54,7 +54,10 @@ class FirebaseDataSource @Inject constructor(
     }
 
     // Возвращает поток списка авторов текущего пользователя
-    fun getAuthorListFlow(): SharedFlow<List<AuthorItemEntity>?> = authorsFlow
+    fun getAuthorListFlow(): SharedFlow<List<AuthorItemEntity>?> {
+        showAuthorsList()
+        return authorsFlow
+    }
 
     // Эмитирует список авторов текущего пользователя.
     // Отменяет предыдущую задачу, если она запущена, чтобы избежать накопления задач.
@@ -172,7 +175,7 @@ class FirebaseDataSource @Inject constructor(
     }
 
     // Выход из системы
-    suspend fun signOut() {
+    fun signOut() {
         auth.signOut()
     }
 

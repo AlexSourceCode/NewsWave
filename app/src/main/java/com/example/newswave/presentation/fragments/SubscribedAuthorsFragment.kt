@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -70,6 +71,11 @@ class SubscribedAuthorsFragment : Fragment() {
         binding.btLogin.setOnClickListener {
             launchLoginFragment()
         }
+        binding.tvRetry.setOnClickListener {
+            binding.tvRetry.visibility = View.GONE
+            binding.pgNews.visibility = View.VISIBLE
+            viewModel.retryFetchAuthors()
+        }
     }
 
     private fun observeViewModel() {
@@ -81,13 +87,20 @@ class SubscribedAuthorsFragment : Fragment() {
                             showProgressBar()
                             showLoggedInState()
                             viewModel.uiState.collect { uiState ->
-                                Log.d("currentListState", "startcollect")
                                 when (uiState) {
-                                    is AuthorState.Error -> hideProgressBar()
+                                    is AuthorState.Error -> {
+                                        showToast()
+                                        hideProgressBar()
+                                        binding.tvRetry.visibility = View.VISIBLE
+                                    }
 
-                                    is AuthorState.Loading -> showProgressBar()
+                                    is AuthorState.Loading -> {
+                                        binding.tvRetry.visibility = View.GONE
+                                        showProgressBar()
+                                    }
 
                                     is AuthorState.Success -> {
+                                        binding.tvRetry.visibility = View.GONE
                                         if (uiState.currentList?.size == 0){
                                             showMessageNoAuthors()
                                             hideProgressBar()
@@ -100,12 +113,19 @@ class SubscribedAuthorsFragment : Fragment() {
                                 }
                             }
                         }
-
                         is AuthState.LoggedOut -> showLoggedOutState()
                     }
                 }
             }
         }
+    }
+
+    private fun showToast() {    // Показ уведомления
+        Toast.makeText(
+            requireContext(),
+            requireActivity().getString(R.string.error_load_data),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun showMessageNoAuthors(){

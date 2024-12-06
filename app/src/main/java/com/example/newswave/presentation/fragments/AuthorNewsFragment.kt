@@ -122,6 +122,8 @@ class AuthorNewsFragment : Fragment() {
 
     private fun setOnClickListener() {
         binding.tvRetry.setOnClickListener {
+            binding.pgNews.visibility = View.VISIBLE
+            binding.tvRetry.visibility = View.GONE
             viewModel.loadAuthorNews((args.author))
         }
     }

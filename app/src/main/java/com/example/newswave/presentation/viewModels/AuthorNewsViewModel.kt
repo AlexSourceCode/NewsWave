@@ -43,16 +43,25 @@ class AuthorNewsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 loadAuthorNewsUseCase(author)
-                    .distinctUntilChanged()//mb comment
                     .collect { news ->
                         _uiState.value = when (news) {
-                            is NewsState.Error -> NewsState.Error(news.message)
-                            is NewsState.Loading -> NewsState.Loading
-                            is NewsState.Success -> NewsState.Success(news.currentList)
+                            is NewsState.Error -> {
+                                Log.d("AuthorNewsViewModel", "Error")
+                                NewsState.Error(news.message)
+                            }
+                            is NewsState.Loading -> {
+                                Log.d("AuthorNewsViewModel", "Loading")
+                                NewsState.Loading
+                            }
+                            is NewsState.Success -> {
+                                Log.d("AuthorNewsViewModel", "Success")
+                                NewsState.Success(news.currentList)
+                            }
                         }
                     }
             } catch (e: Exception){
-                Log.d("AuthorNewsViewModel", e.toString())
+                Log.d("AuthorNewsViewModel", "catch e")
+                _uiState.value = NewsState.Error(e.message.toString())
             }
         }
     }

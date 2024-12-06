@@ -1,6 +1,8 @@
 package com.example.newswave.data.repository
 
 import android.app.Application
+import android.util.Log
+import com.example.newswave.R
 import com.example.newswave.data.dataSource.remote.FirebaseDataSource
 import com.example.newswave.domain.entity.AuthorItemEntity
 import com.example.newswave.domain.model.NewsState
@@ -50,11 +52,17 @@ class SubscriptionRepositoryImpl @Inject constructor(
     }
     // Возвращает поток списка авторов
     override suspend fun getAuthorList(): SharedFlow<List<AuthorItemEntity>?> {
+        if (!isNetworkAvailable(application)){
+            throw Exception(application.getString(R.string.no_internet_connection))
+        }
         return firebaseDataSource.getAuthorListFlow()
     }
 
     // Загружает новости автора и возвращает поток новостей
     override suspend fun loadAuthorNews(author: String): SharedFlow<NewsState> {
+        if (!isNetworkAvailable(application)){
+            throw Exception(application.getString(R.string.no_internet_connection))
+        }
         _currentAuthor.emit(author)
         return authorNews
     }

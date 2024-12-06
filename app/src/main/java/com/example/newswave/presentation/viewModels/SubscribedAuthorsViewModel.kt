@@ -6,22 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.newswave.domain.model.AuthState
 import com.example.newswave.domain.model.AuthorState
 import com.example.newswave.domain.usecases.GetAuthorListUseCase
-import com.example.newswave.domain.usecases.UnsubscribeFromAuthorUseCase
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-import com.example.newswave.domain.model.NewsState
 import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
 import com.example.newswave.domain.usecases.ShowAuthorsListUseCase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import com.example.newswave.domain.usecases.UnsubscribeFromAuthorUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 class SubscribedAuthorsViewModel @Inject constructor(
@@ -45,10 +38,18 @@ class SubscribedAuthorsViewModel @Inject constructor(
         }
     }
 
+    fun retryFetchAuthors() {
+        Log.d("SubscribedAuthorsViewModel", "retryFetchAuthors")
+        getAuthorsList()
+    }
+
     private fun getAuthorsList() {
+        Log.d("SubscribedAuthorsViewModel", "getAuthorsList")
         viewModelScope.launch {
             try {
+                Log.d("SubscribedAuthorsViewModel", "before collectLatest")
                 getAuthorListUseCase().collect { authors ->
+                    Log.d("SubscribedAuthorsViewModel", "after collectLatest")
                     _uiState.value = AuthorState.Success(authors)
                 }
             } catch (e: Exception) {
