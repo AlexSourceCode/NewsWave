@@ -4,14 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.data.dataSource.local.UserPreferences
 import com.example.newswave.domain.entity.UserEntity
-import com.example.newswave.domain.usecases.FetchUserDataUseCase
-import com.example.newswave.domain.usecases.GetContentLanguageUseCase
-import com.example.newswave.domain.usecases.GetSourceCountryUseCase
-import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
-import com.example.newswave.domain.usecases.SaveContentLanguageUseCase
-import com.example.newswave.domain.usecases.SaveSourceCountryUseCase
-import com.example.newswave.domain.usecases.SignOutUseCase
-import com.example.newswave.domain.usecases.SyncUserSettingsUseCase
+import com.example.newswave.domain.usecases.user.FetchUserDataUseCase
+import com.example.newswave.domain.usecases.user.GetContentLanguageUseCase
+import com.example.newswave.domain.usecases.user.GetSourceCountryUseCase
+import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
+import com.example.newswave.domain.usecases.user.SaveContentLanguageUseCase
+import com.example.newswave.domain.usecases.user.SaveSourceCountryUseCase
+import com.example.newswave.domain.usecases.user.SignOutUseCase
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +24,6 @@ class SettingsViewModel @Inject constructor(
     private val userPreferences: UserPreferences,
     private val getContentLanguageUseCase: GetContentLanguageUseCase,
     private val saveContentLanguageUseCase: SaveContentLanguageUseCase,
-    private val syncUserSettingsUseCase: SyncUserSettingsUseCase,
     private val getSourceCountryUseCase: GetSourceCountryUseCase,
     private val saveSourceCountryUseCase: SaveSourceCountryUseCase,
     private val signOutUseCase: SignOutUseCase
@@ -85,10 +83,6 @@ class SettingsViewModel @Inject constructor(
 
     fun saveContentLanguage(language: String) {
         saveContentLanguageUseCase(language)
-    }
-
-    fun syncUserSettings() {
-        syncUserSettingsUseCase()
     }
 
     private fun initSourceCountry() {

@@ -142,11 +142,6 @@ class UserRepositoryImpl @Inject constructor(
 
     }
 
-    // Синхронизация пользовательских настроек с Firebase
-    override fun syncUserSettings() {
-
-    }
-
     // Получение текущего языка контента
     override fun getContentLanguage(): String {
         val content =

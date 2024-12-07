@@ -5,14 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.domain.model.AuthState
 import com.example.newswave.domain.model.AuthorState
-import com.example.newswave.domain.usecases.GetAuthorListUseCase
-import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
-import com.example.newswave.domain.usecases.ShowAuthorsListUseCase
-import com.example.newswave.domain.usecases.UnsubscribeFromAuthorUseCase
+import com.example.newswave.domain.usecases.subscription.GetAuthorListUseCase
+import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
+import com.example.newswave.domain.usecases.subscription.ShowAuthorsListUseCase
+import com.example.newswave.domain.usecases.subscription.UnsubscribeFromAuthorUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

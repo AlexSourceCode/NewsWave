@@ -3,6 +3,9 @@ package com.example.newswave.domain.entity
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
+/**
+ * Представляет новостную статью с её метаданными
+ */
 @Parcelize
 data class NewsItemEntity(
     val id: Int,
@@ -14,6 +17,5 @@ data class NewsItemEntity(
     val publishDate: String,
     val author: String,
     val language: String,
-//    val category: String? = null,
     val sourceCountry: String
-): Parcelable
+) : Parcelable

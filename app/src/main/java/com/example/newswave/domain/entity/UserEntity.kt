@@ -1,5 +1,8 @@
 package com.example.newswave.domain.entity
 
+/**
+ * Представляет пользователя приложения
+ */
 data class UserEntity(
     val id: String,
     val username: String,
@@ -9,6 +12,6 @@ data class UserEntity(
     val lastName: String,
     val newsContent: String,
     val newsSourceCountry: String
-){
-    constructor() : this("","","","","","","","")
+) {
+    constructor() : this("", "", "", "", "", "", "", "")
 }

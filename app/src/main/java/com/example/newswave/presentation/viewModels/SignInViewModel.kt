@@ -4,14 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.data.network.model.ErrorType
-import com.example.newswave.domain.usecases.FetchAuthErrorUseCase
-import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
-import com.example.newswave.domain.usecases.SignInByEmailUseCase
-import com.google.firebase.auth.FirebaseAuth
+import com.example.newswave.domain.usecases.user.FetchAuthErrorUseCase
+import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
+import com.example.newswave.domain.usecases.user.SignInByEmailUseCase
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.auth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow

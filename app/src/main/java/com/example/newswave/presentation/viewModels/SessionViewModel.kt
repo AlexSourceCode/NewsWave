@@ -1,14 +1,8 @@
 package com.example.newswave.presentation.viewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.newswave.domain.usecases.IsUserDataUpdatedUseCase
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.newswave.domain.usecases.user.IsUserDataUpdatedUseCase
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SessionViewModel @Inject constructor(

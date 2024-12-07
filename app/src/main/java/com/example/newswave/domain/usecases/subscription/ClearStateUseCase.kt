@@ -1,4 +1,4 @@
-package com.example.newswave.domain.usecases
+package com.example.newswave.domain.usecases.subscription
 
 import com.example.newswave.domain.repository.SubscriptionRepository
 import javax.inject.Inject

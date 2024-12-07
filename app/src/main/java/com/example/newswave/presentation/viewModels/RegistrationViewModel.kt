@@ -3,9 +3,9 @@ package com.example.newswave.presentation.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.data.network.model.ErrorType
-import com.example.newswave.domain.usecases.FetchAuthErrorUseCase
-import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
-import com.example.newswave.domain.usecases.SignUpByEmailUseCase
+import com.example.newswave.domain.usecases.user.FetchAuthErrorUseCase
+import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
+import com.example.newswave.domain.usecases.user.SignUpByEmailUseCase
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

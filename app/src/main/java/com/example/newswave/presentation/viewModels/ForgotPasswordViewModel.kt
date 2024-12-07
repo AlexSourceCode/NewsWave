@@ -3,13 +3,9 @@ package com.example.newswave.presentation.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.data.network.model.ErrorType
-import com.example.newswave.domain.usecases.FetchAuthErrorUseCase
-import com.example.newswave.domain.usecases.FetchIsSuccessAuthUseCase
-import com.example.newswave.domain.usecases.ObserveAuthStateUseCase
-import com.example.newswave.domain.usecases.ResetPasswordUseCase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.example.newswave.domain.usecases.user.FetchAuthErrorUseCase
+import com.example.newswave.domain.usecases.user.FetchIsSuccessAuthUseCase
+import com.example.newswave.domain.usecases.user.ResetPasswordUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

@@ -1,10 +1,6 @@
-package com.example.newswave.domain.usecases
+package com.example.newswave.domain.usecases.news
 
-import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.NewsRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import javax.inject.Inject
 
 class SearchNewsByFilterUseCase @Inject constructor(

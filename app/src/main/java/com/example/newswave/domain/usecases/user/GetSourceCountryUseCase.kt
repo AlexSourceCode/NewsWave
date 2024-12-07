@@ -1,4 +1,4 @@
-package com.example.newswave.domain.usecases
+package com.example.newswave.domain.usecases.user
 
 import com.example.newswave.domain.repository.UserRepository
 import kotlinx.coroutines.flow.StateFlow
