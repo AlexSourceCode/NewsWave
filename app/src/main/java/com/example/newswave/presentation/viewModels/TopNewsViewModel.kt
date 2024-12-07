@@ -1,9 +1,11 @@
 package com.example.newswave.presentation.viewModels
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.newswave.R
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.model.NewsState
 import com.example.newswave.domain.usecases.FavoriteAuthorCheckUseCase
@@ -31,6 +33,7 @@ import javax.inject.Inject
 
 
 class TopNewsViewModel @Inject constructor(
+    private val application: Application,
     var savedStateHandle: SavedStateHandle,
     private val loadDataUseCase: LoadDataUseCase,
     private val loadNewsForPreviousDayUseCase: LoadNewsForPreviousDayUseCase,
@@ -120,15 +123,20 @@ class TopNewsViewModel @Inject constructor(
                     Log.d("CheckErrorMessage", errorMessage)
                     _uiState.value = NewsState.Error(errorMessage)
                     val savedNews = getTopNews()
-                    if ((!savedNews.isNullOrEmpty()) && (trimmedErrorMessage != "Error loading news by filter: HTTP 402") && (trimmedErrorMessage != "News list is empty or invalid parameters!") && (trimmedErrorMessage != "No results found for the query")) {
-                        Log.d("CheckErrorMessage", "execute gettopnews")
+                    if ((!savedNews.isNullOrEmpty()) && (trimmedErrorMessage != application.getString(
+                            R.string.error_loading_news_by_filter
+                        )) && (trimmedErrorMessage != application.getString(R.string.news_list_is_empty_or_invalid_parameters))
+                        && (trimmedErrorMessage != application.getString(R.string.errorMessageNoResultsFound))
+                    ) {
+                        Log.d("CheckErrorMessage", "wtf ${errorMessage}")
+                        Log.d("CheckErrorMessage", "wtf resource ${application.getString(R.string.errorMessageNoResultsFound)}")
                         _uiState.value = NewsState.Success(savedNews)
                     }
                 }
         }
     }
 
-    private fun fetchTopNewsList() { //yes
+    private fun fetchTopNewsList() {
         viewModelScope.launch {
             try {
                 fetchTopNewsListUseCase()

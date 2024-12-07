@@ -194,9 +194,11 @@ class NewsRepositoryImpl @Inject constructor(
                 .filter { isNetworkAvailableWithError() }
                 .flatMapLatest { (filterParameter, filterValue) ->
                     try {
+                        Log.d("NewsRepositoryImpl", "execute try")
                         val filterType = getFilterType(filterParameter)
                         applyFilter(filterType, filterValue)
                             .catch { e ->
+                                Log.d("NewsRepositoryImpl", "inside error ${e.message}")
                                 _observeErrorLoadData.emit(
                                     application.getString(
                                         R.string.error_loading_news_by_filter,
@@ -206,6 +208,7 @@ class NewsRepositoryImpl @Inject constructor(
                                 emit(emptyList())
                             }
                     } catch (e: Exception) {
+                        Log.d("NewsRepositoryImpl", "outside error ${e.message}")
                         _observeErrorLoadData.emit(
                             application.getString(
                                 R.string.error_loading_news_by_filter,
@@ -222,7 +225,7 @@ class NewsRepositoryImpl @Inject constructor(
                     if (news.isEmpty()) {
                         Log.d("NewsRepositoryImpl", "execute condition")
                         _observeErrorLoadData.emit(
-                            "No results found for the query"
+                            application.getString(R.string.errorMessageNoResultsFound)
                         )
                         return@collect
                     }
