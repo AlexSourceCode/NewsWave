@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.R
 import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.domain.model.NewsState
+import com.example.newswave.presentation.state.NewsState
 import com.example.newswave.domain.usecases.subscription.FavoriteAuthorCheckUseCase
 import com.example.newswave.domain.usecases.news.FetchErrorLoadDataUseCase
 import com.example.newswave.domain.usecases.news.FetchTopNewsListUseCase

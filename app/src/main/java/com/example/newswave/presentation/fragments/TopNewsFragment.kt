@@ -20,7 +20,7 @@ import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentTopNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.domain.model.NewsState
+import com.example.newswave.presentation.state.NewsState
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.adapters.NewsListAdapter
 import com.example.newswave.presentation.viewModels.SessionViewModel

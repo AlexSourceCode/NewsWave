@@ -24,7 +24,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentNewsDetailsBinding
-import com.example.newswave.domain.model.AuthState
+import com.example.newswave.presentation.state.AuthState
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory

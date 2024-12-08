@@ -1,4 +1,4 @@
-package com.example.newswave.domain.model
+package com.example.newswave.presentation.state
 
 import com.example.newswave.domain.entity.NewsItemEntity
 

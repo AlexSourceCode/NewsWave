@@ -2,7 +2,6 @@ package com.example.newswave.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -18,12 +17,11 @@ import com.example.newswave.R
 import com.example.newswave.databinding.FragmentAuthorNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.app.NewsApp
-import com.example.newswave.domain.model.AuthState
-import com.example.newswave.domain.model.NewsState
+import com.example.newswave.presentation.state.AuthState
+import com.example.newswave.presentation.state.NewsState
 import com.example.newswave.presentation.adapters.NewsListAdapter
 import com.example.newswave.presentation.viewModels.AuthorNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

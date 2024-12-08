@@ -1,10 +1,9 @@
 package com.example.newswave.presentation.viewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.domain.model.AuthState
-import com.example.newswave.domain.model.NewsState
+import com.example.newswave.presentation.state.AuthState
+import com.example.newswave.presentation.state.NewsState
 import com.example.newswave.domain.usecases.subscription.FavoriteAuthorCheckUseCase
 import com.example.newswave.domain.usecases.subscription.LoadAuthorNewsUseCase
 import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
@@ -41,29 +40,15 @@ class AuthorNewsViewModel @Inject constructor(
             try {
                 loadAuthorNewsUseCase(author)
                     .collect { news ->
-                        _uiState.value = when (news) {
-                            is NewsState.Error -> {
-                                Log.d("AuthorNewsViewModel", "Error")
-                                NewsState.Error(news.message)
-                            }
-                            is NewsState.Loading -> {
-                                Log.d("AuthorNewsViewModel", "Loading")
-                                NewsState.Loading
-                            }
-                            is NewsState.Success -> {
-                                Log.d("AuthorNewsViewModel", "Success")
-                                NewsState.Success(news.currentList)
-                            }
-                        }
+                        _uiState.value = NewsState.Success(news)
                     }
-            } catch (e: Exception){
-                Log.d("AuthorNewsViewModel", "catch e")
+            } catch (e: Exception) {
                 _uiState.value = NewsState.Error(e.message.toString())
             }
         }
     }
 
-    fun preloadAuthorData(author: String){
+    fun preloadAuthorData(author: String) {
         viewModelScope.launch {
             favoriteAuthorCheckUseCase(author)
         }
@@ -71,7 +56,7 @@ class AuthorNewsViewModel @Inject constructor(
 
     private fun observeAuthState() {
         viewModelScope.launch {
-            observeAuthStateUseCase().collect{ userFirebase ->
+            observeAuthStateUseCase().collect { userFirebase ->
                 if (userFirebase != null) _user.value = AuthState.LoggedIn(userFirebase)
                 else _user.value = AuthState.LoggedOut
             }

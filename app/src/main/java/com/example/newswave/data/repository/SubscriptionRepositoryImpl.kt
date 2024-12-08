@@ -1,11 +1,10 @@
 package com.example.newswave.data.repository
 
 import android.app.Application
-import android.util.Log
 import com.example.newswave.R
 import com.example.newswave.data.dataSource.remote.FirebaseDataSource
 import com.example.newswave.domain.entity.AuthorItemEntity
-import com.example.newswave.domain.model.NewsState
+import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.RemoteDataSource
 import com.example.newswave.domain.repository.SubscriptionRepository
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
@@ -40,8 +39,8 @@ class SubscriptionRepositoryImpl @Inject constructor(
     private val _currentAuthor = MutableSharedFlow<String?>()
 
     // Поток состояния новостей автора
-    private val _authorNews = MutableSharedFlow<NewsState>()
-    private val authorNews: SharedFlow<NewsState> get() = _authorNews.asSharedFlow()
+    private val _authorNews = MutableSharedFlow<List<NewsItemEntity>>()
+    private val authorNews: SharedFlow<List<NewsItemEntity>> get() = _authorNews.asSharedFlow()
 
     // Поток, указывающий, является ли автор избранным
     private var _isFavoriteAuthorFlow = MutableStateFlow<Boolean?>(null)
@@ -59,7 +58,7 @@ class SubscriptionRepositoryImpl @Inject constructor(
     }
 
     // Загружает новости автора и возвращает поток новостей
-    override suspend fun loadAuthorNews(author: String): SharedFlow<NewsState> {
+    override suspend fun loadAuthorNews(author: String): SharedFlow<List<NewsItemEntity>> {
         if (!isNetworkAvailable(application)){
             throw Exception(application.getString(R.string.no_internet_connection))
         }
@@ -119,15 +118,19 @@ class SubscriptionRepositoryImpl @Inject constructor(
                     delay(10) // crutch
                     val isConnected = isNetworkAvailable(application)
                     if (!isConnected) {
-                        _authorNews.emit(NewsState.Error("No Internet connection"))
+                        throw Exception("No Internet connection")
+//                        _authorNews.emit(NewsState.Error("No Internet connection"))
                     }
                     isConnected
                 }
                 .filterNotNull()
                 .flatMapLatest { author -> remoteDataSource.fetchNewsByAuthorFlow(author) }
-                .catch { _authorNews.emit(NewsState.Error(it.toString())) }
+                .catch {
+                    throw Exception(it.toString())
+//                    _authorNews.emit(NewsState.Error(it.toString()))
+                }
                 .collect { news ->
-                    _authorNews.emit(NewsState.Success(news))
+                    _authorNews.emit(news)
                 }
         }
     }

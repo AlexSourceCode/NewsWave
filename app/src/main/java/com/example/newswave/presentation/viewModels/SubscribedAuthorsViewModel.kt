@@ -3,8 +3,8 @@ package com.example.newswave.presentation.viewModels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.domain.model.AuthState
-import com.example.newswave.domain.model.AuthorState
+import com.example.newswave.presentation.state.AuthState
+import com.example.newswave.presentation.state.AuthorState
 import com.example.newswave.domain.usecases.subscription.GetAuthorListUseCase
 import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
 import com.example.newswave.domain.usecases.subscription.ShowAuthorsListUseCase

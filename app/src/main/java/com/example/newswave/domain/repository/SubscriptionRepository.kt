@@ -1,7 +1,7 @@
 package com.example.newswave.domain.repository
 
 import com.example.newswave.domain.entity.AuthorItemEntity
-import com.example.newswave.domain.model.NewsState
+import com.example.newswave.domain.entity.NewsItemEntity
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -32,5 +32,5 @@ interface SubscriptionRepository {
     fun clearState()
 
     // Загрузить новости определённого автора
-    suspend fun loadAuthorNews(author: String): SharedFlow<NewsState>
+    suspend fun loadAuthorNews(author: String): SharedFlow<List<NewsItemEntity>>
 }

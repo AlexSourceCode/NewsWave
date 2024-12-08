@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.domain.model.AuthState
+import com.example.newswave.presentation.state.AuthState
 import com.example.newswave.domain.usecases.subscription.ClearStateUseCase
 import com.example.newswave.domain.usecases.subscription.FavoriteAuthorCheckUseCase
 import com.example.newswave.domain.usecases.subscription.IsFavoriteAuthorUseCase
