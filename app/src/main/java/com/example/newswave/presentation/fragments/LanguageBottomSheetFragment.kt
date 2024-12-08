@@ -2,25 +2,18 @@ package com.example.newswave.presentation.fragments
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.compose.ui.text.toLowerCase
-import androidx.compose.ui.text.toUpperCase
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newswave.R
 import com.example.newswave.databinding.PopupLanguagesSettingsBinding
-import com.example.newswave.utils.LanguageOption
-import com.example.newswave.utils.LocaleHelper
+import com.example.newswave.presentation.model.LanguageOption
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import java.util.Locale
 
 class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
 

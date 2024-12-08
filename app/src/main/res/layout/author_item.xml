@@ -30,7 +30,7 @@
             android:id="@+id/btSubscription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_subscribed_rus_in_authors_list"
+            android:background="@drawable/button_subscribed_in_authors_list"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:paddingStart="16dp"

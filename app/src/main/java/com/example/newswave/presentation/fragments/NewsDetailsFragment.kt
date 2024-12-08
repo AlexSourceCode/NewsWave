@@ -28,13 +28,11 @@ import com.example.newswave.domain.model.AuthState
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
-import com.example.newswave.utils.CustomArrayAdapter
+import com.example.newswave.presentation.adapters.CustomArrayAdapter
 import com.example.newswave.utils.DateUtils
 import com.example.newswave.utils.LocaleHelper
 import com.example.newswave.utils.NetworkUtils
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject

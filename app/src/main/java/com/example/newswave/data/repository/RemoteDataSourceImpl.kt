@@ -7,7 +7,7 @@ import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.network.model.NewsItemDto
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.RemoteDataSource
-import com.example.newswave.utils.Filter
+import com.example.newswave.domain.model.Filter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

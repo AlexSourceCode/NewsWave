@@ -18,7 +18,6 @@ object DateUtils {
     // Получение даты публикации в нужном формате
     @SuppressLint("NewApi")
     fun dateFormat(context: Context, date: String): String {
-        Log.d("CheckDateCur", date)
         val inputFormatter =
             DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss") // шаблон отображения времени
         val currentTimeNew = LocalDateTime.now() //текущее время

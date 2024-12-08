@@ -137,7 +137,7 @@
         tools:layout="@layout/popup_languages_settings" >
         <argument
             android:name="LanguageOption"
-            app:argType="com.example.newswave.utils.LanguageOption" />
+            app:argType="com.example.newswave.presentation.model.LanguageOption" />
         <argument
             android:name="LanguageValue"
             app:argType="string" />

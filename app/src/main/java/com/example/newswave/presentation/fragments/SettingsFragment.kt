@@ -6,26 +6,21 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentSettingsBinding
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.SettingsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
-import com.example.newswave.utils.LanguageOption
+import com.example.newswave.presentation.model.LanguageOption
 import com.example.newswave.utils.LocaleHelper
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.Locale
 import javax.inject.Inject
 
 

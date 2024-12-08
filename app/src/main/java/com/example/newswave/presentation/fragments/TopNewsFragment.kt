@@ -11,13 +11,11 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentTopNewsBinding
@@ -25,16 +23,12 @@ import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.model.NewsState
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.adapters.NewsListAdapter
-import com.example.newswave.presentation.viewModels.SavedStateViewModelFactory
 import com.example.newswave.presentation.viewModels.SessionViewModel
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
-import com.example.newswave.utils.Filter
+import com.example.newswave.domain.model.Filter
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

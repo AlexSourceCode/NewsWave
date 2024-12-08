@@ -1,13 +1,13 @@
-package com.example.newswave.utils
+package com.example.newswave.presentation.adapters
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.example.newswave.R
+import com.example.newswave.utils.StringUtils
 
 class CustomArrayAdapter(context: Context, resource: Int, objects: List<String>) :
     ArrayAdapter<String>(context, resource, objects){

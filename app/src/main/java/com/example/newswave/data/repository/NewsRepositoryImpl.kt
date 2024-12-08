@@ -13,7 +13,7 @@ import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.LocalDataSource
 import com.example.newswave.domain.repository.NewsRepository
 import com.example.newswave.domain.repository.RemoteDataSource
-import com.example.newswave.utils.Filter
+import com.example.newswave.domain.model.Filter
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
