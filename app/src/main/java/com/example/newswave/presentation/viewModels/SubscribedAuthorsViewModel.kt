@@ -7,7 +7,6 @@ import com.example.newswave.presentation.state.AuthState
 import com.example.newswave.presentation.state.AuthorState
 import com.example.newswave.domain.usecases.subscription.GetAuthorListUseCase
 import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
-import com.example.newswave.domain.usecases.subscription.ShowAuthorsListUseCase
 import com.example.newswave.domain.usecases.subscription.UnsubscribeFromAuthorUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +19,6 @@ class SubscribedAuthorsViewModel @Inject constructor(
     private val getAuthorListUseCase: GetAuthorListUseCase,
     private val unsubscribeFromAuthorUseCase: UnsubscribeFromAuthorUseCase,
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
-    showAuthorsListUseCase: ShowAuthorsListUseCase
 ) : ViewModel() {
 
 
@@ -43,12 +41,9 @@ class SubscribedAuthorsViewModel @Inject constructor(
     }
 
     private fun getAuthorsList() {
-        Log.d("SubscribedAuthorsViewModel", "getAuthorsList")
         viewModelScope.launch {
             try {
-                Log.d("SubscribedAuthorsViewModel", "before collectLatest")
                 getAuthorListUseCase().collect { authors ->
-                    Log.d("SubscribedAuthorsViewModel", "after collectLatest")
                     _uiState.value = AuthorState.Success(authors)
                 }
             } catch (e: Exception) {
@@ -68,7 +63,6 @@ class SubscribedAuthorsViewModel @Inject constructor(
 
 
     init {
-        showAuthorsListUseCase()
         getAuthorsList()
         observeAuthState()
     }

@@ -97,10 +97,6 @@ class SubscriptionRepositoryImpl @Inject constructor(
         }
     }
 
-    // Запускает поток авторов и обновляет _authorsFlow при изменении данных в Firebase
-    override fun showAuthorsList() {
-        firebaseDataSource.showAuthorsList()
-    }
 
     // Очищает состояние избранного автора
     override fun clearState() {
@@ -119,7 +115,6 @@ class SubscriptionRepositoryImpl @Inject constructor(
                     val isConnected = isNetworkAvailable(application)
                     if (!isConnected) {
                         throw Exception("No Internet connection")
-//                        _authorNews.emit(NewsState.Error("No Internet connection"))
                     }
                     isConnected
                 }
@@ -127,7 +122,6 @@ class SubscriptionRepositoryImpl @Inject constructor(
                 .flatMapLatest { author -> remoteDataSource.fetchNewsByAuthorFlow(author) }
                 .catch {
                     throw Exception(it.toString())
-//                    _authorNews.emit(NewsState.Error(it.toString()))
                 }
                 .collect { news ->
                     _authorNews.emit(news)

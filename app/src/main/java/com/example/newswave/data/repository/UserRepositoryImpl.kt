@@ -247,15 +247,14 @@ class UserRepositoryImpl @Inject constructor(
         _contentLanguage.emit(user.newsContent)
         _sourceCountry.emit(user.newsSourceCountry)
         _userData.value = user
-
     }
 
     // Загрузка данных пользователя из Firebase и их обновление локально
     private suspend fun updateUserData(userId: String) {
         val result = firebaseDataSource.fetchUserData(userId)
         result.onSuccess { userEntity ->
-            userEntity?.let { user ->
-                updateUserPreferences(userEntity)
+            userEntity?.let {
+                updateUserPreferences(it)
                 _isUserDataUpdatedFlow.emit(Unit)
             }
         }.onFailure { error ->
@@ -265,12 +264,13 @@ class UserRepositoryImpl @Inject constructor(
 
 
     init {
+        fetchUserData()
         // Подписка на изменения состояния авторизации в Firebase
         ioScope.launch {
             firebaseDataSource.authStateFlow
                 .collect { firebaseUser ->
                     firebaseUser?.let { user ->
-                        if (_userData.value?.id != user.uid) { // Проверяем соответствие
+                        if (_userData.value?.id != user.uid) {
                             updateUserData(user.uid)
                         }
                     }

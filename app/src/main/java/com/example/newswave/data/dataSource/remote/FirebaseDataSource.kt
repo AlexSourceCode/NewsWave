@@ -1,6 +1,7 @@
 package com.example.newswave.data.dataSource.remote
 
 import android.util.Log
+import com.example.newswave.di.ApplicationScope
 import com.example.newswave.domain.entity.AuthorItemEntity
 import com.example.newswave.domain.entity.UserEntity
 import com.google.firebase.auth.FirebaseAuth
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -28,6 +30,7 @@ import kotlin.coroutines.suspendCoroutine
  * Класс для работы с Firebase
  * Обеспечивает методы для авторизации, регистрации, сброса пароля и работы с базой данных
  */
+@ApplicationScope
 class FirebaseDataSource @Inject constructor(
     private val auth: FirebaseAuth, // Firebase API для управления авторизацией
     private val database: FirebaseDatabase, // Firebase API для работы с базой данных Realtime Database
@@ -50,6 +53,7 @@ class FirebaseDataSource @Inject constructor(
     private val authorsFlow: SharedFlow<List<AuthorItemEntity>?> get() = _authorsFlow.asSharedFlow()
 
     init {
+        Log.d("FirebaseDataSource", "init")
         observeAuthState()
     }
 

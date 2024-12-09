@@ -6,21 +6,9 @@ import kotlinx.coroutines.flow.SharedFlow
 import javax.inject.Inject
 
 class SessionViewModel @Inject constructor(
-    private val isUserDataUpdatedUseCase: IsUserDataUpdatedUseCase
+    isUserDataUpdatedUseCase: IsUserDataUpdatedUseCase
 ): ViewModel() {
 
     val refreshEvent: SharedFlow<Unit> = isUserDataUpdatedUseCase()
-//
-//    init {
-//        observeUserDataUpdates()
-//    }
-//
-//    private fun observeUserDataUpdates() {
-//        viewModelScope.launch {
-//            isUserDataUpdatedUseCase().collect { updated ->
-//                    _refreshEvent.emit(Unit) // Уведомляем о необходимости обновления
-//            }
-//        }
-//    }
 
 }

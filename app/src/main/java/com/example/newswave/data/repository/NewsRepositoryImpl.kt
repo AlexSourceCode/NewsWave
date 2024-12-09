@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -34,8 +35,8 @@ import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
 /**
- Реализация репозитория для управления данными новостей
- Позволяет загружать, фильтровать и обновлять данные
+Реализация репозитория для управления данными новостей
+Позволяет загружать, фильтровать и обновлять данные
  */
 class NewsRepositoryImpl @Inject constructor(
     private val application: Application,
@@ -111,7 +112,7 @@ class NewsRepositoryImpl @Inject constructor(
             }
 
             WorkInfo.State.SUCCEEDED -> {
-                Log.d("CheckErrorMessage", "Work succeeded")
+                Log.d("NewsRepositoryImpl", "Work succeeded")
             }
 
             else -> Unit
@@ -157,9 +158,14 @@ class NewsRepositoryImpl @Inject constructor(
     }
 
     // Проверка доступности сети с отправкой ошибок при отсутствии соединения
-    private suspend fun isNetworkAvailableWithError(): Boolean {
+    private suspend fun isNetworkAvailableWithError(isSearching: Boolean = false): Boolean {
         return if (!isNetworkAvailable(application)) {
-            _observeErrorLoadData.emit(application.getString(R.string.no_internet_connection))
+            val errorMessage = if (isSearching) {
+                application.getString(R.string.error_no_internet_in_search)
+            } else {
+                application.getString(R.string.no_internet_connection)
+            }
+            _observeErrorLoadData.emit(errorMessage)
             false
         } else {
             true
@@ -167,7 +173,7 @@ class NewsRepositoryImpl @Inject constructor(
     }
 
     // Применение фильтра для получения новостей
-    private suspend fun applyFilter(filter: Filter, value: String): Flow<List<NewsItemEntity>> {
+    private suspend fun applyFilter(filter: Filter, value: String): Flow<List<NewsItemEntity>?> {
         return remoteDataSource.fetchFilteredNews(filter, value)
     }
 
@@ -190,39 +196,18 @@ class NewsRepositoryImpl @Inject constructor(
     private fun observeFilterFlow() {
         ioScope.launch {
             _filterFlow
-                .filter { isNetworkAvailableWithError() }
+                .filter { isNetworkAvailableWithError(true) }
                 .flatMapLatest { (filterParameter, filterValue) ->
-                    try {
-                        Log.d("NewsRepositoryImpl", "execute try")
-                        val filterType = getFilterType(filterParameter)
-                        applyFilter(filterType, filterValue)
-                            .catch { e ->
-                                Log.d("NewsRepositoryImpl", "inside error ${e.message}")
-                                _observeErrorLoadData.emit(
-                                    application.getString(
-                                        R.string.error_loading_news_by_filter,
-                                        e.message
-                                    )
-                                )
-                                emit(emptyList())
-                            }
-                    } catch (e: Exception) {
-                        Log.d("NewsRepositoryImpl", "outside error ${e.message}")
-                        _observeErrorLoadData.emit(
-                            application.getString(
-                                R.string.error_loading_news_by_filter,
-                                e.message
-                            )
-                        )
-                        flow { emptyList<NewsItemDto>() }
-                    }
+                    val filterType = getFilterType(filterParameter)
+                    applyFilter(filterType, filterValue)
+                        .catch { e ->
+                            _observeErrorLoadData.emit(e.message.toString())
+                            emit(null)
+                        }
+                        .filterNotNull()
                 }
-//                .filter { it.isNotEmpty() }
                 .collect { news ->
-                    Log.d("NewsRepositoryImpl", "execute collect")
-                    Log.d("NewsRepositoryImpl", news.toString())
                     if (news.isEmpty()) {
-                        Log.d("NewsRepositoryImpl", "execute condition")
                         _observeErrorLoadData.emit(
                             application.getString(R.string.errorMessageNoResultsFound)
                         )

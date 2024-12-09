@@ -15,6 +15,7 @@ import com.example.newswave.domain.usecases.news.LoadDataUseCase
 import com.example.newswave.domain.usecases.news.LoadNewsForPreviousDayUseCase
 import com.example.newswave.domain.usecases.news.SearchNewsByFilterUseCase
 import com.example.newswave.domain.usecases.news.SearchNewsByFilterUseCaseFactory
+import com.example.newswave.domain.usecases.user.FetchUserDataUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,7 +34,8 @@ class TopNewsViewModel @Inject constructor(
     private val fetchTopNewsListUseCase: FetchTopNewsListUseCase,
     private val searchNewsByFilterUseCaseFactory: SearchNewsByFilterUseCaseFactory,
     private val fetchErrorLoadDataUseCase: FetchErrorLoadDataUseCase,
-    private val favoriteAuthorCheckUseCase: FavoriteAuthorCheckUseCase
+    private val favoriteAuthorCheckUseCase: FavoriteAuthorCheckUseCase,
+    private val fetchUserDataUseCase: FetchUserDataUseCase
 ) : ViewModel() {
 
     private lateinit var searchNewsByFilterUseCase: SearchNewsByFilterUseCase
@@ -111,18 +113,18 @@ class TopNewsViewModel @Inject constructor(
         viewModelScope.launch {
             fetchErrorLoadDataUseCase()
                 .collect { errorMessage ->
-                    val trimmedErrorMessage = errorMessage.toString().trim()
+                    val trimmedErrorMessage = errorMessage.trim()
                     Log.d("CheckErrorMessage", "get error: $errorMessage")
                     Log.d("CheckErrorMessage", errorMessage)
                     _uiState.value = NewsState.Error(errorMessage)
                     val savedNews = getTopNews()
+                    Log.d("CheckErrorMessage", savedNews?.isEmpty().toString())
                     if ((!savedNews.isNullOrEmpty()) && (trimmedErrorMessage != application.getString(
                             R.string.error_loading_news_by_filter
                         )) && (trimmedErrorMessage != application.getString(R.string.news_list_is_empty_or_invalid_parameters))
-                        && (trimmedErrorMessage != application.getString(R.string.errorMessageNoResultsFound))
+                        && (trimmedErrorMessage != application.getString(R.string.errorMessageNoResultsFound)) && (trimmedErrorMessage != application.getString(R.string.error_no_internet_in_search))
                     ) {
                         Log.d("CheckErrorMessage", "wtf ${errorMessage}")
-                        Log.d("CheckErrorMessage", "wtf resource ${application.getString(R.string.errorMessageNoResultsFound)}")
                         _uiState.value = NewsState.Success(savedNews)
                     }
                 }

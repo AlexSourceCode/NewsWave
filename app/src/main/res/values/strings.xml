@@ -72,10 +72,12 @@
     <string name="no_news_for_criteria">No news found for the selected search criteria. Please try adjusting the country or language settings</string>
     <string name="news_list_is_empty_or_invalid_parameters" translatable="false">News list is empty or invalid parameters!</string>
     <string name="error_loading_news_by_filter" translatable="false">Error loading news by filter: %1$s</string>
+    <string name="error_no_internet_in_search">No Internet connection in search</string>
     <string name="invalid_filter" translatable="false">Invalid filter: %1$s</string>
     <string name="yyyy_mm_dd" translatable="false">yyyy-MM-dd</string>
     <string name="unknown_error" translatable="false">Unknown error</string>
     <string name="errorMessageNoResultsFound">No results found for the query</string>
+    <string name="errorHTTP402" translatable="false">HTTP 402</string>
 
 
     <string-array name="languages_interface_array">

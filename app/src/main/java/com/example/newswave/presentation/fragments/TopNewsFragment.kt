@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -39,7 +40,7 @@ class TopNewsFragment : Fragment() {
     private lateinit var adapter: NewsListAdapter
 
 
-    private lateinit var viewModel: TopNewsViewModel
+    private val viewModel: TopNewsViewModel by viewModels { viewModelFactory }
     private val sessionViewModel: SessionViewModel by activityViewModels { viewModelFactory }
 
     @Inject
@@ -60,9 +61,8 @@ class TopNewsFragment : Fragment() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("TopNewsFragmentState", "onCreate")
         super.onCreate(savedInstanceState)
-        observeViewModel() // хз почему не краш
+        observeViewModel()
     }
 
 
@@ -77,7 +77,6 @@ class TopNewsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory)[TopNewsViewModel::class.java]
         setupAdapter()              // Настройка адаптера для RecyclerView
         setupTabLayout()            // Настройка вкладок (TabLayout)
         selectedFilter = requireActivity().application.getString(Filter.TEXT.descriptionResId)
@@ -94,7 +93,7 @@ class TopNewsFragment : Fragment() {
 
     private fun setOnClickListener() {
         binding.tvRetry.setOnClickListener {
-            viewModel.searchNewsByFilter()
+            viewModel.refreshData()//?
         }
     }
 
@@ -178,10 +177,6 @@ class TopNewsFragment : Fragment() {
                     when (uiState) {
                         is NewsState.Error -> {
                             binding.pgNews.visibility = View.GONE
-                            Log.d(
-                                "TopNewsFragmentState",
-                                "Error: ${uiState.message}"
-                            )
                             when (uiState.message.toString().trim()) {
                                 requireContext().getString(R.string.no_internet_connection) -> {
                                     if (adapter.currentList.isEmpty()) {
@@ -190,10 +185,16 @@ class TopNewsFragment : Fragment() {
                                     binding.tvRetry.setOnClickListener {
                                         viewModel.refreshData() // Функция повторного запроса данных
                                     }
-                                    Log.d(
-                                        "TopNewsFragmentState",
-                                        "TopNewsFragment Error: No Internet connection ${uiState.message}"
-                                    )
+                                    showToast()
+                                }
+
+                                requireContext().getString(R.string.errorHTTP402) -> {
+                                    if (adapter.currentList.isEmpty()) {
+                                        binding.tvRetry.visibility = View.VISIBLE
+                                    }
+                                    binding.tvRetry.setOnClickListener {
+                                        viewModel.refreshData() // Функция повторного запроса данных
+                                    }
                                     showToast()
                                 }
 
@@ -206,11 +207,19 @@ class TopNewsFragment : Fragment() {
                                     binding.tvErrorAvailableNews.text = requireContext().getString(R.string.no_news_for_criteria)
                                     binding.tvErrorAvailableNews.visibility = View.VISIBLE
                                 }
-                                "No results found for the query".trim() -> {
+                                requireContext().getString(R.string.errorMessageNoResultsFound) -> {
                                     binding.tvRetry.visibility = View.GONE
                                     binding.tvErrorAvailableNews.text = requireContext().getString(R.string.errorMessageNoResultsFound)
                                     binding.tvErrorAvailableNews.visibility = View.VISIBLE
                                 }
+                                requireContext().getString(R.string.error_no_internet_in_search) -> {
+                                    showToast()
+                                    binding.tvRetry.visibility = View.VISIBLE
+                                    binding.tvRetry.setOnClickListener {
+                                        viewModel.searchNewsByFilter()
+                                    }
+                                }
+
 
                                 else -> { // Другие ошибки
                                     Log.d(
@@ -218,18 +227,11 @@ class TopNewsFragment : Fragment() {
                                         "TopNewsFragment Error: else conditions ${uiState.message.toString()}"
                                     )
                                     showToast()
-                                    binding.tvRetry.visibility = View.VISIBLE
                                     binding.tvRetry.setOnClickListener {
-                                        viewModel.searchNewsByFilter()
+                                        viewModel.refreshData()
                                     }
                                 }
                             }
-
-//                            if (isSearchNews == true) {
-//                                Log.d("TopNewsFragmentState", "isSearchNews")
-//                                binding.tvRetry.visibility = View.VISIBLE
-//                                adapter.submitList(emptyList())
-//                            }
                         }
 
                         is NewsState.Loading -> {

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -32,7 +33,7 @@ class AuthorNewsFragment : Fragment() {
     private val args by navArgs<AuthorNewsFragmentArgs>()
 
     private lateinit var adapter: NewsListAdapter
-    private lateinit var viewModel: AuthorNewsViewModel
+    private val viewModel: AuthorNewsViewModel by viewModels { viewModelFactory }
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -57,13 +58,10 @@ class AuthorNewsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory)[AuthorNewsViewModel::class.java]
         setupAdapter()
         observeViewModel()
         setOnClickListener()
         setupSwipeRefresh()
-
-
     }
 
     private fun setupSwipeRefresh() {

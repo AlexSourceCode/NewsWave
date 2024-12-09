@@ -25,9 +25,6 @@ interface SubscriptionRepository {
     // Узнать, является ли текущий автор избранным
     fun isFavoriteAuthor(): StateFlow<Boolean?>
 
-    // Показать список авторов
-    fun showAuthorsList()
-
     // Очистить текущее состояние подписок
     fun clearState()
 
