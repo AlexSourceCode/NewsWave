@@ -2,6 +2,7 @@ package com.example.newswave.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -26,13 +27,15 @@ import com.example.newswave.presentation.viewModels.ViewModelFactory
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
+/**
+ * Фрагмент для отображения новостей, связанных с конкретным автором.
+ */
 class AuthorNewsFragment : Fragment() {
 
     private lateinit var binding: FragmentAuthorNewsBinding
-    private val args by navArgs<AuthorNewsFragmentArgs>()
+    private val args by navArgs<AuthorNewsFragmentArgs>() // Навигационные аргументы фрагмента, содержащий автора
 
-    private lateinit var adapter: NewsListAdapter
+    private lateinit var adapter: NewsListAdapter // Адаптер для списка новостей
     private val viewModel: AuthorNewsViewModel by viewModels { viewModelFactory }
 
     @Inject
@@ -47,7 +50,6 @@ class AuthorNewsFragment : Fragment() {
         super.onAttach(context)
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,20 +60,21 @@ class AuthorNewsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupAdapter()
-        observeViewModel()
-        setOnClickListener()
-        setupSwipeRefresh()
+        setupAdapter() // Настройка адаптера
+        observeViewModel() // Настройка наблюдения за состоянием ViewModel
+        setOnClickListener() // Установка обработчиков событий
+        setupSwipeRefresh() // Настройка механизма обновления данных
+
+        viewModel.loadAuthorNews(args.author) // Загрузка новостей автора при старте
     }
 
     private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshData(args.author)
-            binding.swipeRefreshLayout.isRefreshing = false
+            viewModel.refreshAuthorNews(args.author)
         }
     }
 
-
+    // Настройка адаптера для RecyclerView
     private fun setupAdapter() {
         adapter = NewsListAdapter(requireActivity().application)
         binding.rcNews.adapter = adapter
@@ -82,52 +85,72 @@ class AuthorNewsFragment : Fragment() {
         binding.currentAuthor.text = args.author
     }
 
+    // Подписка на наблюдение за состоянием UI и авторизацией
     private fun observeViewModel() {
+        // Наблюдение за состоянием UI
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.loadAuthorNews(args.author)
-                viewModel.uiState.collect { uiState ->
-                    when (uiState) {
-                        is NewsState.Error -> {
-                            showToast()
-                            binding.pgNews.visibility = View.GONE
-                            binding.tvRetry.visibility = View.VISIBLE
-                        }
-                        is NewsState.Loading -> {
-                            binding.tvRetry.visibility = View.GONE
-                            binding.pgNews.visibility = View.VISIBLE
-                        }
-                        is NewsState.Success -> {
-                            binding.pgNews.visibility = View.GONE
-                            binding.tvRetry.visibility = View.GONE
-                            adapter.submitList(uiState.currentList)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+
+                launch {
+                    viewModel.uiState.collect { uiState ->
+                        handleUiState(uiState)
+                    }
+                }
+
+                launch {
+                    viewModel.user.collect { authState ->
+                        if (authState is AuthState.LoggedOut) {
+                            findNavController().popBackStack()
                         }
                     }
                 }
             }
         }
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){
-                viewModel.user.collect{ authState ->
-                    if (authState is AuthState.LoggedOut) findNavController().popBackStack()
-                }
+    }
+
+    // Обработка текущего состояния UI
+    private fun handleUiState(uiState: NewsState) {
+        when (uiState) {
+            is NewsState.Error -> {
+                showToast()
+                binding.pgNews.visibility = View.GONE
+                binding.tvRetry.visibility = View.VISIBLE
+                binding.swipeRefreshLayout.isRefreshing = false
+            }
+
+            is NewsState.Loading -> {
+                binding.tvRetry.visibility = View.GONE
+                binding.pgNews.visibility = View.VISIBLE
+            }
+
+            is NewsState.Success -> {
+                binding.pgNews.visibility = View.GONE
+                binding.tvRetry.visibility = View.GONE
+                adapter.submitList(uiState.currentList)
+                binding.swipeRefreshLayout.isRefreshing = false
             }
         }
     }
 
-
+    // Установка обработчиков нажатий
     private fun setOnClickListener() {
         binding.tvRetry.setOnClickListener {
             binding.pgNews.visibility = View.VISIBLE
             binding.tvRetry.visibility = View.GONE
-            viewModel.loadAuthorNews((args.author))
+            viewModel.refreshAuthorNews((args.author))
         }
     }
 
-    private fun showToast(){    // Показ уведомления
-        Toast.makeText(requireContext(), requireActivity().getString(R.string.error_load_data), Toast.LENGTH_LONG).show()
+    // Показ всплывающего уведомления с сообщением об ошибке
+    private fun showToast() {    // Показ уведомления
+        Toast.makeText(
+            requireContext(),
+            requireActivity().getString(R.string.error_load_data),
+            Toast.LENGTH_LONG
+        ).show()
     }
 
+    // Переход к деталям новости
     private fun launchNewsDetailsFragment(news: NewsItemEntity) {
         viewModel.preloadAuthorData(args.author)
         findNavController().navigate(
@@ -137,6 +160,4 @@ class AuthorNewsFragment : Fragment() {
             )
         )
     }
-
-
 }

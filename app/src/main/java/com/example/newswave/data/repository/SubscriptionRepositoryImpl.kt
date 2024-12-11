@@ -1,6 +1,7 @@
 package com.example.newswave.data.repository
 
 import android.app.Application
+import android.util.Log
 import com.example.newswave.R
 import com.example.newswave.data.dataSource.remote.FirebaseDataSource
 import com.example.newswave.domain.entity.AuthorItemEntity
@@ -10,6 +11,7 @@ import com.example.newswave.domain.repository.SubscriptionRepository
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,10 +19,10 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,10 +35,12 @@ class SubscriptionRepositoryImpl @Inject constructor(
     private val firebaseDataSource: FirebaseDataSource
 ) : SubscriptionRepository {
 
-    private val ioScope = CoroutineScope(Dispatchers.IO) // Определяет контекст для корутин на IO-потоке
+    private val ioScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.IO) // Определяет контекст для корутин на IO-потоке
 
     // Поток, содержащий текущего автора
     private val _currentAuthor = MutableSharedFlow<String?>()
+
 
     // Поток состояния новостей автора
     private val _authorNews = MutableSharedFlow<List<NewsItemEntity>>()
@@ -49,9 +53,10 @@ class SubscriptionRepositoryImpl @Inject constructor(
     init {
         observeAuthorNews()
     }
+
     // Возвращает поток списка авторов
     override suspend fun getAuthorList(): SharedFlow<List<AuthorItemEntity>?> {
-        if (!isNetworkAvailable(application)){
+        if (!isNetworkAvailable(application)) {
             throw Exception(application.getString(R.string.no_internet_connection))
         }
         return firebaseDataSource.getAuthorListFlow()
@@ -59,7 +64,7 @@ class SubscriptionRepositoryImpl @Inject constructor(
 
     // Загружает новости автора и возвращает поток новостей
     override suspend fun loadAuthorNews(author: String): SharedFlow<List<NewsItemEntity>> {
-        if (!isNetworkAvailable(application)){
+        if (!isNetworkAvailable(application)) {
             throw Exception(application.getString(R.string.no_internet_connection))
         }
         _currentAuthor.emit(author)
@@ -114,15 +119,20 @@ class SubscriptionRepositoryImpl @Inject constructor(
                     delay(10) // crutch
                     val isConnected = isNetworkAvailable(application)
                     if (!isConnected) {
-                        throw Exception("No Internet connection")
+                        throw Exception(application.getString(R.string.no_internet_connection))
                     }
                     isConnected
                 }
                 .filterNotNull()
-                .flatMapLatest { author -> remoteDataSource.fetchNewsByAuthorFlow(author) }
-                .catch {
-                    throw Exception(it.toString())
+                .flatMapConcat { author ->
+                    try {
+                        remoteDataSource.fetchNewsByAuthorFlow(author)
+                    } catch (e: Exception){
+                        _authorNews.emit(emptyList())
+                        flow{(emit(emptyList()))}
+                    }
                 }
+                .filter { it.isNotEmpty() }
                 .collect { news ->
                     _authorNews.emit(news)
                 }

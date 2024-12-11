@@ -53,7 +53,6 @@ class FirebaseDataSource @Inject constructor(
     private val authorsFlow: SharedFlow<List<AuthorItemEntity>?> get() = _authorsFlow.asSharedFlow()
 
     init {
-        Log.d("FirebaseDataSource", "init")
         observeAuthState()
     }
 
@@ -65,7 +64,7 @@ class FirebaseDataSource @Inject constructor(
 
     // Эмитирует список авторов текущего пользователя.
     // Отменяет предыдущую задачу, если она запущена, чтобы избежать накопления задач.
-    fun showAuthorsList(){
+    private fun showAuthorsList(){
         authorsJob?.cancel()
         authorsJob = ioScope.launch {
             val currentUser = authStateFlow.value
