@@ -38,10 +38,8 @@ class UserRepositoryImpl @Inject constructor(
     // Потоки ошибок для разных операций
     private val _signInError = MutableSharedFlow<String>()
     private val signInError: SharedFlow<String> get() = _signInError
-
     private val _forgotPasswordError = MutableSharedFlow<String>()
     private val forgotPasswordError: SharedFlow<String> get() = _forgotPasswordError
-
     private val _signUpError = MutableSharedFlow<String>()
     private val signUpError: SharedFlow<String> get() = _signUpError
 
@@ -68,6 +66,11 @@ class UserRepositoryImpl @Inject constructor(
         private const val DEFAULT_LANGUAGE = "ru"
     }
 
+    init {
+        fetchUserData()
+        observeAuthStateChanges()
+    }
+
     // Сброс пароля для пользователя. Отправляет запрос в Firebase
     override fun resetPassword(email: String) {
         ioScope.launch {
@@ -78,7 +81,6 @@ class UserRepositoryImpl @Inject constructor(
                 _forgotPasswordError.emit(it.message.toString())
             }
         }
-
     }
 
     // Вход пользователя по email и паролю
@@ -262,10 +264,8 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-
-    init {
-        fetchUserData()
-        // Подписка на изменения состояния авторизации в Firebase
+    // Подписка на изменения состояния авторизации в Firebase
+    private fun observeAuthStateChanges(){
         ioScope.launch {
             firebaseDataSource.authStateFlow
                 .collect { firebaseUser ->

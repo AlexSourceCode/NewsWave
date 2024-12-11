@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentSignInBinding
+import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.SessionViewModel
 import com.example.newswave.presentation.viewModels.SignInViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
@@ -28,11 +30,13 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Фрагмент для авторизации пользователя
+ */
 class SignInFragment : Fragment() {
 
     private lateinit var binding: FragmentSignInBinding
-    private lateinit var viewModel: SignInViewModel
-    private val sessionViewModel: SessionViewModel by activityViewModels { viewModelFactory }
+    private val viewModel: SignInViewModel by viewModels { viewModelFactory }
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -56,73 +60,94 @@ class SignInFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory)[SignInViewModel::class.java]
         observeViewModel()
         setupOnClickListener()
     }
 
+    // Настройка обработчиков нажатий
     private fun setupOnClickListener() {
-        binding.tvRegistration.setOnClickListener {
-            launchRegistrationFragment()
-        }
-        binding.tvForgotPassword.setOnClickListener {
-            launchForgotPasswordFragment()
-        }
-
-        binding.btSignIn.setOnClickListener {
-            val email = binding.etEmail.text.toString().trim()
-            val password = binding.etPassword.text.toString().trim()
-            if (isFieldNotEmpty(email, password)) {
-                viewModel.signIn(email, password)
-            } else {
-                showToast(getString(R.string.please_fill_in_all_the_fields))
-            }
+        binding.apply {
+            tvRegistration.setOnClickListener { launchRegistrationFragment() }
+            tvForgotPassword.setOnClickListener { launchForgotPasswordFragment() }
+            btSignIn.setOnClickListener { handleSignIn() }
         }
     }
 
-    private fun showToast(message: String){
-        Toast.makeText(
-            requireContext(),
-            message,
-            Toast.LENGTH_LONG
-        ).show()
+    // Обработка авторизации пользователя
+    private fun handleSignIn() {
+        val email = binding.etEmail.text.toString().trim()
+        val password = binding.etPassword.text.toString().trim()
+        if (isFieldNotEmpty(email, password)) {
+            viewModel.signIn(email, password)
+        } else {
+            showToast(getString(R.string.please_fill_in_all_the_fields))
+        }
     }
 
+    // Отображение всплывающего уведомления
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+    }
+
+    // Проверка на заполненность полей
     private fun isFieldNotEmpty(email: String, password: String): Boolean {
         return email.isNotEmpty() && password.isNotEmpty()
     }
 
-    private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.user.collect { fireBaseUser ->
-                    if (fireBaseUser != null) {
-                        findNavController().popBackStack()
-                    }
-                }
-            }
-        }
+    // Подписка на изменения ViewModel
+    private fun observeViewModel() { // ?
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.error.collect { errorMessage ->
-                    Log.d("CheckErrorState", "execute from SignInFragment")
-                    showToast(errorMessage)
+                launch {
+                    viewModel.user.collect { fireBaseUser ->
+                        if (fireBaseUser != null) {
+                            findNavController().popBackStack()
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.error.collect { errorMessage ->
+                        showToast(errorMessage)
+                    }
                 }
             }
         }
     }
 
+    // Переход на экран регистрации
     private fun launchRegistrationFragment() {
         findNavController().navigate(
             SignInFragmentDirections.actionLoginFragmentToRegistrationFragment()
         )
     }
 
+    // Переход на экран восстановления пароля с передачей email
     private fun launchForgotPasswordFragment() {
         val email = binding.etEmail.text.toString().trim()
         findNavController().navigate(
             SignInFragmentDirections.actionLoginFragmentToForgotPasswordFragment(email)
         )
     }
-
 }
+
+
+//private fun observeViewModel() { // ?
+//    lifecycleScope.launch {
+//        repeatOnLifecycle(Lifecycle.State.CREATED) {
+//            viewModel.user.collect { fireBaseUser ->
+//                if (fireBaseUser != null) {
+//                    findNavController().popBackStack()
+//                }
+//            }
+//        }
+//    }
+//    lifecycleScope.launch {
+//        repeatOnLifecycle(Lifecycle.State.STARTED) {
+//            viewModel.error.collect { errorMessage ->
+//                Log.d("CheckErrorState", "execute from SignInFragment")
+//                showToast(errorMessage)
+//            }
+//        }
+//    }
+//}

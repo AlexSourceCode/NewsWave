@@ -60,10 +60,10 @@ class AuthorNewsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupAdapter() // Настройка адаптера
-        observeViewModel() // Настройка наблюдения за состоянием ViewModel
-        setOnClickListener() // Установка обработчиков событий
-        setupSwipeRefresh() // Настройка механизма обновления данных
+        setupAdapter()
+        observeViewModel()
+        setOnClickListener()
+        setupSwipeRefresh()
 
         viewModel.loadAuthorNews(args.author) // Загрузка новостей автора при старте
     }

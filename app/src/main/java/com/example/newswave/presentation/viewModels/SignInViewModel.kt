@@ -1,6 +1,5 @@
 package com.example.newswave.presentation.viewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.data.network.model.ErrorType
@@ -17,22 +16,34 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel для управления логикой авторизации.
+ */
 class SignInViewModel @Inject constructor(
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
     private val signInByEmailUseCase: SignInByEmailUseCase,
     private val fetchAuthErrorUseCase: FetchAuthErrorUseCase
 ): ViewModel() {
 
+    // Поток для отправки ошибок
     private var _error = MutableSharedFlow<String>()
     val error: SharedFlow<String> get() = _error.asSharedFlow()
 
+    // Состояние авторизованного пользователя
     private var _user = MutableStateFlow<FirebaseUser?>(null)
     val user: StateFlow<FirebaseUser?> get() = _user.asStateFlow()
 
+    init {
+        observeAuthState()
+        observeAuthErrors()
+    }
+
+    // Вход пользователя по email и паролю
     fun signIn(email:String, password: String){
         signInByEmailUseCase(email, password)
     }
 
+    // Подписка на изменения состояния авторизации
     private fun observeAuthState() {
         viewModelScope.launch {
             observeAuthStateUseCase().collect {
@@ -41,15 +52,12 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    init {
-        observeAuthState()
+    // Подписка на получение ошибок авторизации
+    private fun observeAuthErrors(){
         viewModelScope.launch {
             fetchAuthErrorUseCase(ErrorType.SIGN_IN).collect{
-                Log.d("CheckErrorState", " execute from SignInViewModel")
                 _error.emit(it)
             }
         }
     }
-
-
 }
