@@ -15,6 +15,9 @@ import com.example.newswave.presentation.model.LanguageOption
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
+/**
+ * BottomSheetDialogFragment для выбора языковых настроек
+ */
 class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
 
     private var _binding: PopupLanguagesSettingsBinding? = null
@@ -39,7 +42,7 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        isCancelable = true // Разрешаем закрытие по клику на фон
+        isCancelable = true // Разрешает закрытие по клику на фон
     }
 
     override fun onCreateView(
@@ -57,10 +60,11 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
         return binding.root
     }
 
+    // Конфигурирует настройки диалога, такие как затемнение и состояние развернутого BottomSheet
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return super.onCreateDialog(savedInstanceState).apply {
             window?.setDimAmount(BOTTOM_SHEET_DIM_AMOUNT) // Установка степени затемнения
-            setOnShowListener { // вызывается когда диалог будет показан на экране
+            setOnShowListener { // Вызывается, когда диалог будет показан на экране
                 val bottomSheet =
                     findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as FrameLayout
                 bottomSheet.setBackgroundResource(android.R.color.transparent)
@@ -74,6 +78,7 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
+    // Инициализирует поведение BottomSheet, включая высоту и peekHeight
     private fun initializeBottomSheetBehavior() {
         val bottomSheet = binding.bottomSheetContainer
         behavior = BottomSheetBehavior.from(bottomSheet)
@@ -85,6 +90,7 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
                 val displayMetrics = resources.displayMetrics
                 screenHeight = displayMetrics.heightPixels
 
+                // Вычисляем высоту BottomSheet как процент от высоты экрана
                 val calculatedHeight = (screenHeight * BOTTOM_SHEET_HEIGHT_RATIO).toInt()
                 bottomSheet.layoutParams = bottomSheet.layoutParams.apply {
                     height = calculatedHeight
@@ -96,61 +102,58 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
         })
     }
 
+    // Настраивает RecyclerView с адаптером и данными в зависимости от аргументов
     private fun setupRecyclerView() {
         val recyclerView = binding.rvLanguages
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // Получаем массив строк из ресурсов
-        val languageArray = when (args.languageOption) {
+        // Получаем массив языков и устанавливаем заголовок
+        val languageArray = getLanguageArrayAndSetTitle()
+
+        val adapter = LanguageListAdapter(languageArray)
+        recyclerView.adapter = adapter
+
+        // Выделяет текущий язык
+        adapter.currentLanguageChecked = { listItem ->
+            args.languageValue == listItem
+        }
+        // Обрабатывает выбор языка
+        adapter.onLanguageClick = { language ->
+            handleLanguageSelection(language)
+        }
+    }
+
+    // Получает соответствующий массив языков и устанавливает заголовок в зависимости от аргументов
+    private fun getLanguageArrayAndSetTitle(): List<String> {
+        return when (args.languageOption) {
             LanguageOption.CONTENT_LANGUAGE -> {
                 binding.tvTitle.text = requireContext().getString(R.string.content_language)
-                resources.getStringArray(R.array.languages_content_array)
-                    .toList()
+                resources.getStringArray(R.array.languages_content_array).toList()
             }
 
             LanguageOption.INTERFACE_LANGUAGE -> {
                 binding.tvTitle.text = requireContext().getString(R.string.interface_language)
-                resources.getStringArray(R.array.languages_interface_array)
-                    .toList()
-
+                resources.getStringArray(R.array.languages_interface_array).toList()
             }
 
             LanguageOption.NEWS_SOURCE_COUNTRY -> {
                 binding.tvTitle.text = requireContext().getString(R.string.country_of_news_source)
-                resources.getStringArray(R.array.languages_source_country_array)
-                    .toList()
+                resources.getStringArray(R.array.languages_source_country_array).toList()
             }
         }
-
-        // Создаем адаптер для RecyclerView
-        val adapter = LanguageListAdapter(languageArray)
-
-        // Устанавливаем адаптер для RecyclerView
-        recyclerView.adapter = adapter
-
-        adapter.currentLanguageChecked = { listItem ->
-            args.languageValue == listItem
-        }
-
-        adapter.onLanguageClick = { language ->
-            when (args.languageOption) {
-
-                LanguageOption.INTERFACE_LANGUAGE -> {
-                    launchSettingsFragment(language, INTERFACE_LANGUAGE_SELECTION_RESULT)
-                }
-
-                LanguageOption.CONTENT_LANGUAGE -> {
-                    launchSettingsFragment(language, CONTENT_LANGUAGE_SELECTION_RESULT)
-                }
-
-                LanguageOption.NEWS_SOURCE_COUNTRY -> {
-                    launchSettingsFragment(language, SOURCE_COUNTRY_LANGUAGE_SELECTION_RESULT)
-                }
-            }
-        }
-
     }
 
+    // Обрабатывает логику выбора языка и возвращает результат родительскому фрагменту
+    private fun handleLanguageSelection(language: String) {
+        val resultKey = when (args.languageOption) {
+            LanguageOption.INTERFACE_LANGUAGE -> INTERFACE_LANGUAGE_SELECTION_RESULT
+            LanguageOption.CONTENT_LANGUAGE -> CONTENT_LANGUAGE_SELECTION_RESULT
+            LanguageOption.NEWS_SOURCE_COUNTRY -> SOURCE_COUNTRY_LANGUAGE_SELECTION_RESULT
+        }
+        launchSettingsFragment(language, resultKey)
+    }
+
+    // Возвращает выбранный язык родительскому фрагменту и закрывает диалог
     private fun launchSettingsFragment(language: String, resultKey: String) {
         val resultBundle = Bundle().apply {
             putString(KEY_SELECTION_RESULT, language)
@@ -159,9 +162,9 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
         dismiss() // Закрыть BottomSheet
     }
 
-
+    // Очищает привязку к представлениям, чтобы избежать утечек памяти
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null // Очищаем binding, чтобы избежать утечек памяти
+        _binding = null
     }
 }
