@@ -156,7 +156,8 @@ class AuthorNewsFragment : Fragment() {
         findNavController().navigate(
             AuthorNewsFragmentDirections.actionAuthorNewsFragmentToNewsDetailsFragment3(
                 news,
-                args.author
+                args.author,
+                R.id.subscribedAuthorsFragment
             )
         )
     }

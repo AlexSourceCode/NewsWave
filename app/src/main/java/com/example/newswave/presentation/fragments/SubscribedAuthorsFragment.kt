@@ -186,7 +186,7 @@ class SubscribedAuthorsFragment : Fragment() {
 
     private fun launchLoginFragment() {
         findNavController().navigate(
-            SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToLoginFragment()
+            SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToLoginFragment(R.id.subscribedAuthorsFragment)
         )
     }
 

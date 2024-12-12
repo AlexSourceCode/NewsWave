@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -45,7 +46,7 @@ class NewsDetailsFragment : Fragment() {
     private lateinit var player: ExoPlayer
 
 
-    private lateinit var viewModel: NewsDetailsViewModel
+    private val viewModel: NewsDetailsViewModel by viewModels { viewModelFactory }
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -65,7 +66,6 @@ class NewsDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentNewsDetailsBinding.inflate(layoutInflater)
-        if (args.author.isNullOrBlank()) (activity as MainActivity).setSelectedMenuItem(R.id.topNewsFragment)
         return binding.root
     }
 
@@ -73,10 +73,11 @@ class NewsDetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         player = ExoPlayer.Builder(requireContext()).build()
         binding.playerView.player = player
-        viewModel = ViewModelProvider(this, viewModelFactory)[NewsDetailsViewModel::class.java]
-
         inflateFragment()
         observeViewModel()
+
+        val menuItemId = args.currentBottomItem
+        (activity as MainActivity).setSelectedMenuItem(menuItemId)
     }
 
     private fun inflateFragment() {
@@ -286,7 +287,6 @@ class NewsDetailsFragment : Fragment() {
 
 
     private fun setSubscribedButton() {
-        Log.d("setSubscribedButton", currentLanguage())
         binding.btSubscription.text = getString(R.string.subscribed)
         binding.btSubscription.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         if ("ru" == LocaleHelper.getSystemLanguage()) {
@@ -310,13 +310,6 @@ class NewsDetailsFragment : Fragment() {
         }
     }
 
-    private fun currentLanguage(): String {
-        val currentLocale = resources.configuration.locales[0]
-        val currentLanguage = currentLocale.language
-        val currentCountry = currentLocale.country
-        return currentCountry
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         player.release()
@@ -326,7 +319,7 @@ class NewsDetailsFragment : Fragment() {
     private fun launchSignInFragment() {
         binding.btSubscription.visibility = View.GONE
         findNavController().navigate(
-            NewsDetailsFragmentDirections.actionNewsDetailsFragmentToLoginFragment()
+            NewsDetailsFragmentDirections.actionNewsDetailsFragmentToLoginFragment(R.id.topNewsFragment)
         )
     }
 

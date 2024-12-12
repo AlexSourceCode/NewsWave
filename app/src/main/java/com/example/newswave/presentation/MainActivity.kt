@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.newswave.R
@@ -16,21 +17,17 @@ import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.LocaleHelper
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
-    private val binding by lazy {
-        ActivityMainBinding.inflate(layoutInflater)
-    }
+    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val sessionViewModel: SessionViewModel by viewModels { viewModelFactory }
     private lateinit var bottomNavigationView: BottomNavigationView
-//    private var backPressedOnce = false
-//    private val backPressHandler = Handler(Looper.getMainLooper())
+
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-
-    private val sessionViewModel: SessionViewModel by viewModels { viewModelFactory }
-
 
     private val component by lazy {
         (application as NewsApp).component
@@ -68,10 +65,17 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        lifecycleScope.launch {
+            sessionViewModel.activeMenuItemId.collect { itemId ->
+                itemId?.let {
+                    binding.bottomNavigationView.menu.findItem(it).isChecked = true
+                }
+            }
+        }
     }
 
 
     fun setSelectedMenuItem(itemId: Int) {
-        bottomNavigationView.menu.findItem(itemId).isChecked = true
+        sessionViewModel.setActiveMenuItemId(itemId)
     }
 }

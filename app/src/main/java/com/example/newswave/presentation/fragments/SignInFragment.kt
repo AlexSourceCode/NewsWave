@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentSignInBinding
@@ -37,6 +38,7 @@ class SignInFragment : Fragment() {
 
     private lateinit var binding: FragmentSignInBinding
     private val viewModel: SignInViewModel by viewModels { viewModelFactory }
+    private val args by navArgs<SignInFragmentArgs>()
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -62,6 +64,11 @@ class SignInFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeViewModel()
         setupOnClickListener()
+
+        // Получаем идентификатор активного элемента нижнего меню из аргументов
+        // и обновляем состояние BottomNavigationView
+        val activeItemId = args.currentBottomItem
+        (activity as MainActivity).setSelectedMenuItem(activeItemId)
     }
 
     // Настройка обработчиков нажатий

@@ -492,7 +492,7 @@ class SettingsFragment : Fragment() {
 
     private fun launchSignInFragment() {
         findNavController().navigate(
-            SettingsFragmentDirections.actionSettingsFragmentToLoginFragment()
+            SettingsFragmentDirections.actionSettingsFragmentToLoginFragment(R.id.settingsFragment)
         )
     }
 

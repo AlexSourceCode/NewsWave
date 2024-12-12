@@ -17,6 +17,9 @@
             android:name="author"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="currentBottomItem"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/topNewsFragment"
@@ -64,6 +67,9 @@
         <action
             android:id="@+id/action_newsDetailsFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <argument
+            android:name="currentBottomItem"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -115,6 +121,9 @@
             android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
             app:destination="@id/forgotPasswordFragment"
             app:launchSingleTop="false" />
+        <argument
+            android:name="currentBottomItem"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/registrationFragment"

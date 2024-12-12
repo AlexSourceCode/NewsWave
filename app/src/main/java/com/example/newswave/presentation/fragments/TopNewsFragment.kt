@@ -309,7 +309,7 @@ class TopNewsFragment : Fragment() {
         val author = news.author.split(",")[0]
         viewModel.preloadAuthorData(author)
         findNavController().navigate(
-            TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(news, null)
+            TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(news, null, R.id.topNewsFragment)
         )
     }
 
