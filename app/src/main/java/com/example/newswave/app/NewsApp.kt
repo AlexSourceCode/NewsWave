@@ -7,6 +7,7 @@ import com.example.newswave.data.dataSource.local.UserPreferences
 import com.example.newswave.data.workers.RefreshDataWorkerFactory
 import com.example.newswave.di.DaggerApplicationComponent
 import com.example.newswave.domain.repository.UserRepository
+import com.example.newswave.utils.LanguageUtils
 import javax.inject.Inject
 
 /**
@@ -36,6 +37,7 @@ class NewsApp : Application(), Configuration.Provider {
     override fun onCreate() {
         component.inject(this)
         super.onCreate()
+        LanguageUtils.initialize(this)
 
         val userPreferences = UserPreferences(this)
         userPreferences.initializeDefaultSettings()

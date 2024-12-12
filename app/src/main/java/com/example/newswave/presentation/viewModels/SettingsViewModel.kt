@@ -18,6 +18,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel для управления настройками пользователя в приложении
+ * Обеспечивает взаимодействие с данными пользователя, языковыми настройками и состоянием авторизации
+ */
 class SettingsViewModel @Inject constructor(
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
     private val fetchUserDataUseCase: FetchUserDataUseCase,
@@ -29,23 +33,55 @@ class SettingsViewModel @Inject constructor(
     private val signOutUseCase: SignOutUseCase
 ) : ViewModel() {
 
+    // Хранит текущее состояние авторизованного пользователя
     private var _user =
         MutableStateFlow<FirebaseUser?>(null)
     val user: StateFlow<FirebaseUser?> get() = _user.asStateFlow()
 
+    // Хранит данные пользователя
     private var _userData = MutableStateFlow<UserEntity?>(null)
     val userData: StateFlow<UserEntity?> get() = _userData.asStateFlow()
 
+    // Хранит текущий язык контента
     private val _contentLanguage = MutableStateFlow<String>("")
     val contentLanguage: StateFlow<String> = _contentLanguage
 
+    // Хранит текущую страну источника новостей
     private val _sourceCountry = MutableStateFlow<String>("")
     val sourceCountry: StateFlow<String> = _sourceCountry
 
+    init {
+        observeAuthState()
+        initSourceCountry()
+        initContentLanguage()
+    }
+
+    // Выполняет выход из учетной записи
     fun signOut() {
         signOutUseCase()
     }
 
+    // Получение языка интерфейса
+    fun getInterfaceLanguage(): String {
+        return userPreferences.getInterfaceLanguage()
+    }
+
+    // Сохранение нового языка интерфейса
+    fun saveInterfaceLanguage(language: String) {
+        userPreferences.saveInterfaceLanguage(language)
+    }
+
+    // Сохранение языка контента
+    fun saveContentLanguage(language: String) {
+        saveContentLanguageUseCase(language)
+    }
+
+    // Сохранение страны источника новостей
+    fun saveSourceCountry(country: String) {
+        saveSourceCountryUseCase(country)
+    }
+
+    // Наблюдение за состоянием авторизации пользователя
     private fun observeAuthState() {
         viewModelScope.launch {
             observeAuthStateUseCase().collect { stateAuth ->
@@ -57,6 +93,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    // Загрузка данных пользователя из источника
     private fun fetchUserData() {
         viewModelScope.launch {
             fetchUserDataUseCase().collect { userData ->
@@ -65,14 +102,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun getInterfaceLanguage(): String {
-        return userPreferences.getInterfaceLanguage()
-    }
-
-    fun saveInterfaceLanguage(language: String) {
-        userPreferences.saveInterfaceLanguage(language)
-    }
-
+    // Инициализация языка контента из сохраненных настроек
     private fun initContentLanguage() {
         viewModelScope.launch {
             getContentLanguageUseCase().collect {
@@ -81,10 +111,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun saveContentLanguage(language: String) {
-        saveContentLanguageUseCase(language)
-    }
-
+    // Инициализация страны источника новостей из сохраненных настроек
     private fun initSourceCountry() {
         viewModelScope.launch {
             getSourceCountryUseCase().collect {
@@ -92,16 +119,4 @@ class SettingsViewModel @Inject constructor(
             }
         }
     }
-
-    fun saveSourceCountry(country: String) {
-        saveSourceCountryUseCase(country)
-    }
-
-
-    init {
-        observeAuthState()
-        initSourceCountry()
-        initContentLanguage()
-    }
-
 }
