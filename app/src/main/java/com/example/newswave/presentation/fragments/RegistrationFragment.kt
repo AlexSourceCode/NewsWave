@@ -20,15 +20,18 @@ import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentRegistrationBinding
 import com.example.newswave.presentation.viewModels.RegistrationViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
+import com.example.newswave.utils.InputValidator
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * RegistrationFragment отвечает за регистрацию нового пользователя
+ */
 class RegistrationFragment : Fragment() {
 
     private lateinit var binding: FragmentRegistrationBinding
-
-    private lateinit var viewModel: RegistrationViewModel
+    private val viewModel: RegistrationViewModel by viewModels { viewModelFactory }
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -37,12 +40,10 @@ class RegistrationFragment : Fragment() {
         (requireActivity().application as NewsApp).component
     }
 
-
     override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,36 +55,41 @@ class RegistrationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory)[RegistrationViewModel::class.java]
         setupOnClickListener()
         observeViewModel()
-
     }
 
+    // Подписка на изменения данных во ViewModel
     private fun observeViewModel() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.user.collect { fireBaseUser ->
-                    if (fireBaseUser != null) {
-                        findNavController().popBackStack()
-                    }
-                }
-            }
-        }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.error.collect{
-                    showToast(it)
-                }
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { observeSuccess() }
+                launch { observeError() }
             }
         }
     }
 
+    // Наблюдение за успешной авторизацией
+    private suspend fun observeSuccess() {
+        viewModel.user.collect { fireBaseUser ->
+            if (fireBaseUser != null) {
+                findNavController().popBackStack()
+            }
+        }
+    }
+
+    // Наблюдение за ошибками
+    private suspend fun observeError() {
+        viewModel.error.collect {
+            showToast(it)
+        }
+    }
+
+    // Настройка слушателей кнопок
     private fun setupOnClickListener() {
-        binding.tvSignIn.setOnClickListener {
+        binding.tvSignIn.setOnClickListener { // Переход на экран входа
             findNavController().popBackStack()
         }
-
         binding.btRegister.setOnClickListener {
             val username = binding.etUsername.text.toString().trim()
             val email = binding.etEmail.text.toString().trim()
@@ -91,55 +97,23 @@ class RegistrationFragment : Fragment() {
             val firstName = binding.etFirstName.text.toString().trim()
             val lastName = binding.etLastName.text.toString().trim()
 
-
-            if (validateInputFields(username, email, password, firstName, lastName)) {
+            if (InputValidator.validateRegistrationInput(
+                    context = requireContext(),
+                    username = username,
+                    email = email,
+                    password = password,
+                    firstName = firstName,
+                    lastName = lastName,
+                    showToast = this::showToast
+                )
+            ) {
                 viewModel.signUp(username, email, password, firstName, lastName)
             }
         }
     }
 
-    private fun validateInputFields(
-        username: String,
-        email: String,
-        password: String,
-        firstName: String,
-        lastName: String
-    ): Boolean {
-        if (username.length < 3 || username.length > 20) {
-            showToast(getString(R.string.invalid_username_length))
-            return false
-        }
-
-        // Проверка формата email
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            showToast(getString(R.string.invalid_email_format))
-            return false
-        }
-
-        if (password.isEmpty()) {
-            showToast(getString(R.string.invalid_password_length))
-            return false
-        }
-
-        // Проверка длины имени
-        if (firstName.length < 2 || firstName.length > 20) {
-            showToast(getString(R.string.invalid_first_name_length))
-            return false
-        }
-
-        // Проверка длины фамилии
-        if (lastName.length < 2 || lastName.length > 20) {
-            showToast(getString(R.string.invalid_last_name_length))
-            return false
-        }
-
-        return true
-    }
-
+    // Отображение сообщения пользователю
     private fun showToast(message: String) {
-        Log.d("CheckCalledCount", "flag showToast: ")
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
-
-
 }

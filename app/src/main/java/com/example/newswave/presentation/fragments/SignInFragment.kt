@@ -105,20 +105,23 @@ class SignInFragment : Fragment() {
     private fun observeViewModel() { // ?
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.user.collect { fireBaseUser ->
-                        if (fireBaseUser != null) {
-                            findNavController().popBackStack()
-                        }
-                    }
-                }
-
-                launch {
-                    viewModel.error.collect { errorMessage ->
-                        showToast(errorMessage)
-                    }
-                }
+                launch { observeSuccess() }
+                launch { observeError() }
             }
+        }
+    }
+
+    private suspend fun observeSuccess() {
+        viewModel.user.collect { fireBaseUser ->
+            if (fireBaseUser != null) {
+                findNavController().popBackStack()
+            }
+        }
+    }
+
+    private suspend fun observeError() {
+        viewModel.error.collect { errorMessage ->
+            showToast(errorMessage)
         }
     }
 

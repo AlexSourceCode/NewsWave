@@ -16,6 +16,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * RegistrationViewModel обрабатывает логику регистрации пользователя
+ */
 class RegistrationViewModel @Inject constructor(
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
     private val signUpByEmailUseCase: SignUpByEmailUseCase,
@@ -23,20 +26,20 @@ class RegistrationViewModel @Inject constructor(
 
 ) : ViewModel() {
 
+    // Поток текущего пользователя
     private var _user = MutableStateFlow<FirebaseUser?>(null)
     val user: StateFlow<FirebaseUser?> get() = _user.asStateFlow()
 
+    // Поток ошибок
     private var _error = MutableSharedFlow<String>()
     val error: SharedFlow<String> get() = _error.asSharedFlow()
 
-    private fun observeAuthState() {
-        viewModelScope.launch {
-            observeAuthStateUseCase().collect {
-                _user.value = it
-            }
-        }
+    init {
+        observeAuthState()
+        observeErrors()
     }
 
+    // Регистрация нового пользователя
     fun signUp(
         username: String,
         email: String,
@@ -47,11 +50,20 @@ class RegistrationViewModel @Inject constructor(
         signUpByEmailUseCase(username, email, password, firstName,lastName)
     }
 
-    init {
-        observeAuthState()
+    // Наблюдение за состоянием авторизации
+    private fun observeAuthState() {
         viewModelScope.launch {
-            fetchAuthErrorUseCase(ErrorType.SIGN_UP).collect{
-                _error.emit(it)
+            observeAuthStateUseCase().collect {
+                _user.value = it
+            }
+        }
+    }
+
+    // Наблюдение за ошибками
+    private fun observeErrors() {
+        viewModelScope.launch {
+            fetchAuthErrorUseCase(ErrorType.SIGN_UP).collect { errorMessage ->
+                _error.emit(errorMessage)
             }
         }
     }
