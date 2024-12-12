@@ -32,6 +32,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/button_subscribed_in_authors_list"
             android:textAllCaps="false"
+            android:textSize="12sp"
             android:textColor="@color/white"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"

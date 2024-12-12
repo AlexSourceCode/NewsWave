@@ -13,16 +13,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
+/**
+ * ViewModel для управления состоянием экрана подписанных авторов
+ */
 class SubscribedAuthorsViewModel @Inject constructor(
     private val getAuthorListUseCase: GetAuthorListUseCase,
     private val unsubscribeFromAuthorUseCase: UnsubscribeFromAuthorUseCase,
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
 ) : ViewModel() {
 
+    // Состояние авторизации пользователя
     private var _user = MutableStateFlow<AuthState>(AuthState.LoggedOut)
     val user: StateFlow<AuthState> get() = _user.asStateFlow()
 
+    // Состояние UI
     private val _uiState = MutableStateFlow<AuthorState>(AuthorState.Loading)
     val uiState: StateFlow<AuthorState> get() = _uiState.asStateFlow()
 
@@ -31,16 +35,19 @@ class SubscribedAuthorsViewModel @Inject constructor(
         observeAuthState()
     }
 
+    // Отписка от автора
     fun unsubscribeFromAuthor(author: String){
         viewModelScope.launch {
             unsubscribeFromAuthorUseCase(author)
         }
     }
 
+    // Повторная попытка загрузки списка авторов
     fun retryFetchAuthors() {
         getAuthorsList()
     }
 
+    // Получение списка авторов
     private fun getAuthorsList() {
         viewModelScope.launch {
             try {
@@ -53,6 +60,7 @@ class SubscribedAuthorsViewModel @Inject constructor(
         }
     }
 
+    // Метод для наблюдения за состоянием аутентификации
     private fun observeAuthState() {
         viewModelScope.launch {
             observeAuthStateUseCase().collect { userFirebase ->
