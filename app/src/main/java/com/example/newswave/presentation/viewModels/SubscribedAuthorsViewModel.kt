@@ -1,13 +1,12 @@
 package com.example.newswave.presentation.viewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.newswave.domain.usecases.subscription.GetAuthorListUseCase
+import com.example.newswave.domain.usecases.subscription.UnsubscribeFromAuthorUseCase
+import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
 import com.example.newswave.presentation.state.AuthState
 import com.example.newswave.presentation.state.AuthorState
-import com.example.newswave.domain.usecases.subscription.GetAuthorListUseCase
-import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
-import com.example.newswave.domain.usecases.subscription.UnsubscribeFromAuthorUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,13 +20,16 @@ class SubscribedAuthorsViewModel @Inject constructor(
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
 ) : ViewModel() {
 
-
     private var _user = MutableStateFlow<AuthState>(AuthState.LoggedOut)
     val user: StateFlow<AuthState> get() = _user.asStateFlow()
 
     private val _uiState = MutableStateFlow<AuthorState>(AuthorState.Loading)
     val uiState: StateFlow<AuthorState> get() = _uiState.asStateFlow()
 
+    init {
+        getAuthorsList()
+        observeAuthState()
+    }
 
     fun unsubscribeFromAuthor(author: String){
         viewModelScope.launch {
@@ -36,7 +38,6 @@ class SubscribedAuthorsViewModel @Inject constructor(
     }
 
     fun retryFetchAuthors() {
-        Log.d("SubscribedAuthorsViewModel", "retryFetchAuthors")
         getAuthorsList()
     }
 
@@ -60,12 +61,5 @@ class SubscribedAuthorsViewModel @Inject constructor(
             }
         }
     }
-
-
-    init {
-        getAuthorsList()
-        observeAuthState()
-    }
-
 }
 

@@ -67,11 +67,4 @@ interface ViewModelModule {
     @IntoMap
     @ViewModelKey(SessionViewModel::class)
     fun bindSessionViewModel(viewModel: SessionViewModel): ViewModel
-
-    /**
-     * Фабрика для создания ViewModel
-     */
-    @Binds
-    abstract fun bindViewModelFactory(factory: SavedStateViewModelFactory): ViewModelProvider.Factory
-
 }
