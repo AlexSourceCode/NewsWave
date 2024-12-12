@@ -79,6 +79,7 @@
     <string name="errorMessageNoResultsFound">No results found for the query</string>
     <string name="errorHTTP402" translatable="false">HTTP 402</string>
     <string name="no_recent_news_message" translatable="false">There are no recent news articles by this author</string>
+    <string name="reset_link_sent_successfully">The reset link has been successfully sent</string>
 
 
     <string-array name="languages_interface_array">

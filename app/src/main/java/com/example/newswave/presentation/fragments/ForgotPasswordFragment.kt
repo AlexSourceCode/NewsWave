@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -18,16 +19,21 @@ import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentForgotPasswordBinding
+import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.ForgotPasswordViewModel
+import com.example.newswave.presentation.viewModels.SessionViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Fragment ForgotPasswordFragment отвечает за предоставление пользователю возможности сбросить пароль
+ */
 class ForgotPasswordFragment : Fragment() {
 
     private lateinit var binding: FragmentForgotPasswordBinding
-    private lateinit var viewModel: ForgotPasswordViewModel
+    private val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels { viewModelFactory }
     private val args by navArgs<ForgotPasswordFragmentArgs>()
 
     @Inject
@@ -53,52 +59,55 @@ class ForgotPasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory)[ForgotPasswordViewModel::class.java]
+        setupUI()
         observeViewModel()
+    }
+
+    // Настройка пользовательского интерфейса
+    private fun setupUI() {
+        // Предзаполнение поля email, если оно было передано через навигационные аргументы
         binding.etEmail.setText(args.email)
 
+        // Установка слушателя для кнопки сброса
         binding.btReset.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
-            if (isFieldNotEmpty(email)) {
-                viewModel.resetPassword(email)
+            if (email.isNotEmpty()) {
+                forgotPasswordViewModel.resetPassword(email)
             } else {
-                Log.d("CheckErrorState", "execute from ForgotPassword")
                 showToast(getString(R.string.please_enter_your_email))
             }
         }
     }
 
-    private fun isFieldNotEmpty(email: String): Boolean {
-        return email.isNotEmpty()
-    }
-
+    // Подписка на изменения данных в ViewModel.
     private fun observeViewModel() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.isSuccess.collect { success ->
-                    if (success) {
-                        showToast("The reset link has been successfully sent")
-                        findNavController().popBackStack()
-                    }
-                }
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { observeSuccess() }
+                launch { observeError() }
             }
         }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.error.collect{
-                    showToast(it)
-                }
+    }
+
+    // Подписка на поток успешного выполнения операции
+    private suspend fun observeSuccess(){
+        forgotPasswordViewModel.isSuccess.collect { success ->
+            if (success) {
+                showToast(getString(R.string.reset_link_sent_successfully))
+                findNavController().popBackStack()
             }
         }
-
     }
 
-    private fun showToast(message: String){
-        Toast.makeText(
-            requireContext(),
-            message,
-            Toast.LENGTH_LONG
-        ).show()
+    // Подписка на поток ошибок
+    private suspend fun observeError(){
+        forgotPasswordViewModel.error.collect {
+            showToast(it)
+        }
     }
 
+    // Метод для отображения сообщений Toast
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+    }
 }
