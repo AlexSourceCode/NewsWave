@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
@@ -21,13 +20,13 @@ import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentTopNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.presentation.state.NewsState
+import com.example.newswave.domain.model.Filter
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.adapters.NewsListAdapter
+import com.example.newswave.presentation.state.NewsState
 import com.example.newswave.presentation.viewModels.SessionViewModel
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
-import com.example.newswave.domain.model.Filter
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,14 +37,11 @@ class TopNewsFragment : Fragment() {
 
     private lateinit var binding: FragmentTopNewsBinding
     private lateinit var adapter: NewsListAdapter
-
-
-    private val viewModel: TopNewsViewModel by viewModels { viewModelFactory }
+    private val topNewsViewModel: TopNewsViewModel by viewModels { viewModelFactory }
     private val sessionViewModel: SessionViewModel by activityViewModels { viewModelFactory }
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-
 
     private val component by lazy {
         (requireActivity().application as NewsApp).component
@@ -54,6 +50,10 @@ class TopNewsFragment : Fragment() {
     // Переменные для управления состоянием поиска
     private var isSearchNews: Boolean? = null
     var selectedFilter: String? = null
+
+    companion object{
+        private const val REFRESH_REQUEST_KEY = "refresh_request"
+    }
 
     override fun onAttach(context: Context) {
         component.inject(this)
@@ -64,7 +64,6 @@ class TopNewsFragment : Fragment() {
         super.onCreate(savedInstanceState)
         observeViewModel()
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,16 +83,14 @@ class TopNewsFragment : Fragment() {
         handleBackNavigation()      // Обработка нажатия кнопки "Назад"
         setOnClickListener()        // Установка слушателей нажатий
         setupSwipeRefresh()         // Обновление данных при свайпе вниз
-        parentFragmentManager.setFragmentResultListener("refresh_request", this) { _, _ ->
-            Log.d("TopNewsFragmentState", "execute")
-//            adapter.submitList(emptyList())
-            viewModel.refreshData() // Повторный запрос данных
+        parentFragmentManager.setFragmentResultListener(REFRESH_REQUEST_KEY, this) { _, _ ->
+            topNewsViewModel.refreshData() // Повторный запрос данных
         }
     }
 
     private fun setOnClickListener() {
         binding.tvRetry.setOnClickListener {
-            viewModel.refreshData()//?
+            topNewsViewModel.refreshData()//?
         }
     }
 
@@ -105,7 +102,7 @@ class TopNewsFragment : Fragment() {
                     if (isSearchNews == true) {
                         // Очистка поля поиска и возврат к основным новостям
                         binding.edSearch.text.clear() //handleBackFromSearch
-                        viewModel.backToTopNews()
+                        topNewsViewModel.backToTopNews()
                         isSearchNews = false
                     } else {
                         // Обычное поведение кнопки "Назад"
@@ -115,8 +112,6 @@ class TopNewsFragment : Fragment() {
                 }
             })
     }
-
-
 
     private fun setupTabLayout() {
         val tabLayout: TabLayout = binding.tabLayout
@@ -143,7 +138,7 @@ class TopNewsFragment : Fragment() {
         binding.edSearch.setOnKeyListener { view, keycode, event ->
             if (event.action == KeyEvent.ACTION_DOWN && keycode == KeyEvent.KEYCODE_ENTER) { // проверка, что нажатая клавиша является Enter
                 selectedFilter?.let {
-                    viewModel.updateSearchParameters(it, binding.edSearch.text.toString())
+                    topNewsViewModel.updateSearchParameters(it, binding.edSearch.text.toString())
                     adapter.submitList(emptyList())
                     isSearchNews = true
                 }
@@ -158,11 +153,9 @@ class TopNewsFragment : Fragment() {
     private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             if (isSearchNews == true) {
-                Log.d("TopNewsFragmentState", "refresh isSearchNews")
-                viewModel.searchNewsByFilter()
+                topNewsViewModel.searchNewsByFilter()
             } else {
-                Log.d("TopNewsFragmentState", "refresh")
-                viewModel.refreshData()
+                topNewsViewModel.refreshData()
             }
             binding.swipeRefreshLayout.isRefreshing = false
         }
@@ -171,9 +164,7 @@ class TopNewsFragment : Fragment() {
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                Log.d("TopNewsFragmentState", "collect execute")
-                viewModel.uiState.collect { uiState ->
-                    Log.d("TopNewsFragmentState", "TopNewsFragment collect ")
+                topNewsViewModel.uiState.collect { uiState ->
                     when (uiState) {
                         is NewsState.Error -> {
                             binding.pgNews.visibility = View.GONE
@@ -183,7 +174,7 @@ class TopNewsFragment : Fragment() {
                                         binding.tvRetry.visibility = View.VISIBLE
                                     }
                                     binding.tvRetry.setOnClickListener {
-                                        viewModel.refreshData() // Функция повторного запроса данных
+                                        topNewsViewModel.refreshData() // Функция повторного запроса данных
                                     }
                                     showToast()
                                 }
@@ -193,16 +184,12 @@ class TopNewsFragment : Fragment() {
                                         binding.tvRetry.visibility = View.VISIBLE
                                     }
                                     binding.tvRetry.setOnClickListener {
-                                        viewModel.refreshData() // Функция повторного запроса данных
+                                        topNewsViewModel.refreshData() // Функция повторного запроса данных
                                     }
                                     showToast()
                                 }
 
                                 requireContext().getString(R.string.news_list_is_empty_or_invalid_parameters).trim() -> {
-                                    Log.d(
-                                        "TopNewsFragmentState",
-                                        "TopNewsFragment Error: News list is empty or invalid parameters! ${uiState.message}"
-                                    )
                                     binding.tvRetry.visibility = View.GONE
                                     binding.tvErrorAvailableNews.text = requireContext().getString(R.string.no_news_for_criteria)
                                     binding.tvErrorAvailableNews.visibility = View.VISIBLE
@@ -216,33 +203,27 @@ class TopNewsFragment : Fragment() {
                                     showToast()
                                     binding.tvRetry.visibility = View.VISIBLE
                                     binding.tvRetry.setOnClickListener {
-                                        viewModel.searchNewsByFilter()
+                                        topNewsViewModel.searchNewsByFilter()
                                     }
                                 }
 
 
                                 else -> { // Другие ошибки
-                                    Log.d(
-                                        "TopNewsFragmentState",
-                                        "TopNewsFragment Error: else conditions ${uiState.message.toString()}"
-                                    )
                                     showToast()
                                     binding.tvRetry.setOnClickListener {
-                                        viewModel.refreshData()
+                                        topNewsViewModel.refreshData()
                                     }
                                 }
                             }
                         }
 
                         is NewsState.Loading -> {
-                            Log.d("TopNewsFragmentState", "Loading")
                             binding.tvErrorAvailableNews.visibility = View.GONE
                             binding.tvRetry.visibility = View.GONE
                             binding.pgNews.visibility = View.VISIBLE
                         }
 
                         is NewsState.Success -> {
-                            Log.d("TopNewsFragmentState", "Success")
                             binding.tvErrorAvailableNews.visibility = View.GONE
                             binding.pgNews.visibility = View.GONE
                             binding.tvRetry.visibility = View.GONE
@@ -250,13 +231,12 @@ class TopNewsFragment : Fragment() {
                                 adapter.submitListWithLoadMore(uiState.currentList, null)
                                 adapter.notifyDataSetChanged() //crutch
                             } else {
-                                Log.d("TopNewsFragmentState", "AfterSignIn ${uiState.currentList.get(0).title}")
                                 adapter.submitList(uiState.currentList) {
-                                    if (viewModel.isFirstLaunch) {
+                                    if (topNewsViewModel.isFirstLaunch) {
                                         lifecycleScope.launch {
                                             delay(1000)
                                             scrollToTop()
-                                            viewModel.isFirstLaunch = false
+                                            topNewsViewModel.isFirstLaunch = false
                                         }
                                     }
                                 }
@@ -270,8 +250,7 @@ class TopNewsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) { //started?
                 sessionViewModel.refreshEvent.collect {
-                    Log.d("sessionViewModel.refreshEvent", "execute in topnewsfragment ")
-                    viewModel.refreshData()
+                    topNewsViewModel.refreshData()
                 }
             }
         }
@@ -287,12 +266,11 @@ class TopNewsFragment : Fragment() {
 
         adapter.onLoadMoreListener = {
             adapter.shouldHideRetryButton = false
-            viewModel.loadNewsForPreviousDay()
+            topNewsViewModel.loadNewsForPreviousDay()
         }
     }
 
     private fun showToast() {    // Показ уведомления
-        Log.d("CheckErrorMessage", "TopNewsFragment Error: fun showToast")
         Toast.makeText(
             requireContext(),
             requireActivity().getString(R.string.error_load_data),
@@ -300,17 +278,15 @@ class TopNewsFragment : Fragment() {
         ).show()
     }
 
-
     fun scrollToTop() {         // Прокрутка к началу списка новостей
         binding.rcNews.scrollToPosition(0)
     }
 
     private fun launchNewsDetailsFragment(news: NewsItemEntity) {   // Переход к фрагменту с деталями новости
         val author = news.author.split(",")[0]
-        viewModel.preloadAuthorData(author)
+        topNewsViewModel.preloadAuthorData(author)
         findNavController().navigate(
             TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(news, null, R.id.topNewsFragment)
         )
     }
-
 }

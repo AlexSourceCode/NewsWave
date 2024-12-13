@@ -35,7 +35,6 @@ class TopNewsViewModel @Inject constructor(
     private val searchNewsByFilterUseCaseFactory: SearchNewsByFilterUseCaseFactory,
     private val fetchErrorLoadDataUseCase: FetchErrorLoadDataUseCase,
     private val favoriteAuthorCheckUseCase: FavoriteAuthorCheckUseCase,
-    private val fetchUserDataUseCase: FetchUserDataUseCase
 ) : ViewModel() {
 
     private lateinit var searchNewsByFilterUseCase: SearchNewsByFilterUseCase
@@ -48,7 +47,6 @@ class TopNewsViewModel @Inject constructor(
 
     var isFirstLaunch = true // crutch
 
-
     init {
         loadData()
         fetchErrorLoadData()
@@ -56,7 +54,6 @@ class TopNewsViewModel @Inject constructor(
         setupSearchTrigger()
         setupSearchArgs()
     }
-
 
     fun updateSearchParameters(filter: String, value: String) { // no
         viewModelScope.launch {
@@ -88,7 +85,6 @@ class TopNewsViewModel @Inject constructor(
         }
     }
 
-
     fun loadNewsForPreviousDay() {
         viewModelScope.launch {
             loadNewsForPreviousDayUseCase()
@@ -98,7 +94,6 @@ class TopNewsViewModel @Inject constructor(
     fun refreshData() {
         viewModelScope.launch {
             _uiState.value = NewsState.Loading
-            Log.d("refreshDataState", "execute")
             loadDataUseCase()
         }
     }
@@ -114,17 +109,13 @@ class TopNewsViewModel @Inject constructor(
             fetchErrorLoadDataUseCase()
                 .collect { errorMessage ->
                     val trimmedErrorMessage = errorMessage.trim()
-                    Log.d("CheckErrorMessage", "get error: $errorMessage")
-                    Log.d("CheckErrorMessage", errorMessage)
                     _uiState.value = NewsState.Error(errorMessage)
                     val savedNews = getTopNews()
-                    Log.d("CheckErrorMessage", savedNews?.isEmpty().toString())
                     if ((!savedNews.isNullOrEmpty()) && (trimmedErrorMessage != application.getString(
                             R.string.error_loading_news_by_filter
                         )) && (trimmedErrorMessage != application.getString(R.string.news_list_is_empty_or_invalid_parameters))
                         && (trimmedErrorMessage != application.getString(R.string.errorMessageNoResultsFound)) && (trimmedErrorMessage != application.getString(R.string.error_no_internet_in_search))
                     ) {
-                        Log.d("CheckErrorMessage", "wtf ${errorMessage}")
                         _uiState.value = NewsState.Success(savedNews)
                     }
                 }
@@ -136,7 +127,6 @@ class TopNewsViewModel @Inject constructor(
             try {
                 fetchTopNewsListUseCase()
                     .collect { news ->
-                        Log.d("fetchTopNewsListUseCase", "execute collect")
                         if (news.isEmpty()) _uiState.value = NewsState.Loading
                         else {
                             _uiState.value = NewsState.Success(news)
