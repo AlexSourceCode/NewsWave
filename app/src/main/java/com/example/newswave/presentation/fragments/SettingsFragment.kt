@@ -247,7 +247,7 @@ class SettingsFragment : Fragment() {
     // Переход к фрагменту сброса пароля
     private fun launchForgotPasswordFragment(email: String) {
         findNavController().navigate(
-            SettingsFragmentDirections.actionSettingsFragmentToForgotPasswordFragment(email)
+            SettingsFragmentDirections.actionSettingsFragmentToForgotPasswordFragment(email, R.id.settingsFragment)
         )
     }
 

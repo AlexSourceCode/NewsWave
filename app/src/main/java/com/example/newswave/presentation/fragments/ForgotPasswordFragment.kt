@@ -61,6 +61,7 @@ class ForgotPasswordFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
         observeViewModel()
+        (activity as MainActivity).setSelectedMenuItem(args.currentBottomItem)
     }
 
     // Настройка пользовательского интерфейса

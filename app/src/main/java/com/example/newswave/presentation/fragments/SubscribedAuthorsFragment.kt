@@ -199,7 +199,8 @@ class SubscribedAuthorsFragment : Fragment() {
     private fun launchAuthorNewsFragment(author: String) {
         findNavController().navigate(
             SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToAuthorNewsFragment(
-                author
+                author,
+                R.id.subscribedAuthorsFragment
             )
         )
     }

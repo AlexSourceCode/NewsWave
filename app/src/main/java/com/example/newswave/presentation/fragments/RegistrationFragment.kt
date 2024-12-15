@@ -15,9 +15,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentRegistrationBinding
+import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.RegistrationViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.InputValidator
@@ -32,6 +34,7 @@ class RegistrationFragment : Fragment() {
 
     private lateinit var binding: FragmentRegistrationBinding
     private val viewModel: RegistrationViewModel by viewModels { viewModelFactory }
+    private val args by navArgs<RegistrationFragmentArgs>()
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -57,6 +60,7 @@ class RegistrationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupOnClickListener()
         observeViewModel()
+        (activity as MainActivity).setSelectedMenuItem(args.currentBottomItem)
     }
 
     // Подписка на изменения данных во ViewModel

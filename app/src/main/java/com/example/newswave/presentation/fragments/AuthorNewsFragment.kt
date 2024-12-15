@@ -19,6 +19,7 @@ import com.example.newswave.R
 import com.example.newswave.databinding.FragmentAuthorNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.app.NewsApp
+import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.state.AuthState
 import com.example.newswave.presentation.state.NewsState
 import com.example.newswave.presentation.adapters.NewsListAdapter
@@ -64,8 +65,8 @@ class AuthorNewsFragment : Fragment() {
         observeViewModel()
         setOnClickListener()
         setupSwipeRefresh()
-
         viewModel.loadAuthorNews(args.author) // Загрузка новостей автора при старте
+        (activity as MainActivity).setSelectedMenuItem(R.id.subscribedAuthorsFragment)
     }
 
     private fun setupSwipeRefresh() {

@@ -107,6 +107,9 @@
             android:id="@+id/action_authorNewsFragment_to_newsDetailsFragment3"
             app:destination="@id/newsDetailsFragment3"
             app:popUpTo="@id/authorNewsFragment" />
+        <argument
+            android:name="currentBottomItem"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -129,7 +132,11 @@
         android:id="@+id/registrationFragment"
         android:name="com.example.newswave.presentation.fragments.RegistrationFragment"
         android:label="fragment_registration"
-        tools:layout="@layout/fragment_registration" />
+        tools:layout="@layout/fragment_registration" >
+        <argument
+            android:name="currentBottomItem"
+            app:argType="integer" />
+    </fragment>
     <fragment
         android:id="@+id/forgotPasswordFragment"
         android:name="com.example.newswave.presentation.fragments.ForgotPasswordFragment"
@@ -138,6 +145,9 @@
         <argument
             android:name="email"
             app:argType="string" />
+        <argument
+            android:name="currentBottomItem"
+            app:argType="integer" />
     </fragment>
     <dialog
         android:id="@+id/languageBottomSheetFragment2"

@@ -67,8 +67,7 @@ class SignInFragment : Fragment() {
 
         // Получаем идентификатор активного элемента нижнего меню из аргументов
         // и обновляем состояние BottomNavigationView
-        val activeItemId = args.currentBottomItem
-        (activity as MainActivity).setSelectedMenuItem(activeItemId)
+        (activity as MainActivity).setSelectedMenuItem(args.currentBottomItem)
     }
 
     // Настройка обработчиков нажатий
@@ -128,7 +127,7 @@ class SignInFragment : Fragment() {
     // Переход на экран регистрации
     private fun launchRegistrationFragment() {
         findNavController().navigate(
-            SignInFragmentDirections.actionLoginFragmentToRegistrationFragment()
+            SignInFragmentDirections.actionLoginFragmentToRegistrationFragment(args.currentBottomItem)
         )
     }
 
@@ -136,28 +135,7 @@ class SignInFragment : Fragment() {
     private fun launchForgotPasswordFragment() {
         val email = binding.etEmail.text.toString().trim()
         findNavController().navigate(
-            SignInFragmentDirections.actionLoginFragmentToForgotPasswordFragment(email)
+            SignInFragmentDirections.actionLoginFragmentToForgotPasswordFragment(email, args.currentBottomItem)
         )
     }
 }
-
-
-//private fun observeViewModel() { // ?
-//    lifecycleScope.launch {
-//        repeatOnLifecycle(Lifecycle.State.CREATED) {
-//            viewModel.user.collect { fireBaseUser ->
-//                if (fireBaseUser != null) {
-//                    findNavController().popBackStack()
-//                }
-//            }
-//        }
-//    }
-//    lifecycleScope.launch {
-//        repeatOnLifecycle(Lifecycle.State.STARTED) {
-//            viewModel.error.collect { errorMessage ->
-//                Log.d("CheckErrorState", "execute from SignInFragment")
-//                showToast(errorMessage)
-//            }
-//        }
-//    }
-//}

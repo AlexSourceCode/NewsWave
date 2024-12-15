@@ -21,10 +21,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
+
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val sessionViewModel: SessionViewModel by viewModels { viewModelFactory }
     private lateinit var bottomNavigationView: BottomNavigationView
-
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
