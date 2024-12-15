@@ -158,14 +158,11 @@ class NewsRepositoryImpl @Inject constructor(
     }
 
     // Проверка доступности сети с отправкой ошибок при отсутствии соединения
-    private suspend fun isNetworkAvailableWithError(isSearching: Boolean = false): Boolean {
+    private suspend fun isNetworkAvailableWithError(): Boolean {
         return if (!isNetworkAvailable(application)) {
-            val errorMessage = if (isSearching) {
-                application.getString(R.string.error_no_internet_in_search)
-            } else {
+            _observeErrorLoadData.emit(
                 application.getString(R.string.no_internet_connection)
-            }
-            _observeErrorLoadData.emit(errorMessage)
+            )
             false
         } else {
             true
@@ -196,7 +193,7 @@ class NewsRepositoryImpl @Inject constructor(
     private fun observeFilterFlow() {
         ioScope.launch {
             _filterFlow
-                .filter { isNetworkAvailableWithError(true) }
+                .filter { isNetworkAvailableWithError() }
                 .flatMapLatest { (filterParameter, filterValue) ->
                     val filterType = getFilterType(filterParameter)
                     applyFilter(filterType, filterValue)

@@ -32,7 +32,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 class TopNewsFragment : Fragment() {
 
     private lateinit var binding: FragmentTopNewsBinding
@@ -51,18 +50,13 @@ class TopNewsFragment : Fragment() {
     private var isSearchNews: Boolean? = null
     var selectedFilter: String? = null
 
-    companion object{
+    companion object {
         private const val REFRESH_REQUEST_KEY = "refresh_request"
     }
 
     override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        observeViewModel()
     }
 
     override fun onCreateView(
@@ -76,19 +70,28 @@ class TopNewsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupAdapter()              // Настройка адаптера для RecyclerView
-        setupTabLayout()            // Настройка вкладок (TabLayout)
-        selectedFilter = requireActivity().application.getString(Filter.TEXT.descriptionResId)
-        searchByFilterListener()    // Добавление слушателя поиска
-        handleBackNavigation()      // Обработка нажатия кнопки "Назад"
-        setOnClickListener()        // Установка слушателей нажатий
-        setupSwipeRefresh()         // Обновление данных при свайпе вниз
+        observeViewModel()
+        initializeUI()
+        setupFragmentResultListener()
+    }
+
+    private fun setupFragmentResultListener() {
         parentFragmentManager.setFragmentResultListener(REFRESH_REQUEST_KEY, this) { _, _ ->
-            topNewsViewModel.refreshData() // Повторный запрос данных
+            topNewsViewModel.refreshData()
         }
     }
 
-    private fun setOnClickListener() {
+    private fun initializeUI() {
+        setupAdapter()
+        setupTabLayout()
+        selectedFilter = getString(Filter.TEXT.descriptionResId)
+        setupSearchListener()
+        handleBackNavigation()
+        setupClickListeners()
+        setupSwipeRefresh()
+    }
+
+    private fun setupClickListeners() {
         binding.tvRetry.setOnClickListener {
             topNewsViewModel.refreshData()//?
         }
@@ -100,10 +103,7 @@ class TopNewsFragment : Fragment() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     if (isSearchNews == true) {
-                        // Очистка поля поиска и возврат к основным новостям
-                        binding.edSearch.text.clear() //handleBackFromSearch
-                        topNewsViewModel.backToTopNews()
-                        isSearchNews = false
+                        exitSearchMode()
                     } else {
                         // Обычное поведение кнопки "Назад"
                         isEnabled = false
@@ -111,6 +111,13 @@ class TopNewsFragment : Fragment() {
                     }
                 }
             })
+    }
+
+    // Очистка поля поиска и возврат к основным новостям
+    private fun exitSearchMode() {
+        binding.edSearch.text.clear()
+        topNewsViewModel.backToTopNews()
+        isSearchNews = false
     }
 
     private fun setupTabLayout() {
@@ -134,14 +141,10 @@ class TopNewsFragment : Fragment() {
         })
     }
 
-    private fun searchByFilterListener() {
+    private fun setupSearchListener() {
         binding.edSearch.setOnKeyListener { view, keycode, event ->
             if (event.action == KeyEvent.ACTION_DOWN && keycode == KeyEvent.KEYCODE_ENTER) { // проверка, что нажатая клавиша является Enter
-                selectedFilter?.let {
-                    topNewsViewModel.updateSearchParameters(it, binding.edSearch.text.toString())
-                    adapter.submitList(emptyList())
-                    isSearchNews = true
-                }
+                executeSearch()
                 true
             } else {
                 false
@@ -149,6 +152,13 @@ class TopNewsFragment : Fragment() {
         }
     }
 
+    private fun executeSearch() {
+        selectedFilter?.let {
+            topNewsViewModel.updateSearchParameters(it, binding.edSearch.text.toString())
+            adapter.submitList(emptyList())
+            isSearchNews = true
+        }
+    }
 
     private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -165,109 +175,107 @@ class TopNewsFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 topNewsViewModel.uiState.collect { uiState ->
-                    when (uiState) {
-                        is NewsState.Error -> {
-                            binding.pgNews.visibility = View.GONE
-                            when (uiState.message.toString().trim()) {
-                                requireContext().getString(R.string.no_internet_connection) -> {
-                                    if (adapter.currentList.isEmpty()) {
-                                        binding.tvRetry.visibility = View.VISIBLE
-                                    }
-                                    binding.tvRetry.setOnClickListener {
-                                        topNewsViewModel.refreshData() // Функция повторного запроса данных
-                                    }
-                                    showToast()
-                                }
-
-                                requireContext().getString(R.string.errorHTTP402) -> {
-                                    if (adapter.currentList.isEmpty()) {
-                                        binding.tvRetry.visibility = View.VISIBLE
-                                    }
-                                    binding.tvRetry.setOnClickListener {
-                                        topNewsViewModel.refreshData() // Функция повторного запроса данных
-                                    }
-                                    showToast()
-                                }
-
-                                requireContext().getString(R.string.news_list_is_empty_or_invalid_parameters).trim() -> {
-                                    binding.tvRetry.visibility = View.GONE
-                                    binding.tvErrorAvailableNews.text = requireContext().getString(R.string.no_news_for_criteria)
-                                    binding.tvErrorAvailableNews.visibility = View.VISIBLE
-                                }
-                                requireContext().getString(R.string.errorMessageNoResultsFound) -> {
-                                    binding.tvRetry.visibility = View.GONE
-                                    binding.tvErrorAvailableNews.text = requireContext().getString(R.string.errorMessageNoResultsFound)
-                                    binding.tvErrorAvailableNews.visibility = View.VISIBLE
-                                }
-                                requireContext().getString(R.string.error_no_internet_in_search) -> {
-                                    showToast()
-                                    binding.tvRetry.visibility = View.VISIBLE
-                                    binding.tvRetry.setOnClickListener {
-                                        topNewsViewModel.searchNewsByFilter()
-                                    }
-                                }
-
-
-                                else -> { // Другие ошибки
-                                    showToast()
-                                    binding.tvRetry.setOnClickListener {
-                                        topNewsViewModel.refreshData()
-                                    }
-                                }
-                            }
-                        }
-
-                        is NewsState.Loading -> {
-                            binding.tvErrorAvailableNews.visibility = View.GONE
-                            binding.tvRetry.visibility = View.GONE
-                            binding.pgNews.visibility = View.VISIBLE
-                        }
-
-                        is NewsState.Success -> {
-                            binding.tvErrorAvailableNews.visibility = View.GONE
-                            binding.pgNews.visibility = View.GONE
-                            binding.tvRetry.visibility = View.GONE
-                            if (!adapter.shouldHideRetryButton) {
-                                adapter.submitListWithLoadMore(uiState.currentList, null)
-                                adapter.notifyDataSetChanged() //crutch
-                            } else {
-                                adapter.submitList(uiState.currentList) {
-                                    if (topNewsViewModel.isFirstLaunch) {
-                                        lifecycleScope.launch {
-                                            delay(1000)
-                                            scrollToTop()
-                                            topNewsViewModel.isFirstLaunch = false
-                                        }
-                                    }
-                                }
-
-                            }
-                        }
-                    }
+                    handleUiState(uiState)
                 }
             }
         }
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) { //started?
-                sessionViewModel.refreshEvent.collect {
-                    topNewsViewModel.refreshData()
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                sessionViewModel.refreshEvent.collect { topNewsViewModel.refreshData() }
+            }
+        }
+    }
+
+    private fun handleUiState(uiState: NewsState) {
+        when (uiState) {
+            is NewsState.Error -> handleErrorState(uiState)
+            is NewsState.Loading -> handleLoadingState()
+            is NewsState.Success -> handleSuccessState(uiState)
+        }
+    }
+
+    private fun handleErrorState(uiState: NewsState.Error) {
+        binding.pgNews.visibility = View.GONE
+        val refreshNews = if (isSearchNews == true){
+            {
+                topNewsViewModel.searchNewsByFilter()
+            }
+        } else{
+            {
+                topNewsViewModel.refreshData()
+                topNewsViewModel.showTopNews()
+            }
+        }
+        when (uiState.message.trim()) {
+            getString(R.string.no_internet_connection),
+            getString(R.string.errorHTTP402) -> {
+                showRetryOption (refreshNews)
+            }
+            getString(R.string.news_list_is_empty_or_invalid_parameters) -> {
+                showErrorMessage(getString(R.string.no_news_for_criteria))
+            }
+            getString(R.string.errorMessageNoResultsFound) -> {
+                showErrorMessage(getString(R.string.errorMessageNoResultsFound))
+            }
+
+            else -> {
+                showRetryOption (refreshNews)
+            }
+        }
+    }
+
+    private fun showRetryOption(retryAction: () -> Unit) {
+        binding.tvRetry.visibility = if (isSearchNews == true || adapter.currentList.isEmpty()) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+        binding.tvRetry.setOnClickListener { retryAction() }
+        showToast()
+    }
+
+    private fun showErrorMessage(message: String) {
+        binding.tvRetry.visibility = View.GONE
+        binding.tvErrorAvailableNews.text = message
+        binding.tvErrorAvailableNews.visibility = View.VISIBLE
+    }
+
+    private fun handleLoadingState() {
+        binding.tvErrorAvailableNews.visibility = View.GONE
+        binding.tvRetry.visibility = View.GONE
+        binding.pgNews.visibility = View.VISIBLE
+    }
+
+    private fun handleSuccessState(uiState: NewsState.Success) {
+        binding.pgNews.visibility = View.GONE
+        binding.tvErrorAvailableNews.visibility = View.GONE
+        binding.tvRetry.visibility = View.GONE
+
+        if (!adapter.shouldHideRetryButton) {
+            adapter.submitListWithLoadMore(uiState.currentList, null)
+            adapter.notifyDataSetChanged()
+        } else {
+            adapter.submitList(uiState.currentList) {
+                if (topNewsViewModel.isFirstLaunch) {
+                    lifecycleScope.launch {
+                        delay(1000)
+                        scrollToTop()
+                        topNewsViewModel.isFirstLaunch = false
+                    }
                 }
             }
         }
     }
 
-
     private fun setupAdapter() {
-        adapter = NewsListAdapter(requireActivity().application)
+        adapter = NewsListAdapter(requireActivity().application).apply {
+            onNewsClickListener = { launchNewsDetailsFragment(it) }
+            onLoadMoreListener = {
+                adapter.shouldHideRetryButton = false
+                topNewsViewModel.loadNewsForPreviousDay()
+            }
+        }
         binding.rcNews.adapter = adapter
-        adapter.onNewsClickListener = {
-            launchNewsDetailsFragment(it)
-        }
-
-        adapter.onLoadMoreListener = {
-            adapter.shouldHideRetryButton = false
-            topNewsViewModel.loadNewsForPreviousDay()
-        }
     }
 
     private fun showToast() {    // Показ уведомления
@@ -286,7 +294,9 @@ class TopNewsFragment : Fragment() {
         val author = news.author.split(",")[0]
         topNewsViewModel.preloadAuthorData(author)
         findNavController().navigate(
-            TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(news, null, R.id.topNewsFragment)
+            TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(
+                news, null, R.id.topNewsFragment
+            )
         )
     }
 }

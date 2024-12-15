@@ -69,5 +69,5 @@
         <item>English</item>
     </string-array>
     <string name="errorMessageNoResultsFound">По запросу ничего не найдено</string>
-    <string name="reset_link_sent_successfully">Ссылка для сброса пароля была успешно отправлена</string>
+    <string name="reset_link_sent_successfully">The reset link has been successfully sent</string>
 </resources>

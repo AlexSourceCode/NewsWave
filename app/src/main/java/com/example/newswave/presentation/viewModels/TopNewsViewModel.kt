@@ -47,6 +47,7 @@ class TopNewsViewModel @Inject constructor(
 
     var isFirstLaunch = true // crutch
 
+
     init {
         loadData()
         fetchErrorLoadData()
@@ -54,6 +55,7 @@ class TopNewsViewModel @Inject constructor(
         setupSearchTrigger()
         setupSearchArgs()
     }
+
 
     fun updateSearchParameters(filter: String, value: String) { // no
         viewModelScope.launch {
@@ -85,6 +87,7 @@ class TopNewsViewModel @Inject constructor(
         }
     }
 
+
     fun loadNewsForPreviousDay() {
         viewModelScope.launch {
             loadNewsForPreviousDayUseCase()
@@ -107,18 +110,7 @@ class TopNewsViewModel @Inject constructor(
     private fun fetchErrorLoadData() {
         viewModelScope.launch {
             fetchErrorLoadDataUseCase()
-                .collect { errorMessage ->
-                    val trimmedErrorMessage = errorMessage.trim()
-                    _uiState.value = NewsState.Error(errorMessage)
-                    val savedNews = getTopNews()
-                    if ((!savedNews.isNullOrEmpty()) && (trimmedErrorMessage != application.getString(
-                            R.string.error_loading_news_by_filter
-                        )) && (trimmedErrorMessage != application.getString(R.string.news_list_is_empty_or_invalid_parameters))
-                        && (trimmedErrorMessage != application.getString(R.string.errorMessageNoResultsFound)) && (trimmedErrorMessage != application.getString(R.string.error_no_internet_in_search))
-                    ) {
-                        _uiState.value = NewsState.Success(savedNews)
-                    }
-                }
+                .collect { errorMessage -> _uiState.value = NewsState.Error(errorMessage) }
         }
     }
 
@@ -135,11 +127,15 @@ class TopNewsViewModel @Inject constructor(
                     }
             } catch (e: Exception) {
                 _uiState.value = NewsState.Error(e.toString())
-                val savedNews = getTopNews()
-                if (!savedNews.isNullOrEmpty()) {
-                    _uiState.value = NewsState.Success(savedNews)
-                }
+//                showTopNews()
             }
+        }
+    }
+
+    fun showTopNews(){
+        val savedNews = getTopNews()
+        if (!savedNews.isNullOrEmpty()) {
+            _uiState.value = NewsState.Success(savedNews)
         }
     }
 
