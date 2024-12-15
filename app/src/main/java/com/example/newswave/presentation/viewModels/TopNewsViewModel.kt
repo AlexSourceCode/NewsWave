@@ -1,21 +1,17 @@
 package com.example.newswave.presentation.viewModels
 
-import android.app.Application
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.R
 import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.presentation.state.NewsState
-import com.example.newswave.domain.usecases.subscription.FavoriteAuthorCheckUseCase
 import com.example.newswave.domain.usecases.news.FetchErrorLoadDataUseCase
 import com.example.newswave.domain.usecases.news.FetchTopNewsListUseCase
 import com.example.newswave.domain.usecases.news.LoadDataUseCase
 import com.example.newswave.domain.usecases.news.LoadNewsForPreviousDayUseCase
 import com.example.newswave.domain.usecases.news.SearchNewsByFilterUseCase
 import com.example.newswave.domain.usecases.news.SearchNewsByFilterUseCaseFactory
-import com.example.newswave.domain.usecases.user.FetchUserDataUseCase
+import com.example.newswave.domain.usecases.subscription.FavoriteAuthorCheckUseCase
+import com.example.newswave.presentation.state.NewsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,9 +21,10 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
+/**
+ * TopNewsViewModel отвечает за управление состоянием и бизнес-логикой для экрана топ-новостей.
+ */
 class TopNewsViewModel @Inject constructor(
-    private val application: Application,
     var savedStateHandle: SavedStateHandle,
     private val loadDataUseCase: LoadDataUseCase,
     private val loadNewsForPreviousDayUseCase: LoadNewsForPreviousDayUseCase,
@@ -37,15 +34,20 @@ class TopNewsViewModel @Inject constructor(
     private val favoriteAuthorCheckUseCase: FavoriteAuthorCheckUseCase,
 ) : ViewModel() {
 
-    private lateinit var searchNewsByFilterUseCase: SearchNewsByFilterUseCase
+    private lateinit var searchNewsByFilterUseCase: SearchNewsByFilterUseCase // Поздняя инициализация UseCase для поиска новостей
 
+    // Хранит текущее состояние интерфейса новостей
     private val _uiState = MutableStateFlow<NewsState>(NewsState.Loading)
     val uiState: StateFlow<NewsState> = _uiState.asStateFlow()
 
-    private val _searchTrigger = MutableStateFlow(false)
-    private val _searchArgs = MutableStateFlow<Pair<String, String>?>(null)
+    private val _searchTrigger = MutableStateFlow(false) // Триггер для запуска поиска
+    private val _searchArgs = MutableStateFlow<Pair<String, String>?>(null) // Параметры поиска
 
-    var isFirstLaunch = true // crutch
+    // Указывает, находится ли пользователь в режиме поиска
+    private val _isInSearchMode = MutableStateFlow(false)
+    val isInSearchMode: StateFlow<Boolean> = _isInSearchMode.asStateFlow()
+
+    var isFirstLaunch = true // Флаг для отслеживания первого запуска (временный костыль)
 
 
     init {
@@ -56,21 +58,24 @@ class TopNewsViewModel @Inject constructor(
         setupSearchArgs()
     }
 
-
+    // Обновляет параметры поиска и запускает поиск
     fun updateSearchParameters(filter: String, value: String) { // no
         viewModelScope.launch {
             _uiState.value = NewsState.Loading
             _searchArgs.value = Pair(filter, value)
+            _isInSearchMode.value = true // Вход в режим поиска
             searchNewsByFilter()
         }
     }
 
+    // Предзагрузка данных по автору
     fun preloadAuthorData(author: String) {
         viewModelScope.launch {
             favoriteAuthorCheckUseCase(author)
         }
     }
 
+    // Выполняет поиск новостей по заданным параметрам
     fun searchNewsByFilter() {
         if (!_searchTrigger.value) {
             _searchTrigger.value = true
@@ -81,19 +86,22 @@ class TopNewsViewModel @Inject constructor(
         }
     }
 
+    // Возвращает интерфейс в режим отображения топ-новостей
     fun backToTopNews() {
         viewModelScope.launch {
             _uiState.value = NewsState.Success(fetchTopNewsListUseCase().value)
+            _isInSearchMode.value = false // Выход из режима поиска
         }
     }
 
-
+    // Загружает новости за предыдущий день
     fun loadNewsForPreviousDay() {
         viewModelScope.launch {
             loadNewsForPreviousDayUseCase()
         }
     }
 
+    // Обновляет данные
     fun refreshData() {
         viewModelScope.launch {
             _uiState.value = NewsState.Loading
@@ -101,12 +109,22 @@ class TopNewsViewModel @Inject constructor(
         }
     }
 
+    // Показывает сохраненные топ-новости, если они доступны
+    fun showTopNews(){
+        val savedNews = getTopNews()
+        if (!savedNews.isNullOrEmpty()) {
+            _uiState.value = NewsState.Success(savedNews)
+        }
+    }
+
+    // Загружает основные данные
     private fun loadData() {
         viewModelScope.launch {
             loadDataUseCase()
         }
     }
 
+    // Подписка на сообщения об ошибках загрузки данных
     private fun fetchErrorLoadData() {
         viewModelScope.launch {
             fetchErrorLoadDataUseCase()
@@ -114,6 +132,7 @@ class TopNewsViewModel @Inject constructor(
         }
     }
 
+    // Получает список топ-новостей
     private fun fetchTopNewsList() {
         viewModelScope.launch {
             try {
@@ -127,26 +146,21 @@ class TopNewsViewModel @Inject constructor(
                     }
             } catch (e: Exception) {
                 _uiState.value = NewsState.Error(e.toString())
-//                showTopNews()
             }
         }
     }
 
-    fun showTopNews(){
-        val savedNews = getTopNews()
-        if (!savedNews.isNullOrEmpty()) {
-            _uiState.value = NewsState.Success(savedNews)
-        }
-    }
-
+    // Получает сохраненные топ-новости из SavedStateHandle
     private fun getTopNews(): List<NewsItemEntity>? {
         return savedStateHandle["top_news"]
     }
 
+    // Сохраняет список топ-новостей в SavedStateHandle
     private fun saveTopNews(newsList: List<NewsItemEntity>) {
         savedStateHandle["top_news"] = newsList
     }
 
+    // Настраивает обработку триггера для выполнения поиска
     private fun setupSearchTrigger() {
         viewModelScope.launch {
             try {
@@ -165,6 +179,7 @@ class TopNewsViewModel @Inject constructor(
         }
     }
 
+    // Настраивает обработку параметров поиска
     private fun setupSearchArgs() {
         viewModelScope.launch {
             _searchArgs
@@ -175,5 +190,4 @@ class TopNewsViewModel @Inject constructor(
                 }
         }
     }
-
 }

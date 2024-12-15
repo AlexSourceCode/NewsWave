@@ -32,6 +32,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Этот фрагмент взаимодействует с ViewModel для управления состоянием интерфейса и обработки пользовательских действий
+ */
 class TopNewsFragment : Fragment() {
 
     private lateinit var binding: FragmentTopNewsBinding
@@ -46,8 +49,7 @@ class TopNewsFragment : Fragment() {
         (requireActivity().application as NewsApp).component
     }
 
-    // Переменные для управления состоянием поиска
-    private var isSearchNews: Boolean? = null
+    // Текущий выбранный фильтр
     var selectedFilter: String? = null
 
     companion object {
@@ -75,12 +77,15 @@ class TopNewsFragment : Fragment() {
         setupFragmentResultListener()
     }
 
+    // Настраивает слушатель для получения результата обновления данных от других фрагментов
     private fun setupFragmentResultListener() {
         parentFragmentManager.setFragmentResultListener(REFRESH_REQUEST_KEY, this) { _, _ ->
             topNewsViewModel.refreshData()
         }
     }
 
+    // Инициализирует пользовательский интерфейс, включая адаптер списка,
+    // табы фильтров, обработку кнопки "Назад" и другие элементы.
     private fun initializeUI() {
         setupAdapter()
         setupTabLayout()
@@ -91,18 +96,21 @@ class TopNewsFragment : Fragment() {
         setupSwipeRefresh()
     }
 
+    // Настраивает действия для кнопки повторного запроса
     private fun setupClickListeners() {
         binding.tvRetry.setOnClickListener {
             topNewsViewModel.refreshData()//?
         }
     }
 
+    // Настраивает обработку кнопки "Назад"
+    // Если активен режим поиска, происходит выход из него, иначе работает стандартное поведение
     private fun handleBackNavigation() {
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (isSearchNews == true) {
+                    if (topNewsViewModel.isInSearchMode.value) {
                         exitSearchMode()
                     } else {
                         // Обычное поведение кнопки "Назад"
@@ -113,26 +121,24 @@ class TopNewsFragment : Fragment() {
             })
     }
 
-    // Очистка поля поиска и возврат к основным новостям
+    // Выход из режима поиска: очищает поле поиска и возвращает основной список новостей
     private fun exitSearchMode() {
         binding.edSearch.text.clear()
         topNewsViewModel.backToTopNews()
-        isSearchNews = false
     }
 
+    // Настраивает вкладки с фильтрами и добавляет слушатель выбора вкладки
     private fun setupTabLayout() {
         val tabLayout: TabLayout = binding.tabLayout
-        tabLayout.addTab(tabLayout.newTab().setText(Filter.TEXT.descriptionResId))
-        tabLayout.addTab(tabLayout.newTab().setText(Filter.AUTHOR.descriptionResId))
-        tabLayout.addTab(tabLayout.newTab().setText(Filter.DATE.descriptionResId))
-
+        Filter.entries.forEach { filter ->
+            tabLayout.addTab(tabLayout.newTab().setText(filter.descriptionResId))
+        }
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                val context = requireActivity().application
                 selectedFilter = Filter.entries.find { filter ->
-                    context.getString(filter.descriptionResId) == tab.text.toString()
+                    getString(filter.descriptionResId) == tab.text.toString()
                 }?.let { filter ->
-                    context.getString(filter.descriptionResId)
+                    getString(filter.descriptionResId)
                 }
             }
 
@@ -141,6 +147,7 @@ class TopNewsFragment : Fragment() {
         })
     }
 
+    // Настраивает обработку нажатия в поле поиска
     private fun setupSearchListener() {
         binding.edSearch.setOnKeyListener { view, keycode, event ->
             if (event.action == KeyEvent.ACTION_DOWN && keycode == KeyEvent.KEYCODE_ENTER) { // проверка, что нажатая клавиша является Enter
@@ -152,17 +159,18 @@ class TopNewsFragment : Fragment() {
         }
     }
 
+    // Выполняет поиск новостей по текущему фильтру и введённому тексту
     private fun executeSearch() {
         selectedFilter?.let {
             topNewsViewModel.updateSearchParameters(it, binding.edSearch.text.toString())
             adapter.submitList(emptyList())
-            isSearchNews = true
         }
     }
 
+    // Настраивает обновление данных свайпом
     private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
-            if (isSearchNews == true) {
+            if (topNewsViewModel.isInSearchMode.value) {
                 topNewsViewModel.searchNewsByFilter()
             } else {
                 topNewsViewModel.refreshData()
@@ -171,6 +179,19 @@ class TopNewsFragment : Fragment() {
         }
     }
 
+    // Настраивает адаптер для отображения списка новостей
+    private fun setupAdapter() {
+        adapter = NewsListAdapter(requireActivity().application).apply {
+            onNewsClickListener = { launchNewsDetailsFragment(it) }
+            onLoadMoreListener = {
+                adapter.shouldHideRetryButton = false
+                topNewsViewModel.loadNewsForPreviousDay()
+            }
+        }
+        binding.rcNews.adapter = adapter
+    }
+
+    // Подписка на изменения состояния ViewModel и обновление UI
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -186,6 +207,7 @@ class TopNewsFragment : Fragment() {
         }
     }
 
+    // Обрабатывает изменения состояния новостей и обновляет интерфейс
     private fun handleUiState(uiState: NewsState) {
         when (uiState) {
             is NewsState.Error -> handleErrorState(uiState)
@@ -194,13 +216,12 @@ class TopNewsFragment : Fragment() {
         }
     }
 
+    // Обрабатывает состояние ошибки, показывая соответствующие сообщения и опции
     private fun handleErrorState(uiState: NewsState.Error) {
         binding.pgNews.visibility = View.GONE
-        val refreshNews = if (isSearchNews == true){
-            {
-                topNewsViewModel.searchNewsByFilter()
-            }
-        } else{
+        val refreshNews = if (topNewsViewModel.isInSearchMode.value) {
+            { topNewsViewModel.searchNewsByFilter() }
+        } else {
             {
                 topNewsViewModel.refreshData()
                 topNewsViewModel.showTopNews()
@@ -209,43 +230,50 @@ class TopNewsFragment : Fragment() {
         when (uiState.message.trim()) {
             getString(R.string.no_internet_connection),
             getString(R.string.errorHTTP402) -> {
-                showRetryOption (refreshNews)
+                showRetryOption(refreshNews)
             }
+
             getString(R.string.news_list_is_empty_or_invalid_parameters) -> {
                 showErrorMessage(getString(R.string.no_news_for_criteria))
             }
+
             getString(R.string.errorMessageNoResultsFound) -> {
                 showErrorMessage(getString(R.string.errorMessageNoResultsFound))
             }
 
             else -> {
-                showRetryOption (refreshNews)
+                showRetryOption(refreshNews)
             }
         }
     }
 
+    // Показывает опцию повторной загрузки данных
     private fun showRetryOption(retryAction: () -> Unit) {
-        binding.tvRetry.visibility = if (isSearchNews == true || adapter.currentList.isEmpty()) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+        binding.tvRetry.visibility =
+            if (topNewsViewModel.isInSearchMode.value || adapter.currentList.isEmpty()) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
         binding.tvRetry.setOnClickListener { retryAction() }
         showToast()
     }
 
+    // Отображение сообщения об ошибке на экране
     private fun showErrorMessage(message: String) {
         binding.tvRetry.visibility = View.GONE
         binding.tvErrorAvailableNews.text = message
         binding.tvErrorAvailableNews.visibility = View.VISIBLE
     }
 
+    // Управление состоянием загрузки
     private fun handleLoadingState() {
         binding.tvErrorAvailableNews.visibility = View.GONE
         binding.tvRetry.visibility = View.GONE
         binding.pgNews.visibility = View.VISIBLE
     }
 
+    // Обработка состояния успешной загрузки
     private fun handleSuccessState(uiState: NewsState.Success) {
         binding.pgNews.visibility = View.GONE
         binding.tvErrorAvailableNews.visibility = View.GONE
@@ -267,17 +295,7 @@ class TopNewsFragment : Fragment() {
         }
     }
 
-    private fun setupAdapter() {
-        adapter = NewsListAdapter(requireActivity().application).apply {
-            onNewsClickListener = { launchNewsDetailsFragment(it) }
-            onLoadMoreListener = {
-                adapter.shouldHideRetryButton = false
-                topNewsViewModel.loadNewsForPreviousDay()
-            }
-        }
-        binding.rcNews.adapter = adapter
-    }
-
+    // Показ уведомления о загрузке данных
     private fun showToast() {    // Показ уведомления
         Toast.makeText(
             requireContext(),
@@ -286,10 +304,12 @@ class TopNewsFragment : Fragment() {
         ).show()
     }
 
+    // Прокрутка RecyclerView к началу списка новостей
     fun scrollToTop() {         // Прокрутка к началу списка новостей
         binding.rcNews.scrollToPosition(0)
     }
 
+    // Открытие фрагмента с деталями новости
     private fun launchNewsDetailsFragment(news: NewsItemEntity) {   // Переход к фрагменту с деталями новости
         val author = news.author.split(",")[0]
         topNewsViewModel.preloadAuthorData(author)
