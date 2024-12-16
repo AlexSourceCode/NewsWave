@@ -1,5 +1,6 @@
 package com.example.newswave.presentation.viewModels
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -104,6 +105,7 @@ class TopNewsViewModel @Inject constructor(
     // Обновляет данные
     fun refreshData() {
         viewModelScope.launch {
+            Log.d("TopNewsViewModel", "refreshData")
             _uiState.value = NewsState.Loading
             loadDataUseCase()
         }
@@ -120,6 +122,7 @@ class TopNewsViewModel @Inject constructor(
     // Загружает основные данные
     private fun loadData() {
         viewModelScope.launch {
+            Log.d("TopNewsViewModel", "loaddata")
             loadDataUseCase()
         }
     }
@@ -128,7 +131,9 @@ class TopNewsViewModel @Inject constructor(
     private fun fetchErrorLoadData() {
         viewModelScope.launch {
             fetchErrorLoadDataUseCase()
-                .collect { errorMessage -> _uiState.value = NewsState.Error(errorMessage) }
+                .collect { errorMessage -> _uiState.value = NewsState.Error(errorMessage)
+                    Log.d("TopNewsViewModel", "fetchErrorLoadData after collect")
+                }
         }
     }
 
@@ -138,6 +143,7 @@ class TopNewsViewModel @Inject constructor(
             try {
                 fetchTopNewsListUseCase()
                     .collect { news ->
+                        Log.d("TopNewsViewModel", "fetchTopNewsList collect")
                         if (news.isEmpty()) _uiState.value = NewsState.Loading
                         else {
                             _uiState.value = NewsState.Success(news)
@@ -145,6 +151,7 @@ class TopNewsViewModel @Inject constructor(
                         }
                     }
             } catch (e: Exception) {
+                Log.d("TopNewsViewModel", "fetchTopNewsList catch")
                 _uiState.value = NewsState.Error(e.toString())
             }
         }

@@ -193,16 +193,18 @@ class TopNewsFragment : Fragment() {
 
     // Подписка на изменения состояния ViewModel и обновление UI
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                topNewsViewModel.uiState.collect { uiState ->
-                    handleUiState(uiState)
+                launch {
+                    topNewsViewModel.uiState.collect { uiState ->
+                        handleUiState(uiState)
+                    }
                 }
-            }
-        }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                sessionViewModel.refreshEvent.collect { topNewsViewModel.refreshData() }
+                launch {
+                    sessionViewModel.refreshEvent.collect {
+                        topNewsViewModel.refreshData()
+                    }
+                }
             }
         }
     }
@@ -222,25 +224,20 @@ class TopNewsFragment : Fragment() {
         val refreshNews = if (topNewsViewModel.isInSearchMode.value) {
             { topNewsViewModel.searchNewsByFilter() }
         } else {
-            {
-                topNewsViewModel.refreshData()
-                topNewsViewModel.showTopNews()
-            }
+            { topNewsViewModel.refreshData() }
         }
         when (uiState.message.trim()) {
             getString(R.string.no_internet_connection),
             getString(R.string.errorHTTP402) -> {
                 showRetryOption(refreshNews)
             }
-
             getString(R.string.news_list_is_empty_or_invalid_parameters) -> {
+                adapter.submitList(emptyList())
                 showErrorMessage(getString(R.string.no_news_for_criteria))
             }
-
             getString(R.string.errorMessageNoResultsFound) -> {
                 showErrorMessage(getString(R.string.errorMessageNoResultsFound))
             }
-
             else -> {
                 showRetryOption(refreshNews)
             }
@@ -249,12 +246,12 @@ class TopNewsFragment : Fragment() {
 
     // Показывает опцию повторной загрузки данных
     private fun showRetryOption(retryAction: () -> Unit) {
-        binding.tvRetry.visibility =
-            if (topNewsViewModel.isInSearchMode.value || adapter.currentList.isEmpty()) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
+        if (topNewsViewModel.isInSearchMode.value || adapter.currentList.isEmpty()) {
+            binding.tvRetry.visibility = View.VISIBLE
+            topNewsViewModel.showTopNews()
+        } else {
+            View.GONE
+        }
         binding.tvRetry.setOnClickListener { retryAction() }
         showToast()
     }

@@ -7,13 +7,12 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.example.newswave.R
-import com.example.newswave.data.network.model.NewsItemDto
 import com.example.newswave.data.workers.RefreshDataWorker
 import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.domain.model.Filter
 import com.example.newswave.domain.repository.LocalDataSource
 import com.example.newswave.domain.repository.NewsRepository
 import com.example.newswave.domain.repository.RemoteDataSource
-import com.example.newswave.domain.model.Filter
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +26,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
