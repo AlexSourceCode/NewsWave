@@ -71,7 +71,6 @@ class NewsRepositoryImpl @Inject constructor(
     // Получение топ новостей из БД
     override suspend fun fetchTopNewsList(): StateFlow<List<NewsItemEntity>> = topNewsStateFlow
 
-
     // Запуск фоновой задачи для обновления данных через WorkManager
     override suspend fun loadData() {
         val workManager = WorkManager.getInstance(application.applicationContext)

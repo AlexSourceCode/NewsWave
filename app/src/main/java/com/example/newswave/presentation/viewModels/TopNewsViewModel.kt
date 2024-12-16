@@ -50,6 +50,8 @@ class TopNewsViewModel @Inject constructor(
 
     var isFirstLaunch = true // Флаг для отслеживания первого запуска (временный костыль)
 
+    var savedPosition: Int = 0
+    var savedOffset: Int = 0
 
     init {
         loadData()
@@ -90,6 +92,7 @@ class TopNewsViewModel @Inject constructor(
     // Возвращает интерфейс в режим отображения топ-новостей
     fun backToTopNews() {
         viewModelScope.launch {
+            Log.d("TopNewsViewModel", "backToTopNews")
             _uiState.value = NewsState.Success(fetchTopNewsListUseCase().value)
             _isInSearchMode.value = false // Выход из режима поиска
         }
@@ -105,7 +108,6 @@ class TopNewsViewModel @Inject constructor(
     // Обновляет данные
     fun refreshData() {
         viewModelScope.launch {
-            Log.d("TopNewsViewModel", "refreshData")
             _uiState.value = NewsState.Loading
             loadDataUseCase()
         }
@@ -115,6 +117,7 @@ class TopNewsViewModel @Inject constructor(
     fun showTopNews(){
         val savedNews = getTopNews()
         if (!savedNews.isNullOrEmpty()) {
+            Log.d("TopNewsViewModel", "showTopNews")
             _uiState.value = NewsState.Success(savedNews)
         }
     }
@@ -122,7 +125,6 @@ class TopNewsViewModel @Inject constructor(
     // Загружает основные данные
     private fun loadData() {
         viewModelScope.launch {
-            Log.d("TopNewsViewModel", "loaddata")
             loadDataUseCase()
         }
     }
@@ -131,9 +133,7 @@ class TopNewsViewModel @Inject constructor(
     private fun fetchErrorLoadData() {
         viewModelScope.launch {
             fetchErrorLoadDataUseCase()
-                .collect { errorMessage -> _uiState.value = NewsState.Error(errorMessage)
-                    Log.d("TopNewsViewModel", "fetchErrorLoadData after collect")
-                }
+                .collect { errorMessage -> _uiState.value = NewsState.Error(errorMessage) }
         }
     }
 
@@ -143,15 +143,15 @@ class TopNewsViewModel @Inject constructor(
             try {
                 fetchTopNewsListUseCase()
                     .collect { news ->
-                        Log.d("TopNewsViewModel", "fetchTopNewsList collect")
                         if (news.isEmpty()) _uiState.value = NewsState.Loading
                         else {
+                            Log.d("TopNewsViewModel", "fetchTopNewsList")
+                            Log.d("TopNewsViewModel", news.get(0).title.toString())
                             _uiState.value = NewsState.Success(news)
                             saveTopNews(news)
                         }
                     }
             } catch (e: Exception) {
-                Log.d("TopNewsViewModel", "fetchTopNewsList catch")
                 _uiState.value = NewsState.Error(e.toString())
             }
         }
@@ -177,6 +177,7 @@ class TopNewsViewModel @Inject constructor(
                     .collect {
                         searchNewsByFilterUseCase()
                             .collect { news ->
+                                Log.d("TopNewsViewModel", "setupSearchTrigger")
                                 _uiState.value = NewsState.Success(news)
                             }
                     }

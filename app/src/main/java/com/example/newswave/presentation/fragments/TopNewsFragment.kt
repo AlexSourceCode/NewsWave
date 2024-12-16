@@ -16,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentTopNewsBinding
@@ -51,6 +52,7 @@ class TopNewsFragment : Fragment() {
 
     // Текущий выбранный фильтр
     var selectedFilter: String? = null
+    private lateinit var layoutManager: LinearLayoutManager
 
     companion object {
         private const val REFRESH_REQUEST_KEY = "refresh_request"
@@ -66,6 +68,7 @@ class TopNewsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentTopNewsBinding.inflate(layoutInflater)
+        layoutManager = binding.rcNews.layoutManager as LinearLayoutManager
         (activity as MainActivity).setSelectedMenuItem(R.id.topNewsFragment)
         return binding.root
     }
@@ -162,6 +165,10 @@ class TopNewsFragment : Fragment() {
     // Выполняет поиск новостей по текущему фильтру и введённому тексту
     private fun executeSearch() {
         selectedFilter?.let {
+            topNewsViewModel.savedPosition = layoutManager.findFirstVisibleItemPosition()
+            topNewsViewModel.savedOffset =
+                layoutManager.findViewByPosition(topNewsViewModel.savedPosition)?.top ?: 0
+
             topNewsViewModel.updateSearchParameters(it, binding.edSearch.text.toString())
             adapter.submitList(emptyList())
         }
@@ -184,10 +191,13 @@ class TopNewsFragment : Fragment() {
         adapter = NewsListAdapter(requireActivity().application).apply {
             onNewsClickListener = { launchNewsDetailsFragment(it) }
             onLoadMoreListener = {
-                adapter.shouldHideRetryButton = false
-                topNewsViewModel.loadNewsForPreviousDay()
+                if(!topNewsViewModel.isInSearchMode.value){
+                    adapter.shouldHideRetryButton = false
+                    topNewsViewModel.loadNewsForPreviousDay()
+                }
             }
         }
+
         binding.rcNews.adapter = adapter
     }
 
@@ -248,8 +258,8 @@ class TopNewsFragment : Fragment() {
     private fun showRetryOption(retryAction: () -> Unit) {
         if (topNewsViewModel.isInSearchMode.value || adapter.currentList.isEmpty()) {
             binding.tvRetry.visibility = View.VISIBLE
-            topNewsViewModel.showTopNews()
         } else {
+            topNewsViewModel.showTopNews()
             View.GONE
         }
         binding.tvRetry.setOnClickListener { retryAction() }
@@ -281,13 +291,15 @@ class TopNewsFragment : Fragment() {
             adapter.notifyDataSetChanged()
         } else {
             adapter.submitList(uiState.currentList) {
-                if (topNewsViewModel.isFirstLaunch) {
-                    lifecycleScope.launch {
-                        delay(1000)
-                        scrollToTop()
-                        topNewsViewModel.isFirstLaunch = false
-                    }
-                }
+                if (!topNewsViewModel.isInSearchMode.value)
+                    scrollToPosition(topNewsViewModel.savedPosition, topNewsViewModel.savedOffset)
+//                if (topNewsViewModel.isFirstLaunch) {
+//                    lifecycleScope.launch {
+//                        delay(1000)
+//                        scrollToPosition(currentPosition)
+//                        topNewsViewModel.isFirstLaunch = false
+//                    }
+//                }
             }
         }
     }
@@ -302,8 +314,8 @@ class TopNewsFragment : Fragment() {
     }
 
     // Прокрутка RecyclerView к началу списка новостей
-    fun scrollToTop() {         // Прокрутка к началу списка новостей
-        binding.rcNews.scrollToPosition(0)
+    fun scrollToPosition(position: Int, offset: Int) {
+        layoutManager.scrollToPositionWithOffset(position, offset)
     }
 
     // Открытие фрагмента с деталями новости

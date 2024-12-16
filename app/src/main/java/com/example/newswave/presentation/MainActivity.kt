@@ -55,16 +55,16 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setupWithNavController(navController)
 
 
-        bottomNavigationView.setOnItemReselectedListener { item ->
-            if (item.itemId == R.id.topNewsFragment) {
-                if (item.isChecked) {
-                    val fragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
-                    if (fragment is TopNewsFragment) {
-                        fragment.scrollToTop()
-                    }
-                }
-            }
-        }
+//        bottomNavigationView.setOnItemReselectedListener { item ->
+//            if (item.itemId == R.id.topNewsFragment) {
+//                if (item.isChecked) {
+//                    val fragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
+//                    if (fragment is TopNewsFragment) {
+//                        fragment.scrollToPosition(0)
+//                    }
+//                }
+//            }
+//        }
         lifecycleScope.launch {
             sessionViewModel.activeMenuItemId.collect { itemId ->
                 itemId?.let {

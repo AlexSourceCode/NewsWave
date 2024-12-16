@@ -1,20 +1,16 @@
 package com.example.newswave.presentation.viewModels
 
-import android.app.Application
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.R
 import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.presentation.state.AuthState
-import com.example.newswave.presentation.state.NewsState
 import com.example.newswave.domain.usecases.subscription.FavoriteAuthorCheckUseCase
 import com.example.newswave.domain.usecases.subscription.LoadAuthorNewsUseCase
 import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
+import com.example.newswave.presentation.state.AuthState
+import com.example.newswave.presentation.state.NewsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,10 +18,9 @@ import javax.inject.Inject
  * ViewModel для управления логикой отображения новостей автора
  */
 class AuthorNewsViewModel @Inject constructor(
-    private val application: Application,
-    private val loadAuthorNewsUseCase: LoadAuthorNewsUseCase, // UseCase для загрузки новостей автора
-    private val observeAuthStateUseCase: ObserveAuthStateUseCase, // UseCase для наблюдения за состоянием аутентификации
-    private val favoriteAuthorCheckUseCase: FavoriteAuthorCheckUseCase // UseCase для проверки избранного автора
+    private val loadAuthorNewsUseCase: LoadAuthorNewsUseCase,
+    private val observeAuthStateUseCase: ObserveAuthStateUseCase,
+    private val favoriteAuthorCheckUseCase: FavoriteAuthorCheckUseCase
 ) : ViewModel() {
 
     // Поток состояния UI, изначально в состоянии загрузки
@@ -51,20 +46,6 @@ class AuthorNewsViewModel @Inject constructor(
         }
     }
 
-    // Обрабатывает результат загрузки новостей и обновляет состояние UI
-    private fun handleNewsResult(news: List<NewsItemEntity>) {
-        _uiState.value = if (news.isEmpty()) {
-            NewsState.Error(application.getString(R.string.no_internet_connection))
-        } else {
-            NewsState.Success(news)
-        }
-    }
-
-    // Обрабатывает ошибки и обновляет состояние UI
-    private fun handleError(e: Exception) {
-        _uiState.value = NewsState.Error(e.message.toString())
-    }
-
     // Загружает новости для автора в виде потока
     // Использует collect для обновления состояния при каждом новом элементе
     fun loadAuthorNews(author: String) {
@@ -84,6 +65,20 @@ class AuthorNewsViewModel @Inject constructor(
         viewModelScope.launch {
             favoriteAuthorCheckUseCase(author)
         }
+    }
+
+    // Обрабатывает результат загрузки новостей и обновляет состояние UI
+    private fun handleNewsResult(news: List<NewsItemEntity>) {
+        _uiState.value = if (news.isEmpty()) {
+            NewsState.Error("The list is empty")
+        } else {
+            NewsState.Success(news)
+        }
+    }
+
+    // Обрабатывает ошибки и обновляет состояние UI
+    private fun handleError(e: Exception) {
+        _uiState.value = NewsState.Error(e.message.toString())
     }
 
     // Наблюдает за изменениями состояния аутентификации пользователя

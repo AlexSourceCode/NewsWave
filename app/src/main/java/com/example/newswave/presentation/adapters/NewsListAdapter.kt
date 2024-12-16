@@ -48,7 +48,6 @@ class NewsListAdapter(
 
         // Вызывает обработчик загрузки новостей
         onLoadListener?.invoke()
-
         with(holder.binding) {
             with(news) {
                 // Устанавливает данные в соответствующие элементы UI
