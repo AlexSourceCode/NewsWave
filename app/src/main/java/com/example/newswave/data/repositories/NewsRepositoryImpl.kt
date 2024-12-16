@@ -2,17 +2,20 @@ package com.example.newswave.data.repositories
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.example.newswave.R
+import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.data.worker.RefreshDataWorker
 import com.example.newswave.domain.entities.NewsItemEntity
 import com.example.newswave.domain.model.Filter
 import com.example.newswave.domain.repositories.LocalDataSource
 import com.example.newswave.domain.repositories.NewsRepository
 import com.example.newswave.domain.repositories.RemoteDataSource
+import com.example.newswave.utils.LocaleHelper
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +33,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
@@ -40,7 +44,8 @@ import javax.inject.Inject
 class NewsRepositoryImpl @Inject constructor(
     private val application: Application,
     private val localDataSource: LocalDataSource, // Локальный источник данных (БД)
-    private val remoteDataSource: RemoteDataSource, // Удалённый источник данных (API)
+    private val remoteDataSource: RemoteDataSource, // Удалённый источник данных (API),
+    private val userPreferences: UserPreferences, // Локальные пользовательские настройки
 ) : NewsRepository {
 
     // Текущая дата для фильтрации новостей по дням
@@ -168,10 +173,13 @@ class NewsRepositoryImpl @Inject constructor(
 
     // Получение типа фильтра
     private fun getFilterType(filter: String): Filter {
+        val interfaceLanguage = userPreferences.getInterfaceLanguage()
+        val localeContext = getLocalizedContext(interfaceLanguage)
+
         val map = mapOf(
-            application.getString(Filter.TEXT.descriptionResId) to Filter.TEXT,
-            application.getString(Filter.AUTHOR.descriptionResId) to Filter.AUTHOR,
-            application.getString(Filter.DATE.descriptionResId) to Filter.DATE
+            localeContext.getString(Filter.TEXT.descriptionResId) to Filter.TEXT,
+            localeContext.getString(Filter.AUTHOR.descriptionResId) to Filter.AUTHOR,
+            localeContext.getString(Filter.DATE.descriptionResId) to Filter.DATE
         )
         return map[filter] ?: throw IllegalArgumentException(
             application.getString(
@@ -179,6 +187,16 @@ class NewsRepositoryImpl @Inject constructor(
                 filter
             )
         )
+    }
+
+    private fun getLocalizedContext(language: String): Context {
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+
+        val config = application.resources.configuration
+        config.setLocale(locale)
+
+        return application.createConfigurationContext(config)
     }
 
     // Наблюдение за потоком фильтров и выполнение поиска
