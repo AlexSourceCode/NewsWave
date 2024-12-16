@@ -1,5 +1,6 @@
 package com.example.newswave.data.repositories
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.data.source.remote.FirebaseDataSource
@@ -32,7 +33,6 @@ class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
 
     private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO) // Контекст для фоновых операций
-    private val testScope = CoroutineScope(SupervisorJob() + Dispatchers.IO) // Контекст для тестирования
 
     // Текущий авторизованный пользователь (Firebase)
     private var _user = MutableStateFlow<FirebaseUser?>(null)
@@ -98,6 +98,7 @@ class UserRepositoryImpl @Inject constructor(
 
     // Регистрация нового пользователя
     // Создаёт пользователя в Firebase и сохраняет его данные локально
+    @SuppressLint("SuspiciousIndentation")
     override suspend fun signUpByEmail(
         username: String,
         email: String,
@@ -105,27 +106,30 @@ class UserRepositoryImpl @Inject constructor(
         firstName: String,
         lastName: String,
     ) {
-        val user = UserEntity(
-            id = "",
-            username = username,
-            email = email,
-            password = password,
-            firstName = firstName,
-            lastName = lastName,
-            newsContent = DEFAULT_LANGUAGE,
-            newsSourceCountry = DEFAULT_LANGUAGE
-        )
+        ioScope.launch {
+            val user = UserEntity(
+                id = "",
+                username = username,
+                email = email,
+                password = password,
+                firstName = firstName,
+                lastName = lastName,
+                newsContent = DEFAULT_LANGUAGE,
+                newsSourceCountry = DEFAULT_LANGUAGE
+            )
             firebaseDataSource.signUp(email, password, user)
                 .onSuccess { firebaseUser ->
                     _isUserDataUpdatedFlow.emit(Unit) // Уведомляем, что данные обновлены
                     localDataSource.deleteAllNews()
                     if (firebaseUser != null) {
                         userPreferences.saveUserData(user.copy(id = firebaseUser.uid))
+                        fetchUserData()
                     }
                 }
                 .onFailure {
                     _signUpError.emit(it.message.toString())
                 }
+        }
     }
 
     // Выход пользователя
