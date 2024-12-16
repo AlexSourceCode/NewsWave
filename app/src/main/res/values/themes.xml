@@ -1,9 +1,7 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<resources>
+
     <style name="Base.Theme.NewsWave" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimaryDark">@color/black</item>
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
     <style name="CustomMenuItemStyle">
@@ -22,14 +20,6 @@
         <item name="android:textSize">10sp</item> <!-- Установите нужный размер текста -->
     </style>
 
-
-    <style name="CustomSettingsAlertDialogAnimation">
-        <item name="android:windowEnterAnimation">@anim/enter_animation_window</item>
-        <item name="android:windowExitAnimation">@anim/exit_animation_window</item>
-    </style>
-
-
-
-
     <style name="Theme.NewsWave" parent="Base.Theme.NewsWave" />
+
 </resources>

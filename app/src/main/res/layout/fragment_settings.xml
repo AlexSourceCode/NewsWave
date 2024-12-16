@@ -20,8 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginTop="32dp"
+            android:layout_marginEnd="16dp"
             android:gravity="center"
             android:textColor="@color/white"
             android:textSize="18sp"
@@ -31,10 +31,10 @@
             android:id="@+id/tvUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_gravity="center"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
             android:alpha="0.8"
             android:textColor="@color/white"
             android:textSize="12sp"
@@ -230,10 +230,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
-                    android:textSize="16sp"
                     android:padding="16dp"
                     android:text="@string/change_password"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -254,10 +254,10 @@
                 android:id="@+id/tvLogout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
                 android:padding="16dp"
                 android:text="@string/sign_out"
-                android:textColor="@android:color/holo_red_light" />
+                android:textColor="@android:color/holo_red_light"
+                android:textSize="16sp" />
         </androidx.cardview.widget.CardView>
 
     </LinearLayout>

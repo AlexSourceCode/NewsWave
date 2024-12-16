@@ -3,10 +3,9 @@
     android:id="@+id/tvText"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:ellipsize="end"
+    android:paddingTop="16dp"
+    android:singleLine="true"
     android:textColor="@color/white"
     android:textSize="12sp"
-    android:singleLine="true"
-    android:ellipsize="end"
-    android:textStyle="bold"
-    android:paddingTop="16dp">
-</TextView>
+    android:textStyle="bold" />

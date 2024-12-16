@@ -4,8 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:fillViewport="true"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -59,8 +59,8 @@
             android:layout_marginEnd="50dp"
             android:backgroundTint="@color/white"
             android:inputType="text"
-            android:textColor="@color/white"
             android:maxLength="20"
+            android:textColor="@color/white"
             android:textColorHint="@color/white"
             app:layout_constraintTop_toBottomOf="@+id/tvHintMessage" />
 
@@ -132,10 +132,10 @@
             android:layout_marginStart="50dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="50dp"
-            android:maxLength="20"
             android:autofillHints="given-name"
             android:backgroundTint="@color/white"
             android:inputType="textCapWords"
+            android:maxLength="20"
             android:textColor="@color/white"
             app:layout_constraintTop_toBottomOf="@+id/etPassword" />
 
@@ -154,13 +154,13 @@
             android:id="@+id/etLastName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLength="20"
             android:layout_marginStart="50dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="50dp"
             android:autofillHints="family-name"
             android:backgroundTint="@color/white"
             android:inputType="textCapWords"
+            android:maxLength="20"
             android:textColor="@color/white"
             app:layout_constraintTop_toBottomOf="@+id/etFirstName" />
 
@@ -183,11 +183,11 @@
             android:id="@+id/tvAlreadyRegistered"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="56dp"
             android:alpha="0.3"
             android:text="@string/already_registered_text"
             android:textColor="@color/white"
-            android:layout_marginTop="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/etLastName"
             app:layout_constraintTop_toBottomOf="@id/btRegister" />
@@ -209,7 +209,6 @@
             app:layout_constraintEnd_toEndOf="@id/tvSignIn"
             app:layout_constraintStart_toStartOf="@id/tvSignIn"
             app:layout_constraintTop_toBottomOf="@id/tvSignIn" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -23,7 +23,6 @@
     <string name="alert_dialog_question">Вы действительно хотите отписаться от автора %s?</string>
     <string name="error_load_data">Ошибка загрузки. Проверьте подключение к сети и повторите загрузку.</string>
     <string name="download_error">Ошибка загрузки</string>
-    <string name="repeat">Повторить</string>
     <string name="retry">Повторить</string>
     <string name="sign_in_subscriptions_text">Войдите, и ваши подписки будут здесь</string>
     <string name="sign_up_no_account_text">А если нет аккаунта зарегистрируйтесь. Потом здесь будут ваши подписки</string>
@@ -44,7 +43,7 @@
     <string name="reset_password_hint">Введите адрес электронной почты, на который будет отправлено письмо для сброса пароля</string>
     <string name="change_password">Изменить пароль</string>
     <string name="subscription_prompt_message">Хотите подписаться на этот канал?</string>
-    <string name="sign_in_required_message">Хотите подписаться на этот канал?</string>
+    <string name="sign_in_required_message">Войдите, чтобы подписаться на этот канал</string>
     <string name="cancel">Отмена</string>
     <string name="unsubscribe">Отписаться</string>
     <string name="author_unknown">Автор неизвестен</string>
@@ -55,13 +54,10 @@
     <string name="content_language">Язык контента</string>
     <string name="country_of_news_source">Страна источника новостей</string>
     <string name="interface_language">Язык интерфейса</string>
-    <string name="error_no_internet_in_search">Ошибка загрузки. Проверьте подключение к сети и повторите загрузку</string>
-
 
     <string name="system">Как в системе</string>
     <string name="sign_out">Выход</string>
     <string name="no_news_for_criteria">Новости не найдены по выбранным критериям поиска. Попробуйте изменить настройки страны или языка</string>
-
 
     <string-array name="languages_interface_array">
         <item>Как в системе</item>

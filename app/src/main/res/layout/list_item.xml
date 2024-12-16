@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/text_item"
@@ -13,7 +13,7 @@
         android:padding="16dp"
         android:textColor="@color/white"
         android:textDirection="locale"
-        android:textSize="18sp"/>
+        android:textSize="18sp" />
 
     <ImageView
         android:id="@+id/checked_image"
@@ -21,7 +21,7 @@
         android:layout_height="16dp"
         android:layout_marginEnd="16dp"
         android:src="@drawable/checked"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 </LinearLayout>
 

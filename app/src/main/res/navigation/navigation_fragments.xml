@@ -89,8 +89,8 @@
             app:destination="@id/languageBottomSheetFragment2" />
         <argument
             android:name="selectedLanguage"
-            app:argType="string"
-            android:defaultValue="System" />
+            android:defaultValue="System"
+            app:argType="string" />
         <action
             android:id="@+id/action_settingsFragment_to_forgotPasswordFragment"
             app:destination="@id/forgotPasswordFragment" />
@@ -132,7 +132,7 @@
         android:id="@+id/registrationFragment"
         android:name="com.example.newswave.presentation.fragments.RegistrationFragment"
         android:label="fragment_registration"
-        tools:layout="@layout/fragment_registration" >
+        tools:layout="@layout/fragment_registration">
         <argument
             android:name="currentBottomItem"
             app:argType="integer" />
@@ -153,7 +153,7 @@
         android:id="@+id/languageBottomSheetFragment2"
         android:name="com.example.newswave.presentation.fragments.LanguageBottomSheetFragment"
         android:label="popup_languages_settings"
-        tools:layout="@layout/popup_languages_settings" >
+        tools:layout="@layout/popup_languages_settings">
         <argument
             android:name="LanguageOption"
             app:argType="com.example.newswave.presentation.model.LanguageOption" />

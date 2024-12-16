@@ -30,18 +30,17 @@
             android:id="@+id/btSubscription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
             android:background="@drawable/button_subscribed_in_authors_list"
-            android:textAllCaps="false"
-            android:textSize="12sp"
-            android:textColor="@color/white"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginEnd="16dp"
-            tools:text="Вы подписаны"/>
-
+            tools:text="Вы подписаны" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
