@@ -31,7 +31,8 @@ import javax.inject.Inject
  */
 class AuthorNewsFragment : Fragment() {
 
-    private lateinit var binding: FragmentAuthorNewsBinding
+    private var _binding: FragmentAuthorNewsBinding? = null
+    private val binding get() = _binding!!
     private val args by navArgs<AuthorNewsFragmentArgs>() // Навигационные аргументы фрагмента, содержащий автора
 
     private lateinit var adapter: NewsListAdapter // Адаптер для списка новостей
@@ -53,7 +54,7 @@ class AuthorNewsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentAuthorNewsBinding.inflate(layoutInflater)
+        _binding = FragmentAuthorNewsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -144,7 +145,7 @@ class AuthorNewsFragment : Fragment() {
     private fun showToast() {    // Показ уведомления
         Toast.makeText(
             requireContext(),
-            requireActivity().getString(R.string.error_load_data),
+            getString(R.string.error_load_data),
             Toast.LENGTH_LONG
         ).show()
     }
@@ -159,5 +160,10 @@ class AuthorNewsFragment : Fragment() {
                 R.id.subscribedAuthorsFragment
             )
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

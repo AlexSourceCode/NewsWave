@@ -5,5 +5,5 @@ import javax.inject.Inject
 
 class SaveSourceCountryUseCase @Inject constructor(private val repository: UserRepository) {
 
-    operator fun invoke(country: String) = repository.saveSourceCountry(country)
+    suspend operator fun invoke(country: String) = repository.saveSourceCountry(country)
 }

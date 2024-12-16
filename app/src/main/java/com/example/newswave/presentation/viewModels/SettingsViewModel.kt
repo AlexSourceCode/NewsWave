@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.domain.entity.UserEntity
+import com.example.newswave.domain.usecases.user.ClearUserRepositoryUseCase
 import com.example.newswave.domain.usecases.user.FetchUserDataUseCase
 import com.example.newswave.domain.usecases.user.GetContentLanguageUseCase
 import com.example.newswave.domain.usecases.user.GetSourceCountryUseCase
@@ -30,7 +31,8 @@ class SettingsViewModel @Inject constructor(
     private val saveContentLanguageUseCase: SaveContentLanguageUseCase,
     private val getSourceCountryUseCase: GetSourceCountryUseCase,
     private val saveSourceCountryUseCase: SaveSourceCountryUseCase,
-    private val signOutUseCase: SignOutUseCase
+    private val signOutUseCase: SignOutUseCase,
+    private val clearUserRepositoryUseCase: ClearUserRepositoryUseCase
 ) : ViewModel() {
 
     // Хранит текущее состояние авторизованного пользователя
@@ -58,7 +60,9 @@ class SettingsViewModel @Inject constructor(
 
     // Выполняет выход из учетной записи
     fun signOut() {
-        signOutUseCase()
+        viewModelScope.launch {
+            signOutUseCase()
+        }
     }
 
     // Получение языка интерфейса
@@ -73,12 +77,16 @@ class SettingsViewModel @Inject constructor(
 
     // Сохранение языка контента
     fun saveContentLanguage(language: String) {
-        saveContentLanguageUseCase(language)
+        viewModelScope.launch {
+            saveContentLanguageUseCase(language)
+        }
     }
 
     // Сохранение страны источника новостей
     fun saveSourceCountry(country: String) {
-        saveSourceCountryUseCase(country)
+        viewModelScope.launch {
+            saveSourceCountryUseCase(country)
+        }
     }
 
     // Наблюдение за состоянием авторизации пользователя
@@ -118,5 +126,10 @@ class SettingsViewModel @Inject constructor(
                 _sourceCountry.value = it
             }
         }
+    }
+
+    override fun onCleared() {
+        clearUserRepositoryUseCase()
+        super.onCleared()
     }
 }

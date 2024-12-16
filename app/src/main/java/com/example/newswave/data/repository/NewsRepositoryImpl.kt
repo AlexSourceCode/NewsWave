@@ -17,6 +17,7 @@ import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -46,8 +47,7 @@ class NewsRepositoryImpl @Inject constructor(
     @SuppressLint("NewApi")
     private var currentEndDate: LocalDate = LocalDate.now()
 
-    private val job = SupervisorJob()
-    private val ioScope = CoroutineScope(job + Dispatchers.IO)
+    private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     // Поток для передачи фильтров и значений
     private val _filterFlow =
@@ -81,10 +81,7 @@ class NewsRepositoryImpl @Inject constructor(
             ExistingWorkPolicy.REPLACE,
             workRequest
         )
-
-        ioScope.launch {
-            observeWorkState(workManager)
-        }
+        observeWorkState(workManager)
     }
 
     // Отслеживание состояния задачи WorkManager
@@ -122,15 +119,13 @@ class NewsRepositoryImpl @Inject constructor(
     // Загрузка новостей за предыдущий день.
     @SuppressLint("NewApi")
     override suspend fun loadNewsForPreviousDay() {
-        ioScope.launch {
-            currentEndDate = currentEndDate.minusDays(1)
-            val previousDate = currentEndDate.format(
-                DateTimeFormatter.ofPattern(application.getString(R.string.yyyy_mm_dd))
-            )
-            fetchDataWithNetworkCheck {
-                val newsList = remoteDataSource.fetchTopNews(previousDate)
-                localDataSource.insertNews(newsList)
-            }
+        currentEndDate = currentEndDate.minusDays(1)
+        val previousDate = currentEndDate.format(
+            DateTimeFormatter.ofPattern(application.getString(R.string.yyyy_mm_dd))
+        )
+        fetchDataWithNetworkCheck {
+            val newsList = remoteDataSource.fetchTopNews(previousDate)
+            localDataSource.insertNews(newsList)
         }
     }
 
@@ -210,5 +205,9 @@ class NewsRepositoryImpl @Inject constructor(
                     _filteredNewsSharedFlow.emit(news)
                 }
         }
+    }
+
+    override fun clear() {
+        ioScope.cancel()
     }
 }

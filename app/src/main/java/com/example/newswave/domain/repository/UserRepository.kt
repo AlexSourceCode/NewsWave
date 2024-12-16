@@ -13,13 +13,13 @@ import kotlinx.coroutines.flow.StateFlow
 interface UserRepository {
 
     // Сбросить пароль пользователя
-    fun resetPassword(email: String)
+    suspend fun resetPassword(email: String)
 
     // Войти в систему с использованием email и пароля
-    fun signInByEmail(email: String, password: String)
+    suspend fun signInByEmail(email: String, password: String)
 
     // Зарегистрировать пользователя с использованием email
-    fun signUpByEmail(
+    suspend fun signUpByEmail(
         username: String,
         email: String,
         password: String,
@@ -31,7 +31,7 @@ interface UserRepository {
     fun fetchError(type: ErrorType): SharedFlow<String>
 
     // Выйти из системы
-    fun signOut()
+    suspend fun signOut()
 
     // Получить текущий язык контента
     fun getContentLanguage(): String
@@ -40,13 +40,13 @@ interface UserRepository {
     fun isUserDataUpdated(): SharedFlow<Unit>
 
     // Сохранить текущий язык контента
-    fun saveContentLanguage(language: String)
+    suspend fun saveContentLanguage(language: String)
 
     // Получить текущую страну источника новостей
     fun getSourceCountry(): String
 
     // Сохранить страну источника новостей
-    fun saveSourceCountry(country: String)
+    suspend fun saveSourceCountry(country: String)
 
     // Проверить успешность аутентификации
     fun fetchIsSuccessAuth(): SharedFlow<Boolean>
@@ -62,5 +62,8 @@ interface UserRepository {
 
     // Наблюдать за страной источника новостей
     fun fetchSourceCountry(): StateFlow<String>
+
+    // Очистить корутину, чтобы не было утечек памяти
+    fun clear()
 
 }

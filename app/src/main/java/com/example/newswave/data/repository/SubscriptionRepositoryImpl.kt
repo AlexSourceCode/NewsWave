@@ -11,6 +11,7 @@ import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -93,12 +94,10 @@ class SubscriptionRepositoryImpl @Inject constructor(
     }
 
     // Проверяет, является ли автор избранным, и обновляет состояние _isFavoriteAuthorFlow
-    override fun favoriteAuthorCheck(author: String) {
+    override suspend fun favoriteAuthorCheck(author: String) {
         val currentUser = firebaseDataSource.authStateFlow.value
-        ioScope.launch {
-            val userId = currentUser?.uid ?: return@launch
+            val userId = currentUser?.uid ?: return
             _isFavoriteAuthorFlow.value = firebaseDataSource.isFavoriteAuthor(userId, author)
-        }
     }
 
 
@@ -136,5 +135,9 @@ class SubscriptionRepositoryImpl @Inject constructor(
                     _authorNews.emit(news)
                 }
         }
+    }
+
+    override fun clear() {
+        ioScope.cancel()
     }
 }

@@ -10,6 +10,8 @@ import com.example.newswave.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -29,7 +31,7 @@ class UserRepositoryImpl @Inject constructor(
     private val localDataSource: LocalDataSource // Локальный источник данных
 ) : UserRepository {
 
-    private val ioScope = CoroutineScope(Dispatchers.IO) // Контекст для фоновых операций
+    private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO) // Контекст для фоновых операций
 
     // Текущий авторизованный пользователь (Firebase)
     private var _user = MutableStateFlow<FirebaseUser?>(null)
@@ -72,34 +74,30 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     // Сброс пароля для пользователя. Отправляет запрос в Firebase
-    override fun resetPassword(email: String) {
-        ioScope.launch {
-            val result = firebaseDataSource.resetPassword(email)
-            result.onSuccess {
+    override suspend fun resetPassword(email: String) {
+        firebaseDataSource.resetPassword(email)
+            .onSuccess {
                 _isSuccess.emit(true)
             }.onFailure {
                 _forgotPasswordError.emit(it.message.toString())
             }
-        }
     }
 
     // Вход пользователя по email и паролю
     // Успешный вход удаляет локальные данные и уведомляет о смене состояния
-    override fun signInByEmail(email: String, password: String) {
-        ioScope.launch {
-            val result = firebaseDataSource.signIn(email, password)
-            result.onSuccess {
+    override suspend fun signInByEmail(email: String, password: String) {
+        firebaseDataSource.signIn(email, password)
+            .onSuccess {
                 _isUserDataUpdatedFlow.emit(Unit)
                 localDataSource.deleteAllNews()
             }.onFailure {
                 _signInError.emit(it.message.orEmpty())
             }
-        }
     }
 
     // Регистрация нового пользователя
     // Создаёт пользователя в Firebase и сохраняет его данные локально
-    override fun signUpByEmail(
+    override suspend fun signUpByEmail(
         username: String,
         email: String,
         password: String,
@@ -116,32 +114,27 @@ class UserRepositoryImpl @Inject constructor(
             newsContent = DEFAULT_LANGUAGE,
             newsSourceCountry = DEFAULT_LANGUAGE
         )
-        ioScope.launch {
-            val result = firebaseDataSource.signUp(email, password, user)
-            result.onSuccess { firebaseUser ->
+        firebaseDataSource.signUp(email, password, user)
+            .onSuccess { firebaseUser ->
                 _isUserDataUpdatedFlow.emit(Unit) // Уведомляем, что данные обновлены
                 localDataSource.deleteAllNews()
                 if (firebaseUser != null) {
                     userPreferences.saveUserData(user.copy(id = firebaseUser.uid))
                 }
             }
-            result.onFailure {
+            .onFailure {
                 _signUpError.emit(it.message.toString())
             }
-        }
     }
 
     // Выход пользователя
     // Очищает данные и сбрасывает состояние
-    override fun signOut() {
-        ioScope.launch {
-            firebaseDataSource.signOut()
-            localDataSource.deleteAllNews()
-            userPreferences.clearUserData()
-            _userData.emit(null)
-            _user.value = null
-        }
-
+    override suspend fun signOut() {
+        firebaseDataSource.signOut()
+        localDataSource.deleteAllNews()
+        userPreferences.clearUserData()
+        _userData.emit(null)
+        _user.value = null
     }
 
     // Получение текущего языка контента
@@ -157,15 +150,13 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     // Обновление локального языка контента и его синхронизация с Firebase
-    override fun saveContentLanguage(language: String) {
+    override suspend fun saveContentLanguage(language: String) {
         _contentLanguage.value = language
         userPreferences.saveContentLanguage(language)
-        ioScope.launch {
-            firebaseDataSource.authStateFlow.value?.uid?.let { userId ->
-                updateSingleField(userId, "newsContent", language)
-                userPreferences.getUserData()?.copy(newsContent = language)?.let {
-                    updateUserPreferences(it)
-                }
+        firebaseDataSource.authStateFlow.value?.uid?.let { userId ->
+            updateSingleField(userId, "newsContent", language)
+            userPreferences.getUserData()?.copy(newsContent = language)?.let {
+                updateUserPreferences(it)
             }
         }
     }
@@ -179,18 +170,15 @@ class UserRepositoryImpl @Inject constructor(
     // Сохраняет выбранную страну источника новостей
     // Обновляет данные в локальных настройках и синхронизирует их с Firebase
     //Также очищает локальный кэш новостей
-    override fun saveSourceCountry(country: String) {
+    override suspend fun saveSourceCountry(country: String) {
         _sourceCountry.value = country
         userPreferences.saveSourceCountry(country)
-
-        ioScope.launch {
-            localDataSource.deleteAllNews()
-            firebaseDataSource.authStateFlow.value?.uid?.let { userId ->
-                updateSingleField(userId, "newsSourceCountry", country)
-            }
-            userPreferences.getUserData()?.copy(newsSourceCountry = country)?.let {
-                updateUserPreferences(it)
-            }
+        localDataSource.deleteAllNews()
+        firebaseDataSource.authStateFlow.value?.uid?.let { userId ->
+            updateSingleField(userId, "newsSourceCountry", country)
+        }
+        userPreferences.getUserData()?.copy(newsSourceCountry = country)?.let {
+            updateUserPreferences(it)
         }
     }
 
@@ -205,7 +193,6 @@ class UserRepositoryImpl @Inject constructor(
     override fun fetchIsSuccessAuth(): SharedFlow<Boolean> {
         return isSuccess
     }
-
 
     // Наблюдает за текущим состоянием авторизации в Firebase
     // Предоставляет поток с информацией о текущем авторизованном пользователе
@@ -253,19 +240,19 @@ class UserRepositoryImpl @Inject constructor(
 
     // Загрузка данных пользователя из Firebase и их обновление локально
     private suspend fun updateUserData(userId: String) {
-        val result = firebaseDataSource.fetchUserData(userId)
-        result.onSuccess { userEntity ->
-            userEntity?.let {
-                updateUserPreferences(it)
-                _isUserDataUpdatedFlow.emit(Unit)
+        firebaseDataSource.fetchUserData(userId)
+            .onSuccess { userEntity ->
+                userEntity?.let {
+                    updateUserPreferences(it)
+                    _isUserDataUpdatedFlow.emit(Unit)
+                }
+            }.onFailure { error ->
+                Log.e("UserRepositoryImpl", "Failed to fetch user data: ${error.message}")
             }
-        }.onFailure { error ->
-            Log.e("UserRepositoryImpl", "Failed to fetch user data: ${error.message}")
-        }
     }
 
     // Подписка на изменения состояния авторизации в Firebase
-    private fun observeAuthStateChanges(){
+    private fun observeAuthStateChanges() {
         ioScope.launch {
             firebaseDataSource.authStateFlow
                 .collect { firebaseUser ->
@@ -276,5 +263,9 @@ class UserRepositoryImpl @Inject constructor(
                     }
                 }
         }
+    }
+
+    override fun clear() {
+        ioScope.cancel()
     }
 }

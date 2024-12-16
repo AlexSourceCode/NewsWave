@@ -1,29 +1,25 @@
 package com.example.newswave.presentation.fragments
 
 import android.content.Context
-import androidx.fragment.app.viewModels
 import android.os.Bundle
-import android.util.Log
-import android.util.Patterns
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.newswave.R
 import com.example.newswave.app.NewsApp
+import com.example.newswave.databinding.FragmentForgotPasswordBinding
 import com.example.newswave.databinding.FragmentRegistrationBinding
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.RegistrationViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.InputValidator
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,7 +28,8 @@ import javax.inject.Inject
  */
 class RegistrationFragment : Fragment() {
 
-    private lateinit var binding: FragmentRegistrationBinding
+    private var _binding: FragmentRegistrationBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: RegistrationViewModel by viewModels { viewModelFactory }
     private val args by navArgs<RegistrationFragmentArgs>()
 
@@ -52,7 +49,7 @@ class RegistrationFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentRegistrationBinding.inflate(layoutInflater)
+        _binding = FragmentRegistrationBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -119,5 +116,10 @@ class RegistrationFragment : Fragment() {
     // Отображение сообщения пользователю
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

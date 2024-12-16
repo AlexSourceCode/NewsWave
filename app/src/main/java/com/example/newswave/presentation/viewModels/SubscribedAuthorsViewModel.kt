@@ -2,6 +2,7 @@ package com.example.newswave.presentation.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.newswave.domain.usecases.subscription.ClearSubscriptionRepositoryUseCase
 import com.example.newswave.domain.usecases.subscription.GetAuthorListUseCase
 import com.example.newswave.domain.usecases.subscription.UnsubscribeFromAuthorUseCase
 import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
@@ -20,6 +21,7 @@ class SubscribedAuthorsViewModel @Inject constructor(
     private val getAuthorListUseCase: GetAuthorListUseCase,
     private val unsubscribeFromAuthorUseCase: UnsubscribeFromAuthorUseCase,
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
+    private val clearSubscriptionUseCase: ClearSubscriptionRepositoryUseCase
 ) : ViewModel() {
 
     // Состояние авторизации пользователя
@@ -68,6 +70,11 @@ class SubscribedAuthorsViewModel @Inject constructor(
                 else _user.value = AuthState.LoggedOut
             }
         }
+    }
+
+    override fun onCleared() {
+        clearSubscriptionUseCase()
+        super.onCleared()
     }
 }
 

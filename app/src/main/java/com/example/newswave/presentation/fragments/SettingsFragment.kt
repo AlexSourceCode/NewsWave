@@ -16,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
+import com.example.newswave.databinding.FragmentForgotPasswordBinding
 import com.example.newswave.databinding.FragmentSettingsBinding
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.SettingsViewModel
@@ -31,7 +32,8 @@ import javax.inject.Inject
  */
 class SettingsFragment : Fragment() {
 
-    private lateinit var binding: FragmentSettingsBinding
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: SettingsViewModel by viewModels { viewModelFactory }
     private val languageMaps = LanguageUtils
 
@@ -61,8 +63,7 @@ class SettingsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSettingsBinding.inflate(layoutInflater)
-        (activity as MainActivity).setSelectedMenuItem(R.id.settingsFragment)
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -71,6 +72,7 @@ class SettingsFragment : Fragment() {
         observeViewModel()
         setupClickListeners()
         updateInterfaceLanguageValue()
+        (activity as MainActivity).setSelectedMenuItem(R.id.settingsFragment)
     }
 
     // Настройка слушателей для результатов выбора языка
@@ -131,7 +133,7 @@ class SettingsFragment : Fragment() {
             if (languageName == LocaleHelper.SYSTEM_DEFAULT)
                 navigateToLanguageSelectionPopup(
                     LanguageOption.INTERFACE_LANGUAGE,
-                    requireContext().getString(R.string.system)
+                    getString(R.string.system)
                 )
             else
                 navigateToLanguageSelectionPopup(LanguageOption.INTERFACE_LANGUAGE, languageName)
@@ -251,5 +253,9 @@ class SettingsFragment : Fragment() {
         )
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
 

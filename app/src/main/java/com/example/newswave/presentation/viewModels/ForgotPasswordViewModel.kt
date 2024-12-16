@@ -35,7 +35,9 @@ class ForgotPasswordViewModel @Inject constructor(
 
     // Сброс пароля
     fun resetPassword(email: String) {
-        resetPasswordUseCase(email)
+        viewModelScope.launch {
+            resetPasswordUseCase(email)
+        }
     }
 
     // Подписка на поток успешного выполнения операции.

@@ -40,7 +40,9 @@ class SignInViewModel @Inject constructor(
 
     // Вход пользователя по email и паролю
     fun signIn(email:String, password: String){
-        signInByEmailUseCase(email, password)
+        viewModelScope.launch {
+            signInByEmailUseCase(email, password)
+        }
     }
 
     // Подписка на изменения состояния авторизации

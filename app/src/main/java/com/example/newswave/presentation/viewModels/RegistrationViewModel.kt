@@ -47,7 +47,9 @@ class RegistrationViewModel @Inject constructor(
         firstName: String,
         lastName: String
     ) {
-        signUpByEmailUseCase(username, email, password, firstName,lastName)
+        viewModelScope.launch {
+            signUpByEmailUseCase(username, email, password, firstName,lastName)
+        }
     }
 
     // Наблюдение за состоянием авторизации

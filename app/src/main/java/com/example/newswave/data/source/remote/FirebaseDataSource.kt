@@ -34,8 +34,8 @@ class FirebaseDataSource @Inject constructor(
     private val auth: FirebaseAuth, // Firebase API для управления авторизацией
     private val database: FirebaseDatabase, // Firebase API для работы с базой данных Realtime Database
 ) {
-    private var authorsJob: Job? = null
-    private val ioScope = CoroutineScope(Dispatchers.IO) // Определяет контекст для корутин на IO-потоке
+//    private var authorsJob: Job? = null
+//    private val ioScope = CoroutineScope(Dispatchers.IO) // Определяет контекст для корутин на IO-потоке
 
     // Ссылка на узел Users в Firebase Realtime Database
     private val usersReference = database.getReference("Users")
@@ -56,21 +56,21 @@ class FirebaseDataSource @Inject constructor(
     }
 
     // Возвращает поток списка авторов текущего пользователя
-    fun getAuthorListFlow(): SharedFlow<List<AuthorItemEntity>?> {
+    suspend fun getAuthorListFlow(): SharedFlow<List<AuthorItemEntity>?> {
         showAuthorsList()
         return authorsFlow
     }
 
     // Эмитирует список авторов текущего пользователя.
     // Отменяет предыдущую задачу, если она запущена, чтобы избежать накопления задач.
-    private fun showAuthorsList(){
-        authorsJob?.cancel()
-        authorsJob = ioScope.launch {
+    private suspend fun showAuthorsList(){
+//        authorsJob?.cancel()
+//        authorsJob = ioScope.launch {
             val currentUser = authStateFlow.value
             val userId = currentUser?.uid
             val authors = if (userId != null) fetchAuthors(userId) else null
             _authorsFlow.emit(authors)
-        }
+//        }
     }
 
     // Наблюдает за изменениями состояния аутентификации пользователя.
@@ -140,8 +140,6 @@ class FirebaseDataSource @Inject constructor(
         return authors.any { it.author == author }
     }
 
-
-
     // Авторизация по почте
     suspend fun signIn(email: String, password: String): Result<FirebaseUser?> {
         return try {
@@ -201,21 +199,4 @@ class FirebaseDataSource @Inject constructor(
             Result.failure(e)
         }
     }
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

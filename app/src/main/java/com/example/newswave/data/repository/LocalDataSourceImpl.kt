@@ -28,7 +28,6 @@ class LocalDataSourceImpl @Inject constructor(
     // Возвращает список новостей из локальной базы данных в формате StateFlow
     // Данные преобразуются из NewsDbModel в NewsItemEntity
     override fun getNewsList(): StateFlow<List<NewsItemEntity>> {
-        Log.d("LocalDataSourceImpl", "execute getNewsList")
         return newsDao.getNewsList().map { newsList ->
             newsList.map { newsEntities ->
                 mapper.mapDbModelToEntity(newsEntities)
@@ -43,13 +42,11 @@ class LocalDataSourceImpl @Inject constructor(
 
     // Сохраняет список новостей в локальную базу данных
     override suspend fun insertNews(newsList: List<NewsDbModel>) {
-        Log.d("LocalDataSourceImpl", "execute insertNews")
         newsDao.insertNews(newsList)
     }
 
     // Удаляет все записи из локальной базы данных
     override suspend fun deleteAllNews() {
-        Log.d("LocalDataSourceImpl", "execute deleteAllNews")
         newsDao.deleteAllNews()
     }
 }

@@ -1,23 +1,21 @@
 package com.example.newswave.presentation.viewModels
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.presentation.state.AuthState
 import com.example.newswave.domain.usecases.subscription.ClearStateUseCase
 import com.example.newswave.domain.usecases.subscription.FavoriteAuthorCheckUseCase
 import com.example.newswave.domain.usecases.subscription.IsFavoriteAuthorUseCase
-import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
 import com.example.newswave.domain.usecases.subscription.SubscribeToAuthorUseCase
 import com.example.newswave.domain.usecases.subscription.UnsubscribeFromAuthorUseCase
+import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
+import com.example.newswave.presentation.state.AuthState
 import com.example.newswave.utils.NetworkUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

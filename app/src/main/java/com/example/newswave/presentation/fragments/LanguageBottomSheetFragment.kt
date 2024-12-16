@@ -127,17 +127,17 @@ class LanguageBottomSheetFragment : BottomSheetDialogFragment() {
     private fun getLanguageArrayAndSetTitle(): List<String> {
         return when (args.languageOption) {
             LanguageOption.CONTENT_LANGUAGE -> {
-                binding.tvTitle.text = requireContext().getString(R.string.content_language)
+                binding.tvTitle.text = getString(R.string.content_language)
                 resources.getStringArray(R.array.languages_content_array).toList()
             }
 
             LanguageOption.INTERFACE_LANGUAGE -> {
-                binding.tvTitle.text = requireContext().getString(R.string.interface_language)
+                binding.tvTitle.text = getString(R.string.interface_language)
                 resources.getStringArray(R.array.languages_interface_array).toList()
             }
 
             LanguageOption.NEWS_SOURCE_COUNTRY -> {
-                binding.tvTitle.text = requireContext().getString(R.string.country_of_news_source)
+                binding.tvTitle.text = getString(R.string.country_of_news_source)
                 resources.getStringArray(R.array.languages_source_country_array).toList()
             }
         }

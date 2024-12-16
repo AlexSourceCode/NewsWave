@@ -5,5 +5,5 @@ import javax.inject.Inject
 
 class SaveContentLanguageUseCase @Inject constructor(private val repository: UserRepository) {
 
-    operator fun invoke(language: String) = repository.saveContentLanguage(language)
+    suspend operator fun invoke(language: String) = repository.saveContentLanguage(language)
 }

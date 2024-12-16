@@ -7,7 +7,7 @@ class FavoriteAuthorCheckUseCase @Inject constructor(
     private val repository: SubscriptionRepository
 ) {
 
-    operator fun invoke(author: String) {
+    suspend operator fun invoke(author: String) {
         repository.favoriteAuthorCheck(author)
     }
 }

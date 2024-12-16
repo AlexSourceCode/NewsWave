@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
+import com.example.newswave.databinding.FragmentForgotPasswordBinding
 import com.example.newswave.databinding.FragmentTopNewsBinding
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.model.Filter
@@ -38,7 +39,8 @@ import javax.inject.Inject
  */
 class TopNewsFragment : Fragment() {
 
-    private lateinit var binding: FragmentTopNewsBinding
+    private var _binding: FragmentTopNewsBinding? = null
+    private val binding get() = _binding!!
     private lateinit var adapter: NewsListAdapter
     private val topNewsViewModel: TopNewsViewModel by viewModels { viewModelFactory }
     private val sessionViewModel: SessionViewModel by activityViewModels { viewModelFactory }
@@ -67,9 +69,7 @@ class TopNewsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentTopNewsBinding.inflate(layoutInflater)
-        layoutManager = binding.rcNews.layoutManager as LinearLayoutManager
-        (activity as MainActivity).setSelectedMenuItem(R.id.topNewsFragment)
+        _binding = FragmentTopNewsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -78,6 +78,7 @@ class TopNewsFragment : Fragment() {
         observeViewModel()
         initializeUI()
         setupFragmentResultListener()
+        (activity as MainActivity).setSelectedMenuItem(R.id.topNewsFragment)
     }
 
     // Настраивает слушатель для получения результата обновления данных от других фрагментов
@@ -191,13 +192,13 @@ class TopNewsFragment : Fragment() {
         adapter = NewsListAdapter(requireActivity().application).apply {
             onNewsClickListener = { launchNewsDetailsFragment(it) }
             onLoadMoreListener = {
-                if(!topNewsViewModel.isInSearchMode.value){
+                if (!topNewsViewModel.isInSearchMode.value) {
                     adapter.shouldHideRetryButton = false
                     topNewsViewModel.loadNewsForPreviousDay()
                 }
             }
         }
-
+        layoutManager = binding.rcNews.layoutManager as LinearLayoutManager
         binding.rcNews.adapter = adapter
     }
 
@@ -241,13 +242,16 @@ class TopNewsFragment : Fragment() {
             getString(R.string.errorHTTP402) -> {
                 showRetryOption(refreshNews)
             }
+
             getString(R.string.news_list_is_empty_or_invalid_parameters) -> {
                 adapter.submitList(emptyList())
                 showErrorMessage(getString(R.string.no_news_for_criteria))
             }
+
             getString(R.string.errorMessageNoResultsFound) -> {
                 showErrorMessage(getString(R.string.errorMessageNoResultsFound))
             }
+
             else -> {
                 showRetryOption(refreshNews)
             }
@@ -293,13 +297,6 @@ class TopNewsFragment : Fragment() {
             adapter.submitList(uiState.currentList) {
                 if (!topNewsViewModel.isInSearchMode.value)
                     scrollToPosition(topNewsViewModel.savedPosition, topNewsViewModel.savedOffset)
-//                if (topNewsViewModel.isFirstLaunch) {
-//                    lifecycleScope.launch {
-//                        delay(1000)
-//                        scrollToPosition(currentPosition)
-//                        topNewsViewModel.isFirstLaunch = false
-//                    }
-//                }
             }
         }
     }
@@ -308,7 +305,7 @@ class TopNewsFragment : Fragment() {
     private fun showToast() {    // Показ уведомления
         Toast.makeText(
             requireContext(),
-            requireActivity().getString(R.string.error_load_data),
+            getString(R.string.error_load_data),
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -327,5 +324,10 @@ class TopNewsFragment : Fragment() {
                 news, null, R.id.topNewsFragment
             )
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

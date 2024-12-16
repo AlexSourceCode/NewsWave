@@ -20,7 +20,7 @@ interface SubscriptionRepository {
     suspend fun unsubscribeFromAuthor(author: String)
 
     // Проверить, является ли автор избранным
-    fun favoriteAuthorCheck(author: String)
+    suspend fun favoriteAuthorCheck(author: String)
 
     // Узнать, является ли текущий автор избранным
     fun isFavoriteAuthor(): StateFlow<Boolean?>
@@ -30,4 +30,7 @@ interface SubscriptionRepository {
 
     // Загрузить новости определённого автора
     suspend fun loadAuthorNews(author: String): SharedFlow<List<NewsItemEntity>>
+
+    // Очистить корутину, чтобы не было утечек памяти
+    fun clear()
 }

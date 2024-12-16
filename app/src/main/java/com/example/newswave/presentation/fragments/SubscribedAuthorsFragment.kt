@@ -15,6 +15,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
+import com.example.newswave.databinding.FragmentForgotPasswordBinding
 import com.example.newswave.databinding.FragmentSubscribedAuthorsBinding
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.adapters.AuthorListAdapter
@@ -30,7 +31,8 @@ import javax.inject.Inject
  */
 class SubscribedAuthorsFragment : Fragment() {
 
-    private lateinit var binding: FragmentSubscribedAuthorsBinding
+    private var _binding: FragmentSubscribedAuthorsBinding? = null
+    private val binding get() = _binding!!
     private lateinit var adapter: AuthorListAdapter
     private val viewModel: SubscribedAuthorsViewModel by viewModels { viewModelFactory }
 
@@ -50,8 +52,7 @@ class SubscribedAuthorsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSubscribedAuthorsBinding.inflate(layoutInflater)
-        (activity as MainActivity).setSelectedMenuItem(R.id.subscribedAuthorsFragment)
+        _binding = FragmentSubscribedAuthorsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -60,6 +61,7 @@ class SubscribedAuthorsFragment : Fragment() {
         setupAdapter()
         setupClickListeners()
         observeViewModel()
+        (activity as MainActivity).setSelectedMenuItem(R.id.subscribedAuthorsFragment)
     }
 
     // Настройка адаптера для списка авторов
@@ -142,7 +144,7 @@ class SubscribedAuthorsFragment : Fragment() {
     private fun showToast() {    // Показ уведомления
         Toast.makeText(
             requireContext(),
-            requireActivity().getString(R.string.error_load_data),
+            getString(R.string.error_load_data),
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -210,5 +212,10 @@ class SubscribedAuthorsFragment : Fragment() {
         findNavController().navigate(
             SubscribedAuthorsFragmentDirections.actionSubscribedAuthorsFragmentToLoginFragment(R.id.subscribedAuthorsFragment)
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

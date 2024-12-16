@@ -22,6 +22,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
+import com.example.newswave.databinding.FragmentForgotPasswordBinding
 import com.example.newswave.databinding.FragmentNewsDetailsBinding
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.adapters.CustomArrayAdapter
@@ -40,7 +41,9 @@ import javax.inject.Inject
  * Класс, представляющий экран с деталями новости
  */
 class NewsDetailsFragment : Fragment() {
-    private lateinit var binding: FragmentNewsDetailsBinding
+
+    private var _binding: FragmentNewsDetailsBinding? = null
+    private val binding get() = _binding!!
     private val args by navArgs<NewsDetailsFragmentArgs>()
     private val viewModel: NewsDetailsViewModel by viewModels { viewModelFactory }
     private lateinit var player: ExoPlayer
@@ -61,7 +64,7 @@ class NewsDetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentNewsDetailsBinding.inflate(layoutInflater)
+        _binding = FragmentNewsDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -325,6 +328,7 @@ class NewsDetailsFragment : Fragment() {
         super.onDestroyView()
         player.release()
         binding.playerView.player = null
+        _binding = null
     }
 
     override fun onDestroy() { // crutch

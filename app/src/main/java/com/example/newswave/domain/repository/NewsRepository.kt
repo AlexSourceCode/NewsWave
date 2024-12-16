@@ -25,4 +25,5 @@ interface NewsRepository{
     // Выполнить поиск новостей по фильтру
     suspend fun searchNewsByFilter(filterParameter: String, valueParameter: String): SharedFlow<List<NewsItemEntity>>
 
+    fun clear()
 }

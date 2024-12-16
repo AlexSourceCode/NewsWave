@@ -18,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
+import com.example.newswave.databinding.FragmentAuthorNewsBinding
 import com.example.newswave.databinding.FragmentForgotPasswordBinding
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.ForgotPasswordViewModel
@@ -32,7 +33,8 @@ import javax.inject.Inject
  */
 class ForgotPasswordFragment : Fragment() {
 
-    private lateinit var binding: FragmentForgotPasswordBinding
+    private var _binding: FragmentForgotPasswordBinding? = null
+    private val binding get() = _binding!!
     private val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels { viewModelFactory }
     private val args by navArgs<ForgotPasswordFragmentArgs>()
 
@@ -48,12 +50,11 @@ class ForgotPasswordFragment : Fragment() {
         super.onAttach(context)
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentForgotPasswordBinding.inflate(layoutInflater)
+        _binding = FragmentForgotPasswordBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -110,5 +111,10 @@ class ForgotPasswordFragment : Fragment() {
     // Метод для отображения сообщений Toast
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

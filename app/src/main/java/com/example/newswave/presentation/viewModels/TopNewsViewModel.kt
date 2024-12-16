@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.domain.usecases.news.ClearTopNewsRepositoryUseCase
 import com.example.newswave.domain.usecases.news.FetchErrorLoadDataUseCase
 import com.example.newswave.domain.usecases.news.FetchTopNewsListUseCase
 import com.example.newswave.domain.usecases.news.LoadDataUseCase
@@ -32,6 +33,7 @@ class TopNewsViewModel @Inject constructor(
     private val searchNewsByFilterUseCaseFactory: SearchNewsByFilterUseCaseFactory,
     private val fetchErrorLoadDataUseCase: FetchErrorLoadDataUseCase,
     private val favoriteAuthorCheckUseCase: FavoriteAuthorCheckUseCase,
+    private val clearTopNewsRepositoryUseCase: ClearTopNewsRepositoryUseCase
 ) : ViewModel() {
 
     private lateinit var searchNewsByFilterUseCase: SearchNewsByFilterUseCase // Поздняя инициализация UseCase для поиска новостей
@@ -191,5 +193,10 @@ class TopNewsViewModel @Inject constructor(
                         searchNewsByFilterUseCaseFactory.create(args.first, args.second)
                 }
         }
+    }
+
+    override fun onCleared() {
+        clearTopNewsRepositoryUseCase()
+        super.onCleared()
     }
 }

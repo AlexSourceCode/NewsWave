@@ -18,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
+import com.example.newswave.databinding.FragmentForgotPasswordBinding
 import com.example.newswave.databinding.FragmentSignInBinding
 import com.example.newswave.presentation.MainActivity
 import com.example.newswave.presentation.viewModels.SessionViewModel
@@ -36,7 +37,8 @@ import javax.inject.Inject
  */
 class SignInFragment : Fragment() {
 
-    private lateinit var binding: FragmentSignInBinding
+    private var _binding: FragmentSignInBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: SignInViewModel by viewModels { viewModelFactory }
     private val args by navArgs<SignInFragmentArgs>()
 
@@ -56,7 +58,7 @@ class SignInFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentSignInBinding.inflate(layoutInflater)
+        _binding = FragmentSignInBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -137,5 +139,10 @@ class SignInFragment : Fragment() {
         findNavController().navigate(
             SignInFragmentDirections.actionLoginFragmentToForgotPasswordFragment(email, args.currentBottomItem)
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

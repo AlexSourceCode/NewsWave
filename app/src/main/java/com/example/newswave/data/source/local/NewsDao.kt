@@ -23,7 +23,7 @@ interface NewsDao {
 
     // Удаление всех записей из таблицы новостей
     @Query("DELETE FROM news")
-    fun deleteAllNews()
+    suspend fun deleteAllNews()
 
 }
 
