@@ -2,7 +2,7 @@ package com.example.newswave.presentation.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.data.dataSource.local.UserPreferences
+import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.domain.entity.UserEntity
 import com.example.newswave.domain.usecases.user.FetchUserDataUseCase
 import com.example.newswave.domain.usecases.user.GetContentLanguageUseCase

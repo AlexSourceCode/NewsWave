@@ -3,9 +3,9 @@ package com.example.newswave.di
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
-import com.example.newswave.data.dataSource.local.NewsDao
-import com.example.newswave.data.dataSource.local.NewsDb
-import com.example.newswave.data.dataSource.local.UserPreferences
+import com.example.newswave.data.source.local.NewsDao
+import com.example.newswave.data.source.local.NewsDb
+import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.data.network.api.ApiFactory
 import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.repository.LocalDataSourceImpl

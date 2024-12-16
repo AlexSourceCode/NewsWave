@@ -9,9 +9,8 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
-import com.example.newswave.data.dataSource.local.UserPreferences
+import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.databinding.ActivityMainBinding
-import com.example.newswave.presentation.fragments.TopNewsFragment
 import com.example.newswave.presentation.viewModels.SessionViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.LocaleHelper

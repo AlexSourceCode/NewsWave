@@ -1,4 +1,4 @@
-package com.example.newswave.data.dataSource.remote
+package com.example.newswave.data.source.remote
 
 import android.util.Log
 import com.example.newswave.di.ApplicationScope
@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 

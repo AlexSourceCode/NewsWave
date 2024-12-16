@@ -1,8 +1,8 @@
 package com.example.newswave.data.repository
 
 import android.util.Log
-import com.example.newswave.data.dataSource.local.UserPreferences
-import com.example.newswave.data.dataSource.remote.FirebaseDataSource
+import com.example.newswave.data.source.local.UserPreferences
+import com.example.newswave.data.source.remote.FirebaseDataSource
 import com.example.newswave.data.network.model.ErrorType
 import com.example.newswave.domain.entity.UserEntity
 import com.example.newswave.domain.repository.LocalDataSource

@@ -1,7 +1,7 @@
 package com.example.newswave.data.repository
 
-import com.example.newswave.data.dataSource.local.NewsDbModel
-import com.example.newswave.data.dataSource.local.UserPreferences
+import com.example.newswave.data.source.local.NewsDbModel
+import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.network.api.ApiService
 import com.example.newswave.data.network.model.NewsItemDto

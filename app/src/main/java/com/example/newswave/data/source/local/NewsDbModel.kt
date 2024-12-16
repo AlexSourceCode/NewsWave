@@ -1,4 +1,4 @@
-package com.example.newswave.data.dataSource.local
+package com.example.newswave.data.source.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

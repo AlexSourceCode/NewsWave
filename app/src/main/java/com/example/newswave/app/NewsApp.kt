@@ -3,7 +3,7 @@ package com.example.newswave.app
 import android.app.Application
 import android.content.Context
 import androidx.work.Configuration
-import com.example.newswave.data.dataSource.local.UserPreferences
+import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.data.workers.RefreshDataWorkerFactory
 import com.example.newswave.di.DaggerApplicationComponent
 import com.example.newswave.domain.repository.UserRepository

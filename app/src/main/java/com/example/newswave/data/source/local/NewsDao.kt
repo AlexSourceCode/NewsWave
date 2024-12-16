@@ -1,4 +1,4 @@
-package com.example.newswave.data.dataSource.local
+package com.example.newswave.data.source.local
 
 import androidx.room.Dao
 import androidx.room.Insert

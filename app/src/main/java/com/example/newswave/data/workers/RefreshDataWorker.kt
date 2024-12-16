@@ -8,13 +8,10 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.example.newswave.R
-import com.example.newswave.data.dataSource.local.NewsDbModel
+import com.example.newswave.data.source.local.NewsDbModel
 import com.example.newswave.domain.repository.LocalDataSource
 import com.example.newswave.domain.repository.RemoteDataSource
 import com.example.newswave.utils.DateUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 /**
  * Использует WorkManager для выполнения задач в фоновом режиме

@@ -1,6 +1,5 @@
 package com.example.newswave.presentation.viewModels
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -92,7 +91,6 @@ class TopNewsViewModel @Inject constructor(
     // Возвращает интерфейс в режим отображения топ-новостей
     fun backToTopNews() {
         viewModelScope.launch {
-            Log.d("TopNewsViewModel", "backToTopNews")
             _uiState.value = NewsState.Success(fetchTopNewsListUseCase().value)
             _isInSearchMode.value = false // Выход из режима поиска
         }
@@ -117,7 +115,6 @@ class TopNewsViewModel @Inject constructor(
     fun showTopNews(){
         val savedNews = getTopNews()
         if (!savedNews.isNullOrEmpty()) {
-            Log.d("TopNewsViewModel", "showTopNews")
             _uiState.value = NewsState.Success(savedNews)
         }
     }
@@ -145,8 +142,6 @@ class TopNewsViewModel @Inject constructor(
                     .collect { news ->
                         if (news.isEmpty()) _uiState.value = NewsState.Loading
                         else {
-                            Log.d("TopNewsViewModel", "fetchTopNewsList")
-                            Log.d("TopNewsViewModel", news.get(0).title.toString())
                             _uiState.value = NewsState.Success(news)
                             saveTopNews(news)
                         }
@@ -177,7 +172,6 @@ class TopNewsViewModel @Inject constructor(
                     .collect {
                         searchNewsByFilterUseCase()
                             .collect { news ->
-                                Log.d("TopNewsViewModel", "setupSearchTrigger")
                                 _uiState.value = NewsState.Success(news)
                             }
                     }

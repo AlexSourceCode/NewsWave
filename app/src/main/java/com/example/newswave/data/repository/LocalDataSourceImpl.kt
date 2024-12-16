@@ -1,8 +1,8 @@
 package com.example.newswave.data.repository
 
 import android.util.Log
-import com.example.newswave.data.dataSource.local.NewsDao
-import com.example.newswave.data.dataSource.local.NewsDbModel
+import com.example.newswave.data.source.local.NewsDao
+import com.example.newswave.data.source.local.NewsDbModel
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.domain.entity.NewsItemEntity
 import com.example.newswave.domain.repository.LocalDataSource
