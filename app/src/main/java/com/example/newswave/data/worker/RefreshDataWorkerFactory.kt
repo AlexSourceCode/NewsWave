@@ -1,11 +1,11 @@
-package com.example.newswave.data.workers
+package com.example.newswave.data.worker
 
 import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import com.example.newswave.domain.repository.LocalDataSource
-import com.example.newswave.domain.repository.RemoteDataSource
+import com.example.newswave.domain.repositories.LocalDataSource
+import com.example.newswave.domain.repositories.RemoteDataSource
 import javax.inject.Inject
 
 /**

@@ -1,7 +1,6 @@
-package com.example.newswave.domain.repository
+package com.example.newswave.domain.repositories
 
-import com.example.newswave.domain.entity.NewsItemEntity
-import kotlinx.coroutines.flow.Flow
+import com.example.newswave.domain.entities.NewsItemEntity
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 

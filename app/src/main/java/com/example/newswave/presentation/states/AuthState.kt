@@ -1,4 +1,4 @@
-package com.example.newswave.presentation.state
+package com.example.newswave.presentation.states
 
 import com.google.firebase.auth.FirebaseUser
 

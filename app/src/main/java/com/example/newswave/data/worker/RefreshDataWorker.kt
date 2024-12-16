@@ -1,4 +1,4 @@
-package com.example.newswave.data.workers
+package com.example.newswave.data.worker
 
 import android.content.Context
 import androidx.work.Constraints
@@ -9,8 +9,8 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.example.newswave.R
 import com.example.newswave.data.source.local.NewsDbModel
-import com.example.newswave.domain.repository.LocalDataSource
-import com.example.newswave.domain.repository.RemoteDataSource
+import com.example.newswave.domain.repositories.LocalDataSource
+import com.example.newswave.domain.repositories.RemoteDataSource
 import com.example.newswave.utils.DateUtils
 
 /**
@@ -62,12 +62,10 @@ class RefreshDataWorker(
             throw Exception(e.message.toString())
         }
 
-
         // Обновление локальной базы данных
         localDataSource.deleteAllNews()
         localDataSource.insertNews(newsList)
     }
-
 
     companion object {
         const val WORK_NAME = "refresh news"

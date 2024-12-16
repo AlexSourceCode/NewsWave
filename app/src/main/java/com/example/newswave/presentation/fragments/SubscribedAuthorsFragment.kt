@@ -15,12 +15,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
-import com.example.newswave.databinding.FragmentForgotPasswordBinding
 import com.example.newswave.databinding.FragmentSubscribedAuthorsBinding
-import com.example.newswave.presentation.MainActivity
+import com.example.newswave.presentation.activity.MainActivity
 import com.example.newswave.presentation.adapters.AuthorListAdapter
-import com.example.newswave.presentation.state.AuthState
-import com.example.newswave.presentation.state.AuthorState
+import com.example.newswave.presentation.states.AuthState
+import com.example.newswave.presentation.states.AuthorState
 import com.example.newswave.presentation.viewModels.SubscribedAuthorsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import kotlinx.coroutines.launch
@@ -85,8 +84,8 @@ class SubscribedAuthorsFragment : Fragment() {
 
     // Наблюдение за состоянием ViewModel
     private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) { //????????????
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.user.collect { firebaseUser ->
                     when (firebaseUser) {
                         is AuthState.LoggedIn -> { handleLoggedInState() }
@@ -141,7 +140,7 @@ class SubscribedAuthorsFragment : Fragment() {
     }
 
     // Показ уведомления с ошибкой
-    private fun showToast() {    // Показ уведомления
+    private fun showToast() {
         Toast.makeText(
             requireContext(),
             getString(R.string.error_load_data),

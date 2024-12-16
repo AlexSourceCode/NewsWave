@@ -16,11 +16,11 @@ import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
 import com.example.newswave.databinding.FragmentAuthorNewsBinding
-import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.presentation.MainActivity
+import com.example.newswave.domain.entities.NewsItemEntity
+import com.example.newswave.presentation.activity.MainActivity
 import com.example.newswave.presentation.adapters.NewsListAdapter
-import com.example.newswave.presentation.state.AuthState
-import com.example.newswave.presentation.state.NewsState
+import com.example.newswave.presentation.states.AuthState
+import com.example.newswave.presentation.states.NewsState
 import com.example.newswave.presentation.viewModels.AuthorNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import kotlinx.coroutines.launch

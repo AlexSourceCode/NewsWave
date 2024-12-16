@@ -1,12 +1,12 @@
-package com.example.newswave.data.repository
+package com.example.newswave.data.repositories
 
 import android.util.Log
 import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.data.source.remote.FirebaseDataSource
-import com.example.newswave.data.network.model.ErrorType
-import com.example.newswave.domain.entity.UserEntity
-import com.example.newswave.domain.repository.LocalDataSource
-import com.example.newswave.domain.repository.UserRepository
+import com.example.newswave.data.network.models.ErrorType
+import com.example.newswave.domain.entities.UserEntity
+import com.example.newswave.domain.repositories.LocalDataSource
+import com.example.newswave.domain.repositories.UserRepository
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

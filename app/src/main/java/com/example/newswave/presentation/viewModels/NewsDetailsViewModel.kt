@@ -9,7 +9,7 @@ import com.example.newswave.domain.usecases.subscription.IsFavoriteAuthorUseCase
 import com.example.newswave.domain.usecases.subscription.SubscribeToAuthorUseCase
 import com.example.newswave.domain.usecases.subscription.UnsubscribeFromAuthorUseCase
 import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
-import com.example.newswave.presentation.state.AuthState
+import com.example.newswave.presentation.states.AuthState
 import com.example.newswave.utils.NetworkUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

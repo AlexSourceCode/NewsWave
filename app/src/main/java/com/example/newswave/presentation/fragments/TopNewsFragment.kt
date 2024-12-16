@@ -2,7 +2,6 @@ package com.example.newswave.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -19,18 +18,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
-import com.example.newswave.databinding.FragmentForgotPasswordBinding
 import com.example.newswave.databinding.FragmentTopNewsBinding
-import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.domain.entities.NewsItemEntity
 import com.example.newswave.domain.model.Filter
-import com.example.newswave.presentation.MainActivity
+import com.example.newswave.presentation.activity.MainActivity
 import com.example.newswave.presentation.adapters.NewsListAdapter
-import com.example.newswave.presentation.state.NewsState
+import com.example.newswave.presentation.states.NewsState
 import com.example.newswave.presentation.viewModels.SessionViewModel
 import com.example.newswave.presentation.viewModels.TopNewsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.google.android.material.tabs.TabLayout
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -178,6 +175,8 @@ class TopNewsFragment : Fragment() {
     // Настраивает обновление данных свайпом
     private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
+            topNewsViewModel.savedPosition = 0
+            topNewsViewModel.savedOffset = 0
             if (topNewsViewModel.isInSearchMode.value) {
                 topNewsViewModel.searchNewsByFilter()
             } else {
@@ -302,7 +301,7 @@ class TopNewsFragment : Fragment() {
     }
 
     // Показ уведомления о загрузке данных
-    private fun showToast() {    // Показ уведомления
+    private fun showToast() {
         Toast.makeText(
             requireContext(),
             getString(R.string.error_load_data),
@@ -316,8 +315,12 @@ class TopNewsFragment : Fragment() {
     }
 
     // Открытие фрагмента с деталями новости
-    private fun launchNewsDetailsFragment(news: NewsItemEntity) {   // Переход к фрагменту с деталями новости
+    private fun launchNewsDetailsFragment(news: NewsItemEntity) {
         val author = news.author.split(",")[0]
+        topNewsViewModel.savedPosition = layoutManager.findFirstVisibleItemPosition()
+        topNewsViewModel.savedOffset =
+            layoutManager.findViewByPosition(topNewsViewModel.savedPosition)?.top ?: 0
+
         topNewsViewModel.preloadAuthorData(author)
         findNavController().navigate(
             TopNewsFragmentDirections.actionTopNewsFragmentToNewsDetailsFragment(

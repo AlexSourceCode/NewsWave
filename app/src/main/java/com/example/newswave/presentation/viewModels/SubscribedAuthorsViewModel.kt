@@ -6,8 +6,8 @@ import com.example.newswave.domain.usecases.subscription.ClearSubscriptionReposi
 import com.example.newswave.domain.usecases.subscription.GetAuthorListUseCase
 import com.example.newswave.domain.usecases.subscription.UnsubscribeFromAuthorUseCase
 import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
-import com.example.newswave.presentation.state.AuthState
-import com.example.newswave.presentation.state.AuthorState
+import com.example.newswave.presentation.states.AuthState
+import com.example.newswave.presentation.states.AuthorState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

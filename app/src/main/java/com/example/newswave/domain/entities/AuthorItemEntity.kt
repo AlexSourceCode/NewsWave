@@ -1,4 +1,4 @@
-package com.example.newswave.domain.entity
+package com.example.newswave.domain.entities
 
 /**
  * Представляет автора новостных статей

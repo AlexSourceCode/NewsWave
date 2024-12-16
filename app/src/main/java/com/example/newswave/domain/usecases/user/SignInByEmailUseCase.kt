@@ -1,6 +1,6 @@
 package com.example.newswave.domain.usecases.user
 
-import com.example.newswave.domain.repository.UserRepository
+import com.example.newswave.domain.repositories.UserRepository
 import javax.inject.Inject
 
 class SignInByEmailUseCase @Inject constructor(val repository: UserRepository) {

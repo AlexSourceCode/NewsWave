@@ -1,6 +1,6 @@
 package com.example.newswave.domain.usecases.news
 
-import com.example.newswave.domain.repository.NewsRepository
+import com.example.newswave.domain.repositories.NewsRepository
 import javax.inject.Inject
 
 class LoadNewsForPreviousDayUseCase @Inject constructor(private val repository: NewsRepository) {

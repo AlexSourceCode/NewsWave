@@ -18,7 +18,7 @@
         android:theme="@style/Theme.NewsWave"
         tools:targetApi="31">
         <activity
-            android:name=".presentation.MainActivity"
+            android:name=".presentation.activity.MainActivity"
             android:screenOrientation="portrait"
             android:exported="true"
             >

@@ -1,7 +1,7 @@
 package com.example.newswave.data.network.api
 
-import com.example.newswave.data.network.model.NewsResponseDto
-import com.example.newswave.data.network.model.TopNewsResponseDto
+import com.example.newswave.data.network.models.NewsResponseDto
+import com.example.newswave.data.network.models.TopNewsResponseDto
 import kotlinx.coroutines.flow.Flow
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -50,7 +50,6 @@ interface ApiService {
         @Query("source-country") sourceCountry: String,
         @Query("date") date: String,
         ): Flow<TopNewsResponseDto>
-
 
     companion object {
         private const val QUERY_PARAM_API_KEY = "dd1c0076447947fc921616b08d0af87d"

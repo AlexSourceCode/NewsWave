@@ -1,12 +1,12 @@
-package com.example.newswave.data.repository
+package com.example.newswave.data.repositories
 
 import com.example.newswave.data.source.local.NewsDbModel
 import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.data.mapper.NewsMapper
 import com.example.newswave.data.network.api.ApiService
-import com.example.newswave.data.network.model.NewsItemDto
-import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.domain.repository.RemoteDataSource
+import com.example.newswave.data.network.models.NewsItemDto
+import com.example.newswave.domain.entities.NewsItemEntity
+import com.example.newswave.domain.repositories.RemoteDataSource
 import com.example.newswave.domain.model.Filter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -122,5 +122,4 @@ class RemoteDataSourceImpl @Inject constructor(
                 newsEntities.distinctBy { it.title }
             }
             .catch { throw Exception("Error fetching news by author: $author. Cause: ${it.message}") }
-
 }

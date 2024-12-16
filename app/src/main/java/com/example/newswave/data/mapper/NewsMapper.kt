@@ -1,9 +1,9 @@
 package com.example.newswave.data.mapper
 
 import com.example.newswave.data.source.local.NewsDbModel
-import com.example.newswave.data.network.model.NewsItemDto
-import com.example.newswave.data.network.model.TopNewsResponseDto
-import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.data.network.models.NewsItemDto
+import com.example.newswave.data.network.models.TopNewsResponseDto
+import com.example.newswave.domain.entities.NewsItemEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

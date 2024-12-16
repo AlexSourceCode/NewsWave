@@ -1,7 +1,7 @@
 package com.example.newswave.domain.usecases.news
 
-import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.domain.repository.NewsRepository
+import com.example.newswave.domain.entities.NewsItemEntity
+import com.example.newswave.domain.repositories.NewsRepository
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 

@@ -1,12 +1,12 @@
-package com.example.newswave.data.repository
+package com.example.newswave.data.repositories
 
 import android.app.Application
 import com.example.newswave.R
 import com.example.newswave.data.source.remote.FirebaseDataSource
-import com.example.newswave.domain.entity.AuthorItemEntity
-import com.example.newswave.domain.entity.NewsItemEntity
-import com.example.newswave.domain.repository.RemoteDataSource
-import com.example.newswave.domain.repository.SubscriptionRepository
+import com.example.newswave.domain.entities.AuthorItemEntity
+import com.example.newswave.domain.entities.NewsItemEntity
+import com.example.newswave.domain.repositories.RemoteDataSource
+import com.example.newswave.domain.repositories.SubscriptionRepository
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +40,6 @@ class SubscriptionRepositoryImpl @Inject constructor(
 
     // Поток, содержащий текущего автора
     private val _currentAuthor = MutableSharedFlow<String?>()
-
 
     // Поток состояния новостей автора
     private val _authorNews = MutableSharedFlow<List<NewsItemEntity>>()
@@ -96,8 +95,8 @@ class SubscriptionRepositoryImpl @Inject constructor(
     // Проверяет, является ли автор избранным, и обновляет состояние _isFavoriteAuthorFlow
     override suspend fun favoriteAuthorCheck(author: String) {
         val currentUser = firebaseDataSource.authStateFlow.value
-            val userId = currentUser?.uid ?: return
-            _isFavoriteAuthorFlow.value = firebaseDataSource.isFavoriteAuthor(userId, author)
+        val userId = currentUser?.uid ?: return
+        _isFavoriteAuthorFlow.value = firebaseDataSource.isFavoriteAuthor(userId, author)
     }
 
 
@@ -125,9 +124,9 @@ class SubscriptionRepositoryImpl @Inject constructor(
                 .flatMapConcat { author ->
                     try {
                         remoteDataSource.fetchNewsByAuthorFlow(author)
-                    } catch (e: Exception){
+                    } catch (e: Exception) {
                         _authorNews.emit(emptyList())
-                        flow{(emit(emptyList()))}
+                        flow { (emit(emptyList())) }
                     }
                 }
                 .filter { it.isNotEmpty() }

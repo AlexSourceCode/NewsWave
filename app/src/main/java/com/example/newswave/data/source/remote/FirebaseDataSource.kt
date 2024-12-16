@@ -2,8 +2,8 @@ package com.example.newswave.data.source.remote
 
 import android.util.Log
 import com.example.newswave.di.ApplicationScope
-import com.example.newswave.domain.entity.AuthorItemEntity
-import com.example.newswave.domain.entity.UserEntity
+import com.example.newswave.domain.entities.AuthorItemEntity
+import com.example.newswave.domain.entities.UserEntity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
@@ -34,8 +34,8 @@ class FirebaseDataSource @Inject constructor(
     private val auth: FirebaseAuth, // Firebase API для управления авторизацией
     private val database: FirebaseDatabase, // Firebase API для работы с базой данных Realtime Database
 ) {
-//    private var authorsJob: Job? = null
-//    private val ioScope = CoroutineScope(Dispatchers.IO) // Определяет контекст для корутин на IO-потоке
+    private var authorsJob: Job? = null
+    private val ioScope = CoroutineScope(Dispatchers.IO) // Определяет контекст для корутин на IO-потоке
 
     // Ссылка на узел Users в Firebase Realtime Database
     private val usersReference = database.getReference("Users")
@@ -64,13 +64,13 @@ class FirebaseDataSource @Inject constructor(
     // Эмитирует список авторов текущего пользователя.
     // Отменяет предыдущую задачу, если она запущена, чтобы избежать накопления задач.
     private suspend fun showAuthorsList(){
-//        authorsJob?.cancel()
-//        authorsJob = ioScope.launch {
+        authorsJob?.cancel()
+        authorsJob = ioScope.launch {
             val currentUser = authStateFlow.value
             val userId = currentUser?.uid
             val authors = if (userId != null) fetchAuthors(userId) else null
             _authorsFlow.emit(authors)
-//        }
+        }
     }
 
     // Наблюдает за изменениями состояния аутентификации пользователя.

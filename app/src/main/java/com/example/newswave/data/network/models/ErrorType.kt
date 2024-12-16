@@ -1,4 +1,4 @@
-package com.example.newswave.data.network.model
+package com.example.newswave.data.network.models
 
 /**
  * Перечисление типов ошибок, связанных с сетью

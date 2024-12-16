@@ -2,7 +2,7 @@ package com.example.newswave.presentation.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.data.network.model.ErrorType
+import com.example.newswave.data.network.models.ErrorType
 import com.example.newswave.domain.usecases.user.FetchAuthErrorUseCase
 import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
 import com.example.newswave.domain.usecases.user.SignInByEmailUseCase

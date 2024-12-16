@@ -3,7 +3,7 @@ package com.example.newswave.presentation.viewModels
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.domain.entities.NewsItemEntity
 import com.example.newswave.domain.usecases.news.ClearTopNewsRepositoryUseCase
 import com.example.newswave.domain.usecases.news.FetchErrorLoadDataUseCase
 import com.example.newswave.domain.usecases.news.FetchTopNewsListUseCase
@@ -12,7 +12,7 @@ import com.example.newswave.domain.usecases.news.LoadNewsForPreviousDayUseCase
 import com.example.newswave.domain.usecases.news.SearchNewsByFilterUseCase
 import com.example.newswave.domain.usecases.news.SearchNewsByFilterUseCaseFactory
 import com.example.newswave.domain.usecases.subscription.FavoriteAuthorCheckUseCase
-import com.example.newswave.presentation.state.NewsState
+import com.example.newswave.presentation.states.NewsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,8 +48,6 @@ class TopNewsViewModel @Inject constructor(
     // Указывает, находится ли пользователь в режиме поиска
     private val _isInSearchMode = MutableStateFlow(false)
     val isInSearchMode: StateFlow<Boolean> = _isInSearchMode.asStateFlow()
-
-    var isFirstLaunch = true // Флаг для отслеживания первого запуска (временный костыль)
 
     var savedPosition: Int = 0
     var savedOffset: Int = 0

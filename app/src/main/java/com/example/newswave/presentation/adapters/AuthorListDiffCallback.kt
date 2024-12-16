@@ -1,7 +1,7 @@
 package com.example.newswave.presentation.adapters
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.newswave.domain.entity.AuthorItemEntity
+import com.example.newswave.domain.entities.AuthorItemEntity
 
 /**
  * DiffUtil callback для эффективного сравнения авторов

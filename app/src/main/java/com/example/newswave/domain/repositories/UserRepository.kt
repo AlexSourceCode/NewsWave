@@ -1,9 +1,8 @@
-package com.example.newswave.domain.repository
+package com.example.newswave.domain.repositories
 
-import com.example.newswave.data.network.model.ErrorType
-import com.example.newswave.domain.entity.UserEntity
+import com.example.newswave.data.network.models.ErrorType
+import com.example.newswave.domain.entities.UserEntity
 import com.google.firebase.auth.FirebaseUser
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 

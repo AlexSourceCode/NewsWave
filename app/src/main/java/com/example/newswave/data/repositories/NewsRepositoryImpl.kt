@@ -1,4 +1,4 @@
-package com.example.newswave.data.repository
+package com.example.newswave.data.repositories
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -7,12 +7,12 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.example.newswave.R
-import com.example.newswave.data.workers.RefreshDataWorker
-import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.data.worker.RefreshDataWorker
+import com.example.newswave.domain.entities.NewsItemEntity
 import com.example.newswave.domain.model.Filter
-import com.example.newswave.domain.repository.LocalDataSource
-import com.example.newswave.domain.repository.NewsRepository
-import com.example.newswave.domain.repository.RemoteDataSource
+import com.example.newswave.domain.repositories.LocalDataSource
+import com.example.newswave.domain.repositories.NewsRepository
+import com.example.newswave.domain.repositories.RemoteDataSource
 import com.example.newswave.utils.NetworkUtils.isNetworkAvailable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

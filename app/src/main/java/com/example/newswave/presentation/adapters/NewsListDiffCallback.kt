@@ -1,7 +1,7 @@
 package com.example.newswave.presentation.adapters
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.domain.entities.NewsItemEntity
 
 // DiffCallback для сравнения элементов списка новостей
 object NewsListDiffCallback: DiffUtil.ItemCallback<NewsItemEntity>() {

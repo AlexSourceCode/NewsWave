@@ -1,6 +1,6 @@
-package com.example.newswave.presentation.state
+package com.example.newswave.presentation.states
 
-import com.example.newswave.domain.entity.AuthorItemEntity
+import com.example.newswave.domain.entities.AuthorItemEntity
 
 /**
  * Представляет состояние пользовательского интерфейса для данных об авторах

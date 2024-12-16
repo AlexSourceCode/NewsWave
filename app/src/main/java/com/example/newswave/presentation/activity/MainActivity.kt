@@ -1,4 +1,4 @@
-package com.example.newswave.presentation
+package com.example.newswave.presentation.activity
 
 import android.content.Context
 import android.os.Bundle

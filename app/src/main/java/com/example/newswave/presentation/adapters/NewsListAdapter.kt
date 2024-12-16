@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newswave.R
 import com.example.newswave.databinding.NewsItemBinding
-import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.domain.entities.NewsItemEntity
 import com.example.newswave.utils.DateUtils
 import com.example.newswave.utils.NetworkUtils
 import com.example.newswave.utils.TextUtils

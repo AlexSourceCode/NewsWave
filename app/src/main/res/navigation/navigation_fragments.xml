@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_news_details">
         <argument
             android:name="news"
-            app:argType="com.example.newswave.domain.entity.NewsItemEntity" />
+            app:argType="com.example.newswave.domain.entities.NewsItemEntity" />
         <argument
             android:name="author"
             app:argType="string"
@@ -59,7 +59,7 @@
         tools:layout="@layout/fragment_news_details">
         <argument
             android:name="news"
-            app:argType="com.example.newswave.domain.entity.NewsItemEntity" />
+            app:argType="com.example.newswave.domain.entities.NewsItemEntity" />
         <argument
             android:name="author"
             app:argType="string"

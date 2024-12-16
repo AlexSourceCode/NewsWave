@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newswave.R
 import com.example.newswave.databinding.AuthorItemBinding
-import com.example.newswave.domain.entity.AuthorItemEntity
+import com.example.newswave.domain.entities.AuthorItemEntity
 import com.example.newswave.utils.StringUtils
 
 /**

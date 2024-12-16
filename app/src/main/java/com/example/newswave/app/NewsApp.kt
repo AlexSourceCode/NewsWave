@@ -4,9 +4,9 @@ import android.app.Application
 import android.content.Context
 import androidx.work.Configuration
 import com.example.newswave.data.source.local.UserPreferences
-import com.example.newswave.data.workers.RefreshDataWorkerFactory
+import com.example.newswave.data.worker.RefreshDataWorkerFactory
 import com.example.newswave.di.DaggerApplicationComponent
-import com.example.newswave.domain.repository.UserRepository
+import com.example.newswave.domain.repositories.UserRepository
 import com.example.newswave.utils.LanguageUtils
 import javax.inject.Inject
 

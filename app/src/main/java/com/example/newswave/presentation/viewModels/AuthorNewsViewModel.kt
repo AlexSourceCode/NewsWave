@@ -2,12 +2,12 @@ package com.example.newswave.presentation.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.domain.entity.NewsItemEntity
+import com.example.newswave.domain.entities.NewsItemEntity
 import com.example.newswave.domain.usecases.subscription.FavoriteAuthorCheckUseCase
 import com.example.newswave.domain.usecases.subscription.LoadAuthorNewsUseCase
 import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
-import com.example.newswave.presentation.state.AuthState
-import com.example.newswave.presentation.state.NewsState
+import com.example.newswave.presentation.states.AuthState
+import com.example.newswave.presentation.states.NewsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

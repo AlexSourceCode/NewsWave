@@ -22,11 +22,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.newswave.R
 import com.example.newswave.app.NewsApp
-import com.example.newswave.databinding.FragmentForgotPasswordBinding
 import com.example.newswave.databinding.FragmentNewsDetailsBinding
-import com.example.newswave.presentation.MainActivity
+import com.example.newswave.presentation.activity.MainActivity
 import com.example.newswave.presentation.adapters.CustomArrayAdapter
-import com.example.newswave.presentation.state.AuthState
+import com.example.newswave.presentation.states.AuthState
 import com.example.newswave.presentation.viewModels.NewsDetailsViewModel
 import com.example.newswave.presentation.viewModels.ViewModelFactory
 import com.example.newswave.utils.DateUtils
@@ -190,7 +189,6 @@ class NewsDetailsFragment : Fragment() {
                             handleLoggedInState()
                             launch { observeAuthorState() }
                         }
-
                         is AuthState.LoggedOut -> handleLoggedOutState()
                     }
                 }
@@ -249,8 +247,7 @@ class NewsDetailsFragment : Fragment() {
 
     // Наблюдение за состоянием автора
     private suspend fun observeAuthorState() {
-        viewModel.checkAuthorInRepository(args.news.author)
-        viewModel.authorState.collectLatest { isFavorite -> // возможно нужен запуск в launch
+        viewModel.authorState.collectLatest { isFavorite ->
             if (viewModel.isInternetConnection(requireContext())) {
                 if (isFavorite != null) {
                     updateSubscriptionButton(isFavorite)
