@@ -285,17 +285,21 @@ class TopNewsFragment : Fragment() {
 
     // Обработка состояния успешной загрузки
     private fun handleSuccessState(uiState: NewsState.Success) {
-        binding.pgNews.visibility = View.GONE
-        binding.tvErrorAvailableNews.visibility = View.GONE
-        binding.tvRetry.visibility = View.GONE
+        if (uiState.currentList.isEmpty()) {
+            showRetryOption { topNewsViewModel.refreshData() }
+        } else{
+            binding.pgNews.visibility = View.GONE
+            binding.tvErrorAvailableNews.visibility = View.GONE
+            binding.tvRetry.visibility = View.GONE
 
-        if (!adapter.shouldHideRetryButton) {
-            adapter.submitListWithLoadMore(uiState.currentList, null)
-            adapter.notifyDataSetChanged()
-        } else {
-            adapter.submitList(uiState.currentList) {
-                if (!topNewsViewModel.isInSearchMode.value)
-                    scrollToPosition(topNewsViewModel.savedPosition, topNewsViewModel.savedOffset)
+            if (!adapter.shouldHideRetryButton) {
+                adapter.submitListWithLoadMore(uiState.currentList, null)
+                adapter.notifyDataSetChanged()
+            } else {
+                adapter.submitList(uiState.currentList) {
+                    if (!topNewsViewModel.isInSearchMode.value)
+                        scrollToPosition(topNewsViewModel.savedPosition, topNewsViewModel.savedOffset)
+                }
             }
         }
     }
