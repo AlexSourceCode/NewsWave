@@ -25,8 +25,8 @@
         android:paddingEnd="36dp"
         android:text="@string/the_list_of_authors_is_empty_add_new_authors_to_see_them_here"
         android:textColor="@color/white"
-        android:textSize="24sp"
-        android:visibility="gone" />
+        android:textSize="20sp"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:id="@+id/textContainer"

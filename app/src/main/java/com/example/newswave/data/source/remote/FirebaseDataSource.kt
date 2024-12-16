@@ -8,11 +8,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseException
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -21,6 +23,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.util.concurrent.CancellationException
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -156,7 +160,8 @@ class FirebaseDataSource @Inject constructor(
             auth.createUserWithEmailAndPassword(email, password).await()
             val firebaseUser = auth.currentUser
             firebaseUser?.let {
-                usersReference.child(it.uid).setValue(user.copy(id = it.uid)).await()
+                usersReference.child(firebaseUser.uid).setValue(user.copy(id = firebaseUser.uid))
+                    .await()
             }
             Result.success(firebaseUser)
         } catch (e: Exception) {

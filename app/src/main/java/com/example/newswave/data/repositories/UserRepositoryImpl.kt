@@ -32,6 +32,7 @@ class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
 
     private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO) // Контекст для фоновых операций
+    private val testScope = CoroutineScope(SupervisorJob() + Dispatchers.IO) // Контекст для тестирования
 
     // Текущий авторизованный пользователь (Firebase)
     private var _user = MutableStateFlow<FirebaseUser?>(null)
@@ -114,17 +115,17 @@ class UserRepositoryImpl @Inject constructor(
             newsContent = DEFAULT_LANGUAGE,
             newsSourceCountry = DEFAULT_LANGUAGE
         )
-        firebaseDataSource.signUp(email, password, user)
-            .onSuccess { firebaseUser ->
-                _isUserDataUpdatedFlow.emit(Unit) // Уведомляем, что данные обновлены
-                localDataSource.deleteAllNews()
-                if (firebaseUser != null) {
-                    userPreferences.saveUserData(user.copy(id = firebaseUser.uid))
+            firebaseDataSource.signUp(email, password, user)
+                .onSuccess { firebaseUser ->
+                    _isUserDataUpdatedFlow.emit(Unit) // Уведомляем, что данные обновлены
+                    localDataSource.deleteAllNews()
+                    if (firebaseUser != null) {
+                        userPreferences.saveUserData(user.copy(id = firebaseUser.uid))
+                    }
                 }
-            }
-            .onFailure {
-                _signUpError.emit(it.message.toString())
-            }
+                .onFailure {
+                    _signUpError.emit(it.message.toString())
+                }
     }
 
     // Выход пользователя
