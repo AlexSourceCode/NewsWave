@@ -115,7 +115,6 @@ class SettingsFragment : Fragment() {
         }
         binding.tvLogout.setOnClickListener {
             viewModel.signOut()
-            restartWithNewLocale()
         }
         binding.llContentLanguage.setOnClickListener {
             val languageName = binding.tvContentLanguageValue.text.toString()
@@ -231,8 +230,8 @@ class SettingsFragment : Fragment() {
 
     // Перезапуск приложения с новой локалью
     private fun restartWithNewLocale() {
+        requireActivity().recreate()
         parentFragmentManager.setFragmentResult(REFRESH_REQUEST_KEY, Bundle.EMPTY)
-        requireActivity().recreate() // Перезапускает Activity, сохраняя состояние фрагментов.
     }
 
     // Метод для перехода к фрагменту входа в аккаунт

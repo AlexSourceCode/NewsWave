@@ -2,6 +2,7 @@ package com.example.newswave.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -73,14 +74,16 @@ class TopNewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeViewModel()
-        initializeUI()
         setupFragmentResultListener()
+        initializeUI()
+        setupClickListeners()
         (activity as MainActivity).setSelectedMenuItem(R.id.topNewsFragment)
     }
 
     // Настраивает слушатель для получения результата обновления данных от других фрагментов
     private fun setupFragmentResultListener() {
         parentFragmentManager.setFragmentResultListener(REFRESH_REQUEST_KEY, this) { _, _ ->
+            Log.d("TopNewsFragment", "setupFragmentResultListener")
             topNewsViewModel.refreshData()
         }
     }
@@ -93,7 +96,6 @@ class TopNewsFragment : Fragment() {
         selectedFilter = getString(Filter.TEXT.descriptionResId)
         setupSearchListener()
         handleBackNavigation()
-        setupClickListeners()
         setupSwipeRefresh()
     }
 
@@ -112,8 +114,10 @@ class TopNewsFragment : Fragment() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     if (topNewsViewModel.isInSearchMode.value) {
+                        Log.d("TopNewsFragment", "refreshEvent: !isInSearchMode")
                         exitSearchMode()
                     } else {
+                        Log.d("TopNewsFragment", "refreshEvent: isInSearchMode")
                         // Обычное поведение кнопки "Назад"
                         isEnabled = false
                         requireActivity().onBackPressed()
@@ -207,12 +211,17 @@ class TopNewsFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     topNewsViewModel.uiState.collect { uiState ->
+                        Log.d("TopNewsFragment", "Received UI state: uiState")
                         handleUiState(uiState)
                     }
                 }
                 launch {
-                    sessionViewModel.refreshEvent.collect {
-                        topNewsViewModel.refreshData()
+                    sessionViewModel.refreshEvent.collect { shouldRefresh ->
+                        Log.d("TopNewsFragment", "refreshEvent: $shouldRefresh")
+                        if (shouldRefresh) {
+                            topNewsViewModel.refreshData()
+                            sessionViewModel.resetRefreshEvent()
+                        }
                     }
                 }
             }
@@ -287,7 +296,7 @@ class TopNewsFragment : Fragment() {
     private fun handleSuccessState(uiState: NewsState.Success) {
         if (uiState.currentList.isEmpty()) {
             showRetryOption { topNewsViewModel.refreshData() }
-        } else{
+        } else {
             binding.pgNews.visibility = View.GONE
             binding.tvErrorAvailableNews.visibility = View.GONE
             binding.tvRetry.visibility = View.GONE
@@ -298,7 +307,10 @@ class TopNewsFragment : Fragment() {
             } else {
                 adapter.submitList(uiState.currentList) {
                     if (!topNewsViewModel.isInSearchMode.value)
-                        scrollToPosition(topNewsViewModel.savedPosition, topNewsViewModel.savedOffset)
+                        scrollToPosition(
+                            topNewsViewModel.savedPosition,
+                            topNewsViewModel.savedOffset
+                        )
                 }
             }
         }

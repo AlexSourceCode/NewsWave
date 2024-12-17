@@ -113,6 +113,7 @@ class AuthorNewsFragment : Fragment() {
         when (uiState) {
             is NewsState.Error -> {
                 showToast()
+                adapter.submitList(emptyList())
                 binding.pgNews.visibility = View.GONE
                 binding.tvRetry.visibility = View.VISIBLE
                 binding.swipeRefreshLayout.isRefreshing = false

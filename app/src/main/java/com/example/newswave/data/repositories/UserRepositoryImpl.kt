@@ -1,6 +1,5 @@
 package com.example.newswave.data.repositories
 
-import android.annotation.SuppressLint
 import android.util.Log
 import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.data.source.remote.FirebaseDataSource
@@ -32,7 +31,8 @@ class UserRepositoryImpl @Inject constructor(
     private val localDataSource: LocalDataSource // Локальный источник данных
 ) : UserRepository {
 
-    private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO) // Контекст для фоновых операций
+    private val ioScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.IO) // Контекст для фоновых операций
 
     // Текущий авторизованный пользователь (Firebase)
     private var _user = MutableStateFlow<FirebaseUser?>(null)
@@ -76,29 +76,33 @@ class UserRepositoryImpl @Inject constructor(
 
     // Сброс пароля для пользователя. Отправляет запрос в Firebase
     override suspend fun resetPassword(email: String) {
-        firebaseDataSource.resetPassword(email)
-            .onSuccess {
-                _isSuccess.emit(true)
-            }.onFailure {
-                _forgotPasswordError.emit(it.message.toString())
-            }
+        ioScope.launch {
+            firebaseDataSource.resetPassword(email)
+                .onSuccess {
+                    _isSuccess.emit(true)
+                }.onFailure {
+                    _forgotPasswordError.emit(it.message.toString())
+                }
+        }
     }
 
     // Вход пользователя по email и паролю
     // Успешный вход удаляет локальные данные и уведомляет о смене состояния
     override suspend fun signInByEmail(email: String, password: String) {
-        firebaseDataSource.signIn(email, password)
-            .onSuccess {
-                _isUserDataUpdatedFlow.emit(Unit)
-                localDataSource.deleteAllNews()
-            }.onFailure {
-                _signInError.emit(it.message.orEmpty())
-            }
+        ioScope.launch {
+            firebaseDataSource.signIn(email, password)
+                .onSuccess {
+                    localDataSource.deleteAllNews()
+                    _isUserDataUpdatedFlow.emit(Unit)
+//                    Log.d("UserRepositoryImpl", "signInByEmail _isUserDataUpdatedFlow")
+                }.onFailure {
+                    _signInError.emit(it.message.orEmpty())
+                }
+        }
     }
 
     // Регистрация нового пользователя
     // Создаёт пользователя в Firebase и сохраняет его данные локально
-    @SuppressLint("SuspiciousIndentation")
     override suspend fun signUpByEmail(
         username: String,
         email: String,
@@ -140,6 +144,7 @@ class UserRepositoryImpl @Inject constructor(
         userPreferences.clearUserData()
         _userData.emit(null)
         _user.value = null
+        _isUserDataUpdatedFlow.emit(Unit)
     }
 
     // Получение текущего языка контента
@@ -245,15 +250,17 @@ class UserRepositoryImpl @Inject constructor(
 
     // Загрузка данных пользователя из Firebase и их обновление локально
     private suspend fun updateUserData(userId: String) {
-        firebaseDataSource.fetchUserData(userId)
-            .onSuccess { userEntity ->
-                userEntity?.let {
-                    updateUserPreferences(it)
-                    _isUserDataUpdatedFlow.emit(Unit)
+        ioScope.launch {
+            firebaseDataSource.fetchUserData(userId)
+                .onSuccess { userEntity ->
+                    userEntity?.let {
+                        updateUserPreferences(it)
+                        _isUserDataUpdatedFlow.emit(Unit)
+                    }
+                }.onFailure { error ->
+                    Log.e("UserRepositoryImpl", "Failed to fetch user data: ${error.message}")
                 }
-            }.onFailure { error ->
-                Log.e("UserRepositoryImpl", "Failed to fetch user data: ${error.message}")
-            }
+        }
     }
 
     // Подписка на изменения состояния авторизации в Firebase

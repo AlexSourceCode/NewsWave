@@ -12,7 +12,6 @@ object LocaleHelper {
 
     const val SYSTEM_DEFAULT = "system"
 
-
     fun setLocale(context: Context, languageCode: String): Context { // languageCode тут в маленьком регистре
         val locale = if (languageCode == SYSTEM_DEFAULT) Locale(getSystemLanguage()) else Locale(languageCode)
         Locale.setDefault(locale)
@@ -21,9 +20,5 @@ object LocaleHelper {
         config.setLocale(locale)
         return context.createConfigurationContext(config)
     }
-
     fun getSystemLanguage(): String = Resources.getSystem().configuration.locales[0].language
-
-
-
 }
