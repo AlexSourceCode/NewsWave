@@ -40,11 +40,11 @@ class UserRepositoryImpl @Inject constructor(
 
     // Потоки ошибок для разных операций
     private val _signInError = MutableSharedFlow<String>()
-    private val signInError: SharedFlow<String> get() = _signInError
+    private val signInError: SharedFlow<String> get() = _signInError.asSharedFlow()
     private val _forgotPasswordError = MutableSharedFlow<String>()
-    private val forgotPasswordError: SharedFlow<String> get() = _forgotPasswordError
+    private val forgotPasswordError: SharedFlow<String> get() = _forgotPasswordError.asSharedFlow()
     private val _signUpError = MutableSharedFlow<String>()
-    private val signUpError: SharedFlow<String> get() = _signUpError
+    private val signUpError: SharedFlow<String> get() = _signUpError.asSharedFlow()
 
     // Данные пользователя
     private var _userData = MutableStateFlow<UserEntity?>(null)
@@ -56,14 +56,18 @@ class UserRepositoryImpl @Inject constructor(
 
     // Локальные настройки языка и страны
     private val _contentLanguage = MutableStateFlow<String>(getContentLanguage())
-    private val contentLanguage: StateFlow<String> = _contentLanguage
+    private val contentLanguage: StateFlow<String> = _contentLanguage.asStateFlow()
 
     private val _sourceCountry = MutableStateFlow<String>(getSourceCountry())
-    private val sourceCountry: StateFlow<String> = _sourceCountry
+    private val sourceCountry: StateFlow<String> = _sourceCountry.asStateFlow()
 
     // Поток для уведомления об обновлении данных пользователя
     private val _isUserDataUpdatedFlow = MutableSharedFlow<Unit>()
-    private val isUserDataUpdatedFlow: SharedFlow<Unit> = _isUserDataUpdatedFlow
+    private val isUserDataUpdatedFlow: SharedFlow<Unit> = _isUserDataUpdatedFlow.asSharedFlow()
+
+    private val _interfaceLanguage = MutableStateFlow<String>(getInterfaceLanguage())
+    private val interfaceLanguage: StateFlow<String> = _interfaceLanguage.asStateFlow()
+
 
     companion object {
         private const val DEFAULT_LANGUAGE = "ru"
@@ -190,6 +194,22 @@ class UserRepositoryImpl @Inject constructor(
         userPreferences.getUserData()?.copy(newsSourceCountry = country)?.let {
             updateUserPreferences(it)
         }
+    }
+
+    // Получение текущего языка интерфейса
+    override fun getInterfaceLanguage(): String {
+        return userPreferences.getInterfaceLanguage()
+    }
+
+    // Сохранение нового языка интерфейса
+    override suspend fun saveInterfaceLanguage(language: String) {
+        userPreferences.saveInterfaceLanguage(language)
+        _interfaceLanguage.value = language
+    }
+
+    // Поток для подписки на изменения интерфейсного языка
+    override fun fetchInterfaceLanguage(): StateFlow<String> {
+        return interfaceLanguage
     }
 
     // Асинхронно обновляет одно поле пользовательских данных в Firebase.

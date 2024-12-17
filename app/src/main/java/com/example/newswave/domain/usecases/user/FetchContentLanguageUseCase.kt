@@ -4,7 +4,7 @@ import com.example.newswave.domain.repositories.UserRepository
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
-class GetSourceCountryUseCase @Inject constructor(private val repository: UserRepository) {
+class FetchContentLanguageUseCase @Inject constructor(private val repository: UserRepository) {
 
-    operator fun invoke(): StateFlow<String> = repository.fetchSourceCountry()
+    operator fun invoke(): StateFlow<String> = repository.fetchContentLanguage()
 }

@@ -1,16 +1,16 @@
 package com.example.newswave.presentation.viewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.domain.entities.UserEntity
 import com.example.newswave.domain.usecases.user.ClearUserRepositoryUseCase
+import com.example.newswave.domain.usecases.user.FetchInterfaceLanguageUseCase
 import com.example.newswave.domain.usecases.user.FetchUserDataUseCase
-import com.example.newswave.domain.usecases.user.GetContentLanguageUseCase
-import com.example.newswave.domain.usecases.user.GetSourceCountryUseCase
+import com.example.newswave.domain.usecases.user.FetchContentLanguageUseCase
+import com.example.newswave.domain.usecases.user.FetchSourceCountryUseCase
 import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
 import com.example.newswave.domain.usecases.user.SaveContentLanguageUseCase
+import com.example.newswave.domain.usecases.user.SaveInterfaceLanguageUseCase
 import com.example.newswave.domain.usecases.user.SaveSourceCountryUseCase
 import com.example.newswave.domain.usecases.user.SignOutUseCase
 import com.google.firebase.auth.FirebaseUser
@@ -27,13 +27,14 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
     private val fetchUserDataUseCase: FetchUserDataUseCase,
-    private val userPreferences: UserPreferences,
-    private val getContentLanguageUseCase: GetContentLanguageUseCase,
+    private val fetchContentLanguageUseCase: FetchContentLanguageUseCase,
     private val saveContentLanguageUseCase: SaveContentLanguageUseCase,
-    private val getSourceCountryUseCase: GetSourceCountryUseCase,
+    private val fetchSourceCountryUseCase: FetchSourceCountryUseCase,
     private val saveSourceCountryUseCase: SaveSourceCountryUseCase,
     private val signOutUseCase: SignOutUseCase,
-    private val clearUserRepositoryUseCase: ClearUserRepositoryUseCase
+    private val clearUserRepositoryUseCase: ClearUserRepositoryUseCase,
+    private val saveInterfaceLanguageUseCase: SaveInterfaceLanguageUseCase,
+    private val fetchInterfaceLanguageUseCase: FetchInterfaceLanguageUseCase
 ) : ViewModel() {
 
     // Хранит текущее состояние авторизованного пользователя
@@ -53,10 +54,14 @@ class SettingsViewModel @Inject constructor(
     private val _sourceCountry = MutableStateFlow<String>("")
     val sourceCountry: StateFlow<String> = _sourceCountry
 
+    private val _interfaceLanguage = MutableStateFlow<String>("")
+    val interfaceLanguage: StateFlow<String> get() = _interfaceLanguage.asStateFlow()
+
     init {
         observeAuthState()
         initSourceCountry()
         initContentLanguage()
+        initInterfaceLanguage()
     }
 
     // Выполняет выход из учетной записи
@@ -66,14 +71,11 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    // Получение языка интерфейса
-    fun getInterfaceLanguage(): String {
-        return userPreferences.getInterfaceLanguage()
-    }
-
     // Сохранение нового языка интерфейса
     fun saveInterfaceLanguage(language: String) {
-        userPreferences.saveInterfaceLanguage(language)
+        viewModelScope.launch {
+            saveInterfaceLanguageUseCase(language)
+        }
     }
 
     // Сохранение языка контента
@@ -114,7 +116,7 @@ class SettingsViewModel @Inject constructor(
     // Инициализация языка контента из сохраненных настроек
     private fun initContentLanguage() {
         viewModelScope.launch {
-            getContentLanguageUseCase().collect {
+            fetchContentLanguageUseCase().collect {
                 _contentLanguage.value = it
             }
         }
@@ -123,8 +125,16 @@ class SettingsViewModel @Inject constructor(
     // Инициализация страны источника новостей из сохраненных настроек
     private fun initSourceCountry() {
         viewModelScope.launch {
-            getSourceCountryUseCase().collect {
+            fetchSourceCountryUseCase().collect {
                 _sourceCountry.value = it
+            }
+        }
+    }
+
+    private fun initInterfaceLanguage() {
+        viewModelScope.launch {
+            fetchInterfaceLanguageUseCase().collect {
+                _interfaceLanguage.value = it
             }
         }
     }

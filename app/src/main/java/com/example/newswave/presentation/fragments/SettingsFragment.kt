@@ -67,7 +67,6 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeViewModel()
         setupClickListeners()
-        updateInterfaceLanguageValue()
         (activity as MainActivity).setSelectedMenuItem(R.id.settingsFragment)
     }
 
@@ -121,7 +120,7 @@ class SettingsFragment : Fragment() {
             navigateToLanguageSelectionPopup(LanguageOption.CONTENT_LANGUAGE, languageName)
         }
         binding.llInterfaceLanguage.setOnClickListener {
-            val languageCode = viewModel.getInterfaceLanguage()
+            val languageCode = viewModel.interfaceLanguage.value.toString()
             val languageName =
                 LanguageUtils.getLanguageName(languageCode, LanguageUtils.interfaceMap)
 
@@ -147,6 +146,7 @@ class SettingsFragment : Fragment() {
                 launch { observeUserData() }
                 launch { observeContentLanguage() }
                 launch { observeSourceCountry()}
+                launch { observeInterfaceLanguage() }
             }
         }
     }
@@ -175,10 +175,7 @@ class SettingsFragment : Fragment() {
     private suspend fun observeContentLanguage(){
         viewModel.contentLanguage.collect { languageCode ->
             binding.tvContentLanguageValue.text =
-                LanguageUtils.getLanguageName(
-                    languageCode,
-                    languageMaps.contentLanguage
-                )
+                LanguageUtils.getLanguageName(languageCode, languageMaps.contentLanguage)
         }
     }
 
@@ -186,6 +183,12 @@ class SettingsFragment : Fragment() {
         viewModel.sourceCountry.collect { countryCode ->
             binding.tvNewsSourceCountryValue.text =
                 LanguageUtils.getLanguageName(countryCode, languageMaps.sourceCountry)
+        }
+    }
+    private suspend fun observeInterfaceLanguage(){
+        viewModel.interfaceLanguage.collect { languageCode ->
+            binding.tvInterfaceLanguageValue.text =
+                LanguageUtils.getLanguageName(languageCode, languageMaps.interfaceMap)
         }
     }
 
@@ -217,15 +220,6 @@ class SettingsFragment : Fragment() {
                 tvUsername.visibility = View.GONE
             }
         }
-    }
-
-    // Обновление значения языка интерфейса
-    private fun updateInterfaceLanguageValue() {
-        binding.tvInterfaceLanguageValue.text =
-            LanguageUtils.getLanguageName(
-                viewModel.getInterfaceLanguage(),
-                languageMaps.interfaceMap
-            )
     }
 
     // Перезапуск приложения с новой локалью

@@ -1,5 +1,6 @@
 package com.example.newswave.presentation.adapters
 
+import android.app.Application
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,18 +9,22 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newswave.R
+import com.example.newswave.data.source.local.UserPreferences
 import com.example.newswave.databinding.NewsItemBinding
 import com.example.newswave.domain.entities.NewsItemEntity
 import com.example.newswave.utils.DateUtils
 import com.example.newswave.utils.NetworkUtils
 import com.example.newswave.utils.TextUtils
 import com.squareup.picasso.Picasso
+import java.util.Locale
+import javax.inject.Inject
 
 /**
  * Адаптер для отображения списка новостей в RecyclerView
  */
-class NewsListAdapter(
-    private val context: Context
+class NewsListAdapter (
+    private val context: Context,
+    private val interfaceLanguage: String?
 ) : ListAdapter<NewsItemEntity, NewsListAdapter.NewsListViewHolder>(NewsListDiffCallback) {
 
     // Обработчик нажатия на новость
@@ -53,7 +58,9 @@ class NewsListAdapter(
                 // Устанавливает данные в соответствующие элементы UI
                 tvText.text = TextUtils.sentenceDivision(news.text)
                 tvTitle.text = news.title
-                tvDate.text = DateUtils.dateFormat(context, news.publishDate)
+
+                tvDate.text = DateUtils.dateFormat(context, news.publishDate, interfaceLanguage.toString())
+
 
                 // Загружает изображение, если есть доступ в интернет
                 try {

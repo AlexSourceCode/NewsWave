@@ -12,10 +12,12 @@ import com.example.newswave.domain.usecases.news.LoadNewsForPreviousDayUseCase
 import com.example.newswave.domain.usecases.news.SearchNewsByFilterUseCase
 import com.example.newswave.domain.usecases.news.SearchNewsByFilterUseCaseFactory
 import com.example.newswave.domain.usecases.subscription.FavoriteAuthorCheckUseCase
+import com.example.newswave.domain.usecases.user.FetchInterfaceLanguageUseCase
 import com.example.newswave.presentation.states.NewsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.take
@@ -33,7 +35,8 @@ class TopNewsViewModel @Inject constructor(
     private val searchNewsByFilterUseCaseFactory: SearchNewsByFilterUseCaseFactory,
     private val fetchErrorLoadDataUseCase: FetchErrorLoadDataUseCase,
     private val favoriteAuthorCheckUseCase: FavoriteAuthorCheckUseCase,
-    private val clearTopNewsRepositoryUseCase: ClearTopNewsRepositoryUseCase
+    private val clearTopNewsRepositoryUseCase: ClearTopNewsRepositoryUseCase,
+    private val fetchInterfaceLanguageUseCase: FetchInterfaceLanguageUseCase
 ) : ViewModel() {
 
     private lateinit var searchNewsByFilterUseCase: SearchNewsByFilterUseCase // Поздняя инициализация UseCase для поиска новостей
@@ -49,6 +52,9 @@ class TopNewsViewModel @Inject constructor(
     private val _isInSearchMode = MutableStateFlow(false)
     val isInSearchMode: StateFlow<Boolean> = _isInSearchMode.asStateFlow()
 
+    private val _interfaceLanguage = MutableStateFlow<String?>(null)
+    val interfaceLanguage: StateFlow<String?> get() = _interfaceLanguage.asStateFlow()
+
     var savedPosition: Int = 0
     var savedOffset: Int = 0
 
@@ -58,6 +64,7 @@ class TopNewsViewModel @Inject constructor(
         fetchTopNewsList()
         setupSearchTrigger()
         setupSearchArgs()
+        observeInterfaceLanguage()
     }
 
     // Обновляет параметры поиска и запускает поиск
@@ -190,6 +197,14 @@ class TopNewsViewModel @Inject constructor(
                     searchNewsByFilterUseCase =
                         searchNewsByFilterUseCaseFactory.create(args.first, args.second)
                 }
+        }
+    }
+
+    private fun observeInterfaceLanguage() {
+        viewModelScope.launch {
+            fetchInterfaceLanguageUseCase().collect {
+                _interfaceLanguage.value = it
+            }
         }
     }
 

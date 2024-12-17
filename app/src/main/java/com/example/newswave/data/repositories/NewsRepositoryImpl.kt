@@ -154,6 +154,10 @@ class NewsRepositoryImpl @Inject constructor(
         return filteredNewsSharedFlow
     }
 
+    override suspend fun getInterfaceLanguage(): String {
+        return userPreferences.getInterfaceLanguage()
+    }
+
     // Проверка доступности сети с отправкой ошибок при отсутствии соединения
     private suspend fun isNetworkAvailableWithError(): Boolean {
         return if (!isNetworkAvailable(application)) {
@@ -172,8 +176,8 @@ class NewsRepositoryImpl @Inject constructor(
     }
 
     // Получение типа фильтра
-    private fun getFilterType(filter: String): Filter {
-        val interfaceLanguage = userPreferences.getInterfaceLanguage()
+    private suspend fun getFilterType(filter: String): Filter {
+        val interfaceLanguage = getInterfaceLanguage()
         val localeContext = getLocalizedContext(interfaceLanguage)
 
         val map = mapOf(

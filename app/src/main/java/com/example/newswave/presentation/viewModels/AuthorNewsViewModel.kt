@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.newswave.domain.entities.NewsItemEntity
 import com.example.newswave.domain.usecases.subscription.FavoriteAuthorCheckUseCase
 import com.example.newswave.domain.usecases.subscription.LoadAuthorNewsUseCase
+import com.example.newswave.domain.usecases.user.FetchInterfaceLanguageUseCase
 import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
 import com.example.newswave.presentation.states.AuthState
 import com.example.newswave.presentation.states.NewsState
@@ -20,7 +21,8 @@ import javax.inject.Inject
 class AuthorNewsViewModel @Inject constructor(
     private val loadAuthorNewsUseCase: LoadAuthorNewsUseCase,
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
-    private val favoriteAuthorCheckUseCase: FavoriteAuthorCheckUseCase
+    private val favoriteAuthorCheckUseCase: FavoriteAuthorCheckUseCase,
+    private val fetchInterfaceLanguageUseCase: FetchInterfaceLanguageUseCase
 ) : ViewModel() {
 
     // Поток состояния UI, изначально в состоянии загрузки
@@ -31,8 +33,16 @@ class AuthorNewsViewModel @Inject constructor(
     private var _user = MutableStateFlow<AuthState>(AuthState.LoggedOut)
     val user: StateFlow<AuthState> get() = _user.asStateFlow()
 
+    private val _interfaceLanguage = MutableStateFlow<String?>(null)
+    val interfaceLanguage: StateFlow<String?> get() = _interfaceLanguage.asStateFlow()
+
     init {
         observeAuthState() // Запуск наблюдения за состоянием авторизации при создании ViewModel
+        viewModelScope.launch {
+            fetchInterfaceLanguageUseCase().collect{
+                _interfaceLanguage.value = it
+            }
+        }
     }
 
     // Обновляет данные новостей

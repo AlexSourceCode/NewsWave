@@ -76,7 +76,7 @@ class AuthorNewsFragment : Fragment() {
 
     // Настройка адаптера для RecyclerView
     private fun setupAdapter() {
-        adapter = NewsListAdapter(requireActivity().application)
+        adapter = NewsListAdapter(requireContext(), viewModel.interfaceLanguage.value)
         binding.rcNews.adapter = adapter
         adapter.shouldHideRetryButton = true
         adapter.onNewsClickListener = { news ->

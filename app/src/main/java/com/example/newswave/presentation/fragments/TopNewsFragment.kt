@@ -2,7 +2,6 @@ package com.example.newswave.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -83,7 +82,6 @@ class TopNewsFragment : Fragment() {
     // Настраивает слушатель для получения результата обновления данных от других фрагментов
     private fun setupFragmentResultListener() {
         parentFragmentManager.setFragmentResultListener(REFRESH_REQUEST_KEY, this) { _, _ ->
-            Log.d("TopNewsFragment", "setupFragmentResultListener")
             topNewsViewModel.refreshData()
         }
     }
@@ -114,10 +112,8 @@ class TopNewsFragment : Fragment() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     if (topNewsViewModel.isInSearchMode.value) {
-                        Log.d("TopNewsFragment", "refreshEvent: !isInSearchMode")
                         exitSearchMode()
                     } else {
-                        Log.d("TopNewsFragment", "refreshEvent: isInSearchMode")
                         // Обычное поведение кнопки "Назад"
                         isEnabled = false
                         requireActivity().onBackPressed()
@@ -192,7 +188,7 @@ class TopNewsFragment : Fragment() {
 
     // Настраивает адаптер для отображения списка новостей
     private fun setupAdapter() {
-        adapter = NewsListAdapter(requireActivity().application).apply {
+        adapter = NewsListAdapter(requireContext(), topNewsViewModel.interfaceLanguage.value).apply {
             onNewsClickListener = { launchNewsDetailsFragment(it) }
             onLoadMoreListener = {
                 if (!topNewsViewModel.isInSearchMode.value) {
@@ -211,13 +207,11 @@ class TopNewsFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     topNewsViewModel.uiState.collect { uiState ->
-                        Log.d("TopNewsFragment", "Received UI state: uiState")
                         handleUiState(uiState)
                     }
                 }
                 launch {
                     sessionViewModel.refreshEvent.collect { shouldRefresh ->
-                        Log.d("TopNewsFragment", "refreshEvent: $shouldRefresh")
                         if (shouldRefresh) {
                             topNewsViewModel.refreshData()
                             sessionViewModel.resetRefreshEvent()

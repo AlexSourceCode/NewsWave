@@ -105,7 +105,7 @@ class NewsDetailsFragment : Fragment() {
         with(binding) {
             tvText.text = args.news.text
             tvTitle.text = args.news.title
-            tvDate.text = DateUtils.dateFormat(requireActivity().application, args.news.publishDate)
+            tvDate.text = DateUtils.dateFormat(requireContext(), args.news.publishDate, viewModel.interfaceLanguage.value as String)
         }
     }
 

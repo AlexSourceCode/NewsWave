@@ -8,6 +8,7 @@ import com.example.newswave.domain.usecases.subscription.FavoriteAuthorCheckUseC
 import com.example.newswave.domain.usecases.subscription.IsFavoriteAuthorUseCase
 import com.example.newswave.domain.usecases.subscription.SubscribeToAuthorUseCase
 import com.example.newswave.domain.usecases.subscription.UnsubscribeFromAuthorUseCase
+import com.example.newswave.domain.usecases.user.FetchInterfaceLanguageUseCase
 import com.example.newswave.domain.usecases.user.ObserveAuthStateUseCase
 import com.example.newswave.presentation.states.AuthState
 import com.example.newswave.utils.NetworkUtils
@@ -29,8 +30,9 @@ class NewsDetailsViewModel @Inject constructor(
     private val unsubscribeFromAuthorUseCase: UnsubscribeFromAuthorUseCase,
     private val isFavoriteAuthorUseCase: IsFavoriteAuthorUseCase,
     private val observeAuthStateUseCase: ObserveAuthStateUseCase,
-    private val clearStateUseCase: ClearStateUseCase
-) : ViewModel() {
+    private val clearStateUseCase: ClearStateUseCase,
+    private val fetchInterfaceLanguageUseCase: FetchInterfaceLanguageUseCase
+    ) : ViewModel() {
 
     // Состояние подписки на автора
     private var _authorState = MutableStateFlow<Boolean?>(null)
@@ -40,8 +42,12 @@ class NewsDetailsViewModel @Inject constructor(
     private var _authState = MutableStateFlow<AuthState>(AuthState.LoggedOut)
     val authState: StateFlow<AuthState> get() = _authState.asStateFlow()
 
+    private val _interfaceLanguage = MutableStateFlow<String?>(null)
+    val interfaceLanguage: StateFlow<String?> get() = _interfaceLanguage.asStateFlow()
+
     init {
         observeAuthState()
+        observeInterfaceLanguage()
     }
 
     // Проверяет, добавлен ли автор в избранное
@@ -99,5 +105,12 @@ class NewsDetailsViewModel @Inject constructor(
     // Очищает состояния ViewModel
     fun clearState() {
         clearStateUseCase()
+    }
+    private fun observeInterfaceLanguage(){
+        viewModelScope.launch {
+            fetchInterfaceLanguageUseCase().collect{
+                _interfaceLanguage.value = it
+            }
+        }
     }
 }

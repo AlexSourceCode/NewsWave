@@ -65,4 +65,8 @@ interface UserRepository {
     // Очистить корутину, чтобы не было утечек памяти
     fun clear()
 
+    fun getInterfaceLanguage(): String
+    suspend fun saveInterfaceLanguage(language: String)
+    fun fetchInterfaceLanguage(): StateFlow<String>
+
 }
