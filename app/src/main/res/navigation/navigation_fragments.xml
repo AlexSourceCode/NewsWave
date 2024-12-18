@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_fragments"
+    app:startDestination="@id/topNewsFragment">
+
+    <fragment
+        android:id="@+id/newsDetailsFragment3"
+        android:name="com.example.newswave.presentation.fragments.NewsDetailsFragment"
+        android:label="fragment_news_details"
+        tools:layout="@layout/fragment_news_details">
+        <argument
+            android:name="news"
+            app:argType="com.example.newswave.domain.entities.NewsItemEntity" />
+        <argument
+            android:name="author"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="currentBottomItem"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/topNewsFragment"
+        android:name="com.example.newswave.presentation.fragments.TopNewsFragment"
+        android:label="fragment_top_news"
+        app:enterAnim="@anim/fade_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/fade_out"
+        tools:layout="@layout/fragment_top_news">
+        <action
+            android:id="@+id/action_topNewsFragment_to_newsDetailsFragment"
+            app:destination="@id/newsDetailsFragment"
+            app:popUpTo="@id/topNewsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/subscribedAuthorsFragment"
+        android:name="com.example.newswave.presentation.fragments.SubscribedAuthorsFragment"
+        android:label="fragment_subscribed_authors"
+        app:enterAnim="@anim/fade_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/fade_out"
+        tools:layout="@layout/fragment_subscribed_authors">
+        <action
+            android:id="@+id/action_subscribedAuthorsFragment_to_authorNewsFragment"
+            app:destination="@id/authorNewsFragment" />
+        <action
+            android:id="@+id/action_subscribedAuthorsFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/subscribedAuthorsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newsDetailsFragment"
+        android:name="com.example.newswave.presentation.fragments.NewsDetailsFragment"
+        android:label="fragment_news_details"
+        tools:layout="@layout/fragment_news_details">
+        <argument
+            android:name="news"
+            app:argType="com.example.newswave.domain.entities.NewsItemEntity" />
+        <argument
+            android:name="author"
+            app:argType="string"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_newsDetailsFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <argument
+            android:name="currentBottomItem"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.newswave.presentation.fragments.SettingsFragment"
+        android:label="fragment_settings"
+        app:enterAnim="@anim/fade_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/fade_out"
+        tools:layout="@layout/fragment_settings">
+        <action
+            android:id="@+id/action_settingsFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_languageBottomSheetFragment2"
+            app:destination="@id/languageBottomSheetFragment2" />
+        <argument
+            android:name="selectedLanguage"
+            android:defaultValue="System"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_settingsFragment_to_forgotPasswordFragment"
+            app:destination="@id/forgotPasswordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/authorNewsFragment"
+        android:name="com.example.newswave.presentation.fragments.AuthorNewsFragment"
+        android:label="fragment_author_news"
+        tools:layout="@layout/fragment_author_news">
+        <argument
+            android:name="author"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_authorNewsFragment_to_newsDetailsFragment3"
+            app:destination="@id/newsDetailsFragment3"
+            app:popUpTo="@id/authorNewsFragment" />
+        <argument
+            android:name="currentBottomItem"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.newswave.presentation.fragments.SignInFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_sign_in">
+        <action
+            android:id="@+id/action_loginFragment_to_registrationFragment"
+            app:destination="@id/registrationFragment"
+            app:popUpTo="@id/loginFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
+            app:destination="@id/forgotPasswordFragment"
+            app:launchSingleTop="false" />
+        <argument
+            android:name="currentBottomItem"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/registrationFragment"
+        android:name="com.example.newswave.presentation.fragments.RegistrationFragment"
+        android:label="fragment_registration"
+        tools:layout="@layout/fragment_registration">
+        <argument
+            android:name="currentBottomItem"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.example.newswave.presentation.fragments.ForgotPasswordFragment"
+        android:label="fragment_forgot_password"
+        tools:layout="@layout/fragment_forgot_password">
+        <argument
+            android:name="email"
+            app:argType="string" />
+        <argument
+            android:name="currentBottomItem"
+            app:argType="integer" />
+    </fragment>
+    <dialog
+        android:id="@+id/languageBottomSheetFragment2"
+        android:name="com.example.newswave.presentation.fragments.LanguageBottomSheetFragment"
+        android:label="popup_languages_settings"
+        tools:layout="@layout/popup_languages_settings">
+        <argument
+            android:name="LanguageOption"
+            app:argType="com.example.newswave.presentation.model.LanguageOption" />
+        <argument
+            android:name="LanguageValue"
+            app:argType="string" />
+    </dialog>
+</navigation>
